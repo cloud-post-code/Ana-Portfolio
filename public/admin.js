@@ -13,6 +13,152 @@ function showToast(message, type) {
   }, 3000);
 }
 
+/* ─── Job CRM: status ─────────────────────────────────────────────────── */
+function updateCrmJobStatus(selectEl) {
+  var id = selectEl.getAttribute('data-id');
+  var prev = '';
+  try {
+    prev = decodeURIComponent(selectEl.getAttribute('data-prev') || '');
+  } catch (e) {
+    prev = selectEl.getAttribute('data-prev') || '';
+  }
+  var next = selectEl.value;
+  if (next === prev) return;
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ st: next })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      selectEl.setAttribute('data-prev', encodeURIComponent(next));
+      showToast('Status updated', 'success');
+    })
+    .catch(function () {
+      showToast('Could not update status', 'error');
+      selectEl.value = prev;
+      if (selectEl.value !== prev) location.reload();
+    });
+}
+
+function updateCrmJobPriority(selectEl) {
+  var id = selectEl.getAttribute('data-id');
+  var prev = '';
+  try {
+    prev = decodeURIComponent(selectEl.getAttribute('data-prev') || '');
+  } catch (e) {
+    prev = selectEl.getAttribute('data-prev') || '';
+  }
+  var next = selectEl.value;
+  if (next === prev) return;
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pri: next })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      selectEl.setAttribute('data-prev', encodeURIComponent(next));
+      var row = selectEl.closest('tr');
+      if (row) row.setAttribute('data-pri', next);
+      var pc = ['high', 'medium', 'low'].indexOf(next.toLowerCase()) >= 0 ? next.toLowerCase() : 'other';
+      selectEl.className = 'admin__job-priority admin__job-priority--' + pc;
+      showToast('Priority updated', 'success');
+    })
+    .catch(function () {
+      showToast('Could not update priority', 'error');
+      selectEl.value = prev;
+      if (selectEl.value !== prev) location.reload();
+    });
+}
+
+/* ─── Job CRM: star / remove ──────────────────────────────────────────── */
+function toggleJobStar(btn) {
+  var id = btn.getAttribute('data-id');
+  var wasStarred = btn.getAttribute('data-starred') === '1';
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ starred: !wasStarred })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      showToast(wasStarred ? 'Removed from starred' : 'Starred', 'success');
+      setTimeout(function () { location.reload(); }, 400);
+    })
+    .catch(function () { showToast('Could not update star', 'error'); });
+}
+
+function downloadJobCoverLetter(id) {
+  fetch('/api/jobs-crm/' + encodeURIComponent(id) + '/cover-letter')
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      var disposition = res.headers.get('Content-Disposition') || '';
+      var m = /filename="([^"]+)"/.exec(disposition);
+      var fname = m && m[1] ? m[1] : 'cover-letter.txt';
+      return res.blob().then(function (blob) {
+        return { fname: fname, blob: blob };
+      });
+    })
+    .then(function (o) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(o.blob);
+      a.download = o.fname;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      showToast('Cover letter downloaded', 'success');
+    })
+    .catch(function () {
+      showToast('Could not generate cover letter', 'error');
+    });
+}
+
+function editJobCrmSkills(id) {
+  var raw = window.prompt('Comma-separated role skills (aligned with your experience — e.g. Campaign planning, Social content, Stakeholder comms):');
+  if (raw === null) return;
+  var skills = raw.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ skills: skills })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      showToast('Skills updated', 'success');
+      setTimeout(function () { location.reload(); }, 400);
+    })
+    .catch(function () { showToast('Could not save skills', 'error'); });
+}
+
+function deleteJobCrm(id) {
+  if (!confirm('Remove this job from your CRM list? This cannot be undone.')) return;
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), { method: 'DELETE' })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      showToast('Job removed from CRM', 'success');
+      setTimeout(function () { location.reload(); }, 500);
+    })
+    .catch(function () { showToast('Remove failed', 'error'); });
+}
+
 /* ─── Delete item from dashboard ──────────────────────────────────────── */
 function deleteItem(entity, id) {
   if (!confirm('Are you sure you want to delete this item?')) return;
@@ -297,4 +443,91 @@ function initDragAndDrop() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initDragAndDrop);
+/* ─── Job CRM: search + filters ─────────────────────────────────────── */
+function initJobCrmSearch() {
+  var input = document.getElementById('job-crm-search');
+  var tbody = document.getElementById('job-crm-tbody');
+  var countEl = document.getElementById('job-crm-search-count');
+  if (!tbody) return;
+
+  var rows = tbody.querySelectorAll('tr');
+  var total = rows.length;
+
+  var fPri = document.getElementById('job-crm-filter-pri');
+  var fSt = document.getElementById('job-crm-filter-st');
+  var fStar = document.getElementById('job-crm-filter-star');
+  var fRegion = document.getElementById('job-crm-filter-region');
+  var fTrack = document.getElementById('job-crm-filter-track');
+
+  function hayFor(tr) {
+    var raw = tr.getAttribute('data-job-crm-search') || '';
+    try {
+      return decodeURIComponent(raw).toLowerCase();
+    } catch (e) {
+      return raw.toLowerCase();
+    }
+  }
+
+  function apply() {
+    var q = input ? input.value.trim().toLowerCase() : '';
+    var terms = q.split(/\s+/).filter(Boolean);
+    var pri = fPri ? fPri.value : 'all';
+    var st = fSt ? fSt.value : 'all';
+    var star = fStar ? fStar.value : 'all';
+    var region = fRegion ? fRegion.value : 'all';
+    var track = fTrack ? fTrack.value : 'all';
+
+    var visible = 0;
+    rows.forEach(function (tr) {
+      var hay = hayFor(tr);
+      var okSearch = !terms.length || terms.every(function (t) {
+        return hay.indexOf(t) !== -1;
+      });
+
+      var rowPri = tr.getAttribute('data-pri') || '';
+      var okPri = pri === 'all' || rowPri === pri;
+
+      var rowSt = tr.getAttribute('data-st') || '';
+      var okSt = st === 'all' || rowSt === st;
+
+      var rowStar = tr.getAttribute('data-starred') === '1';
+      var okStar = star === 'all' ||
+        (star === 'starred' && rowStar) ||
+        (star === 'unstarred' && !rowStar);
+
+      var rowReg = tr.getAttribute('data-region') || '';
+      var okReg = region === 'all' || rowReg === region;
+
+      var tracksStr = tr.getAttribute('data-tracks') || '';
+      var okTrack = track === 'all' ||
+        (track === 'unclassified' && tracksStr.indexOf('unclassified') !== -1) ||
+        (track !== 'all' && track !== 'unclassified' && tracksStr.split(/\s+/).indexOf(track) !== -1);
+
+      var show = okSearch && okPri && okSt && okStar && okReg && okTrack;
+      tr.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+
+    if (countEl) {
+      var anyFilter = (pri !== 'all') || (st !== 'all') || (star !== 'all') || (region !== 'all') || (track !== 'all');
+      if (!q && !anyFilter) {
+        countEl.textContent = '';
+      } else {
+        countEl.textContent = visible + ' of ' + total;
+      }
+    }
+  }
+
+  if (input) {
+    input.addEventListener('input', apply);
+    input.addEventListener('search', apply);
+  }
+  [fPri, fSt, fStar, fRegion, fTrack].forEach(function (el) {
+    if (el) el.addEventListener('change', apply);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  initDragAndDrop();
+  initJobCrmSearch();
+});

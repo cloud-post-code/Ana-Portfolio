@@ -188,4 +188,96 @@ function crudRoutes(entityName, filename) {
 crudRoutes('experiences', 'experiences.json');
 crudRoutes('projects', 'projects.json');
 
+const JOBS_CRM_FILE = 'jobs-crm.json';
+const { generateCoverLetter, slugify: coverLetterFileSlug } = require('../lib/cover-letter');
+
+router.get('/jobs-crm/:id/cover-letter', (req, res) => {
+  let jobs;
+  try {
+    jobs = loadData(JOBS_CRM_FILE);
+  } catch (e) {
+    return res.status(404).send('Jobs CRM data not found');
+  }
+  const job = jobs.find(j => j.id === req.params.id);
+  if (!job) return res.status(404).send('Job not found');
+
+  let experiences = [];
+  try {
+    experiences = loadData('experiences.json').sort((a, b) => (a.order || 0) - (b.order || 0));
+  } catch (e) {
+    /* optional */
+  }
+
+  let profile = null;
+  try {
+    profile = loadData('job-search-profile.json');
+  } catch (e) {
+    /* optional */
+  }
+
+  const text = generateCoverLetter({ job, experiences, profile });
+  const filename = `Cover-letter-${coverLetterFileSlug(job.co)}.txt`;
+
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  res.setHeader('Content-Disposition', `attachment; filename="${filename.replace(/"/g, '')}"`);
+  res.send(text);
+});
+
+router.patch('/jobs-crm/:id', (req, res) => {
+  let data;
+  try {
+    data = loadData(JOBS_CRM_FILE);
+  } catch (e) {
+    return res.status(404).json({ error: 'Jobs CRM data not found' });
+  }
+  const idx = data.findIndex(j => j.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Job not found' });
+  let changed = false;
+  if (typeof req.body.starred === 'boolean') {
+    data[idx].starred = req.body.starred;
+    changed = true;
+  }
+  if (req.body.st !== undefined) {
+    const st = String(req.body.st).trim().slice(0, 120);
+    if (!st) return res.status(400).json({ error: 'st cannot be empty' });
+    data[idx].st = st;
+    changed = true;
+  }
+  if (req.body.skills !== undefined) {
+    if (!Array.isArray(req.body.skills)) {
+      return res.status(400).json({ error: 'skills must be an array of strings' });
+    }
+    data[idx].skills = req.body.skills
+      .map(s => String(s).trim().slice(0, 100))
+      .filter(Boolean)
+      .slice(0, 25);
+    changed = true;
+  }
+  if (req.body.pri !== undefined) {
+    const pri = String(req.body.pri).trim().slice(0, 40);
+    if (!pri) return res.status(400).json({ error: 'pri cannot be empty' });
+    data[idx].pri = pri;
+    changed = true;
+  }
+  if (!changed) {
+    return res.status(400).json({ error: 'Provide starred, st, skills, and/or pri' });
+  }
+  saveData(JOBS_CRM_FILE, data);
+  res.json(data[idx]);
+});
+
+router.delete('/jobs-crm/:id', (req, res) => {
+  let data;
+  try {
+    data = loadData(JOBS_CRM_FILE);
+  } catch (e) {
+    return res.status(404).json({ error: 'Jobs CRM data not found' });
+  }
+  const idx = data.findIndex(j => j.id === req.params.id);
+  if (idx === -1) return res.status(404).json({ error: 'Job not found' });
+  data.splice(idx, 1);
+  saveData(JOBS_CRM_FILE, data);
+  res.json({ success: true });
+});
+
 module.exports = router;

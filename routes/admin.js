@@ -2,6 +2,13 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const { CRM_JOB_STATUSES } = require('./crm-constants');
+const {
+  regionFromLoc,
+  tracksForJob,
+  TRACK_DEFS,
+  buildConnectionSuggestions
+} = require('./job-crm-helpers');
 
 function loadJSON(filename) {
   return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', filename), 'utf8'));
@@ -11,12 +18,49 @@ router.get('/', (req, res) => {
   const experiences = loadJSON('experiences.json').sort((a, b) => a.order - b.order);
   const projects = loadJSON('projects.json').sort((a, b) => a.order - b.order);
   let jobsCrm = [];
+  let starredJobCount = 0;
   try {
-    jobsCrm = loadJSON('jobs-crm.json');
+    const raw = loadJSON('jobs-crm.json');
+    const starred = [];
+    const rest = [];
+    raw.forEach(function (j) {
+      if (j.starred) starred.push(j);
+      else rest.push(j);
+    });
+    starredJobCount = starred.length;
+    jobsCrm = starred.concat(rest);
   } catch (e) {
     /* optional data file */
   }
-  res.render('admin/dashboard', { experiences, projects, jobsCrm });
+
+  let jobSearchProfile = null;
+  try {
+    jobSearchProfile = loadJSON('job-search-profile.json');
+  } catch (e) {
+    /* optional */
+  }
+
+  const crmJobRows = jobsCrm.map(function (job) {
+    return {
+      job,
+      region: regionFromLoc(job.loc),
+      tracks: tracksForJob(job)
+    };
+  });
+
+  const connectionSuggestions = buildConnectionSuggestions(experiences, jobsCrm);
+
+  res.render('admin/dashboard', {
+    experiences,
+    projects,
+    jobsCrm,
+    crmJobRows,
+    starredJobCount,
+    crmStatusOptions: CRM_JOB_STATUSES,
+    crmTrackOptions: TRACK_DEFS,
+    jobSearchProfile,
+    connectionSuggestions
+  });
 });
 
 router.get('/experiences/new', (req, res) => {

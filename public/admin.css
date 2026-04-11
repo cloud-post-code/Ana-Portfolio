@@ -183,6 +183,12 @@ body.admin {
   padding: 0.375rem 0.75rem;
 }
 
+.admin__btn--tiny {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  margin-top: 0.35rem;
+}
+
 .admin__btn--large {
   font-size: 1rem;
   padding: 0.75rem 2rem;
@@ -510,7 +516,254 @@ body.admin {
   background: var(--admin-danger);
 }
 
+/* ─── Job CRM profile & connections ─────────────────────────────────── */
+.admin__crm-profile {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin__crm-profile__title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.admin__crm-profile__summary {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--admin-text);
+  margin-bottom: 1rem;
+}
+
+.admin__crm-profile__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem 1.5rem;
+}
+
+.admin__crm-profile__label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--admin-text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.admin__crm-profile__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.admin__crm-profile__list--tags {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.admin__crm-profile__inline {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.admin__crm-profile__file-hint {
+  margin: 1rem 0 0;
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+}
+
+.admin__tag--emph {
+  background: rgba(220, 75, 116, 0.12);
+  border-color: rgba(220, 75, 116, 0.35);
+  color: var(--admin-text);
+  font-weight: 500;
+}
+
+.admin__tag--skill {
+  background: #f0f7f4;
+  border-color: #c5ddd2;
+  color: #1a4d3a;
+}
+
+.admin__crm-connections {
+  margin-bottom: 1.5rem;
+}
+
+.admin__crm-connections__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.admin__crm-connections__lead {
+  font-size: 0.85rem;
+  color: var(--admin-text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.admin__crm-connections__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.admin__crm-connections__card {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  padding: 1rem 1.1rem;
+}
+
+.admin__crm-connections__exp {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+}
+
+.admin__crm-connections__meta {
+  font-size: 0.8rem;
+  color: var(--admin-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.admin__crm-connections__skills-label {
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.admin__crm-connections__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.65rem;
+}
+
+.admin__crm-connections__matches {
+  margin: 0;
+  padding-left: 1rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.admin__crm-connections__matches li {
+  margin-bottom: 0.35rem;
+}
+
+.admin__crm-connections__score {
+  font-size: 0.72rem;
+  color: var(--admin-text-muted);
+  margin-left: 0.35rem;
+}
+
+.admin__crm-connections__link {
+  font-size: 0.78rem;
+  margin-left: 0.35rem;
+  color: var(--admin-accent);
+  font-weight: 600;
+}
+
 /* ─── Job CRM ──────────────────────────────────────────────────────────── */
+.admin__jobs-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 0;
+}
+
+.admin__jobs-toolbar--filters {
+  align-items: flex-end;
+}
+
+.admin__jobs-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.5rem 0.65rem;
+  width: 100%;
+  margin-bottom: 0.35rem;
+}
+
+.admin__jobs-filter-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-text-muted);
+  margin-right: -0.35rem;
+}
+
+.admin__jobs-filter-select {
+  padding: 0.4rem 0.5rem;
+  font-family: var(--admin-font);
+  font-size: 0.78rem;
+  color: var(--admin-text);
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  max-width: 11rem;
+}
+
+.admin__jobs-filter-select:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+}
+
+.admin__jobs-search-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+}
+
+.admin__jobs-search-input {
+  flex: 1;
+  min-width: 12rem;
+  max-width: 28rem;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--admin-font);
+  font-size: 0.9rem;
+  color: var(--admin-text);
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+}
+
+.admin__jobs-search-input::placeholder {
+  color: var(--admin-text-muted);
+  opacity: 0.85;
+}
+
+.admin__jobs-search-input:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+}
+
+.admin__jobs-search-count {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--admin-accent);
+  min-height: 1.2em;
+}
+
+.admin__jobs-search-hint {
+  width: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+}
+
 .admin__section-lead {
   font-size: 0.9rem;
   color: var(--admin-text-muted);
@@ -560,6 +813,150 @@ body.admin {
 
 .admin__jobs-table tbody tr:hover {
   background: rgba(220, 75, 116, 0.04);
+}
+
+.admin__jobs-th-star {
+  width: 2.5rem;
+  text-align: center;
+}
+
+.admin__jobs-star-cell {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.admin__job-star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--admin-text-muted);
+  transition: background 0.15s, color 0.15s, transform 0.12s;
+}
+
+.admin__job-star:hover {
+  background: rgba(220, 75, 116, 0.12);
+  color: var(--admin-accent);
+}
+
+.admin__job-star--on {
+  color: #c9a227;
+}
+
+.admin__job-star--on:hover {
+  color: #a68518;
+}
+
+.admin__jobs-row--starred {
+  background: rgba(201, 162, 39, 0.06);
+}
+
+.admin__jobs-cover-cell {
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.admin__jobs-actions {
+  white-space: nowrap;
+}
+
+.admin__jobs-skills-cell {
+  min-width: 7rem;
+  max-width: 14rem;
+}
+
+.admin__jobs-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-bottom: 0.15rem;
+}
+
+.admin__jobs-skills--empty {
+  font-size: 0.85rem;
+}
+
+.admin__jobs-status-cell {
+  min-width: 9.5rem;
+}
+
+.admin__job-status {
+  width: 100%;
+  max-width: 11rem;
+  padding: 0.35rem 0.5rem;
+  font-family: var(--admin-font);
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--admin-text);
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.admin__job-status:hover {
+  border-color: rgba(220, 75, 116, 0.45);
+}
+
+.admin__job-status:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+}
+
+.admin__jobs-pri-cell {
+  min-width: 6.5rem;
+}
+
+.admin__job-priority {
+  width: 100%;
+  max-width: 8.5rem;
+  padding: 0.35rem 0.45rem;
+  font-family: var(--admin-font);
+  font-size: 0.8rem;
+  font-weight: 600;
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  cursor: pointer;
+  line-height: 1.3;
+}
+
+.admin__job-priority--high {
+  background: #e1f5ee;
+  color: #0f6e56;
+  border-color: rgba(15, 110, 86, 0.35);
+}
+
+.admin__job-priority--medium {
+  background: #faeeda;
+  color: #854f0b;
+  border-color: rgba(133, 79, 11, 0.35);
+}
+
+.admin__job-priority--low {
+  background: #f1efe8;
+  color: #5f5e5a;
+  border-color: rgba(95, 94, 90, 0.35);
+}
+
+.admin__job-priority--other {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+}
+
+.admin__job-priority:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
 }
 
 .admin__jobs-num {

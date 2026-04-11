@@ -4,14 +4,146 @@
   <div class="admin__section-header">
     <div>
       <h2>Job CRM</h2>
-      <p class="admin__section-lead">Roles you are tracking (<%= (jobsCrm || []).length %> listings)</p>
+      <p class="admin__section-lead">Roles you are tracking (<%= (jobsCrm || []).length %> listings<% if (typeof starredJobCount !== 'undefined' && starredJobCount) { %>, <strong><%= starredJobCount %> starred</strong><% } %>)</p>
     </div>
   </div>
-  <% if ((jobsCrm || []).length) { %>
+
+  <% if (typeof jobSearchProfile !== 'undefined' && jobSearchProfile) { %>
+  <div class="admin__crm-profile">
+    <h3 class="admin__crm-profile__title"><%= jobSearchProfile.headline || 'What you are looking for' %></h3>
+    <% if (jobSearchProfile.summary) { %>
+    <p class="admin__crm-profile__summary"><%= jobSearchProfile.summary %></p>
+    <% } %>
+    <div class="admin__crm-profile__grid">
+      <% if (jobSearchProfile.keyDetails && jobSearchProfile.keyDetails.length) { %>
+      <div class="admin__crm-profile__block">
+        <h4 class="admin__crm-profile__label">Key details</h4>
+        <ul class="admin__crm-profile__list">
+          <% jobSearchProfile.keyDetails.forEach(function (line) { %>
+          <li><%= line %></li>
+          <% }); %>
+        </ul>
+      </div>
+      <% } %>
+      <% if (jobSearchProfile.targetSkillsToUse && jobSearchProfile.targetSkillsToUse.length) { %>
+      <div class="admin__crm-profile__block">
+        <h4 class="admin__crm-profile__label">Skills you want to use next</h4>
+        <ul class="admin__crm-profile__list admin__crm-profile__list--tags">
+          <% jobSearchProfile.targetSkillsToUse.forEach(function (s) { %>
+          <li><span class="admin__tag admin__tag--emph"><%= s %></span></li>
+          <% }); %>
+        </ul>
+      </div>
+      <% } %>
+      <% if (jobSearchProfile.locationsPreferred && jobSearchProfile.locationsPreferred.length) { %>
+      <div class="admin__crm-profile__block">
+        <h4 class="admin__crm-profile__label">Locations</h4>
+        <p class="admin__crm-profile__inline"><%= jobSearchProfile.locationsPreferred.join(' · ') %></p>
+      </div>
+      <% } %>
+      <% if (jobSearchProfile.roleTypesPreferred && jobSearchProfile.roleTypesPreferred.length) { %>
+      <div class="admin__crm-profile__block">
+        <h4 class="admin__crm-profile__label">Role types</h4>
+        <p class="admin__crm-profile__inline"><%= jobSearchProfile.roleTypesPreferred.join(' · ') %></p>
+      </div>
+      <% } %>
+    </div>
+    <p class="admin__crm-profile__file-hint">Edit <code>data/job-search-profile.json</code> to update this section. The <code>applicant</code> block (name, email, phone, city) is used for cover letter downloads.</p>
+  </div>
+  <% } %>
+
+  <% if (typeof connectionSuggestions !== 'undefined' && connectionSuggestions && connectionSuggestions.length) { %>
+  <div class="admin__crm-connections">
+    <h3 class="admin__crm-connections__title">Potential connections (from your experience)</h3>
+    <p class="admin__crm-connections__lead">Roles that overlap your portfolio skills—use for outreach angles and coffee chats.</p>
+    <div class="admin__crm-connections__grid">
+      <% connectionSuggestions.forEach(function (block) { %>
+      <div class="admin__crm-connections__card">
+        <h4 class="admin__crm-connections__exp"><%= block.experienceTitle %></h4>
+        <p class="admin__crm-connections__meta"><%= block.experienceRole %> <% if (block.experienceCompany) { %>· <%= block.experienceCompany %><% } %></p>
+        <% if (block.topSkills && block.topSkills.length) { %>
+        <p class="admin__crm-connections__skills-label">Experience skills</p>
+        <div class="admin__crm-connections__chips">
+          <% block.topSkills.forEach(function (sk) { %>
+          <span class="admin__tag"><%= sk %></span>
+          <% }); %>
+        </div>
+        <% } %>
+        <ul class="admin__crm-connections__matches">
+          <% block.matches.forEach(function (m) { var j = m.job; %>
+          <li>
+            <strong><%= j.co %></strong> — <%= j.role %>
+            <span class="admin__crm-connections__score">match <%= m.score %></span>
+            <% if (j.url) { %>
+            <a href="<%= j.url %>" target="_blank" rel="noopener noreferrer" class="admin__crm-connections__link">Listing</a>
+            <% } %>
+          </li>
+          <% }); %>
+        </ul>
+      </div>
+      <% }); %>
+    </div>
+  </div>
+  <% } %>
+
+  <% if ((crmJobRows || []).length) { %>
+  <div class="admin__jobs-toolbar admin__jobs-toolbar--filters">
+    <div class="admin__jobs-filters">
+      <label class="admin__jobs-filter-label" for="job-crm-filter-pri">Priority</label>
+      <select id="job-crm-filter-pri" class="admin__jobs-filter-select" aria-label="Filter by priority">
+        <option value="all">All priorities</option>
+        <option value="High">High</option>
+        <option value="Medium">Medium</option>
+        <option value="Low">Low</option>
+      </select>
+      <label class="admin__jobs-filter-label" for="job-crm-filter-st">Status</label>
+      <select id="job-crm-filter-st" class="admin__jobs-filter-select" aria-label="Filter by status">
+        <option value="all">All statuses</option>
+        <% (crmStatusOptions || []).forEach(function (s) { %>
+        <option value="<%= s %>"><%= s %></option>
+        <% }); %>
+      </select>
+      <label class="admin__jobs-filter-label" for="job-crm-filter-star">Saved</label>
+      <select id="job-crm-filter-star" class="admin__jobs-filter-select" aria-label="Filter starred">
+        <option value="all">All rows</option>
+        <option value="starred">Starred only</option>
+        <option value="unstarred">Not starred</option>
+      </select>
+      <label class="admin__jobs-filter-label" for="job-crm-filter-region">Region</label>
+      <select id="job-crm-filter-region" class="admin__jobs-filter-select" aria-label="Filter by region">
+        <option value="all">All regions</option>
+        <option value="boston">Boston area / MA</option>
+        <option value="nyc">New York</option>
+        <option value="ri">Rhode Island</option>
+        <option value="remote">Remote / national</option>
+        <option value="other">Other</option>
+      </select>
+      <label class="admin__jobs-filter-label" for="job-crm-filter-track">Job type</label>
+      <select id="job-crm-filter-track" class="admin__jobs-filter-select" aria-label="Filter by job type track">
+        <option value="all">All types</option>
+        <% (crmTrackOptions || []).forEach(function (t) { %>
+        <option value="<%= t.id %>"><%= t.label %></option>
+        <% }); %>
+        <option value="unclassified">Unclassified</option>
+      </select>
+    </div>
+    <label class="admin__jobs-search-label" for="job-crm-search">Search</label>
+    <input
+      type="search"
+      id="job-crm-search"
+      class="admin__jobs-search-input"
+      placeholder="Company, role, location, status, tags, skills…"
+      autocomplete="off"
+      aria-describedby="job-crm-search-hint"
+    />
+    <span id="job-crm-search-count" class="admin__jobs-search-count" aria-live="polite"></span>
+    <p id="job-crm-search-hint" class="admin__jobs-search-hint">Filters combine with search. Words in search must all match.</p>
+  </div>
   <div class="admin__jobs-wrap">
     <table class="admin__jobs-table">
       <thead>
         <tr>
+          <th scope="col" class="admin__jobs-th-star" title="Star">★</th>
           <th scope="col">#</th>
           <th scope="col">Company</th>
           <th scope="col">Role</th>
@@ -19,12 +151,39 @@
           <th scope="col">Status</th>
           <th scope="col">Priority</th>
           <th scope="col">Tags</th>
+          <th scope="col">Role skills</th>
           <th scope="col">Listing</th>
+          <th scope="col">Cover letter</th>
+          <th scope="col">Actions</th>
         </tr>
       </thead>
-      <tbody>
-        <% (jobsCrm || []).forEach(function(job, idx) { %>
-        <tr>
+      <tbody id="job-crm-tbody">
+        <% (crmJobRows || []).forEach(function (row, idx) { var job = row.job; %>
+        <% var _crmSt = (job.st != null && String(job.st).trim() !== '') ? String(job.st).trim() : 'To Apply'; %>
+        <% var _crmKnown = (typeof crmStatusOptions !== 'undefined' && crmStatusOptions.indexOf(_crmSt) !== -1); %>
+        <% var _crmPri = (job.pri != null && String(job.pri).trim() !== '') ? String(job.pri).trim() : 'Medium'; %>
+        <% var _crmPriOpts = ['High', 'Medium', 'Low']; %>
+        <% var _crmPriKnown = _crmPriOpts.indexOf(_crmPri) !== -1; %>
+        <% var _crmPriClass = _crmPriKnown ? _crmPri.toLowerCase() : 'other'; %>
+        <% var _searchParts = [job.id, job.co, job.role, job.loc, _crmSt, job.pri, (job.tags || []).join(' '), (job.skills || []).join(' '), job.notes || '', job.url || '']; %>
+        <% var _searchBlob = _searchParts.filter(function (p) { return p != null && String(p).length; }).map(function (p) { return String(p); }).join(' '); %>
+        <tr class="<%= job.starred ? 'admin__jobs-row--starred' : '' %>"
+          data-job-crm-search="<%= encodeURIComponent(_searchBlob) %>"
+          data-pri="<%= _crmPri %>"
+          data-st="<%= _crmSt %>"
+          data-starred="<%= job.starred ? '1' : '0' %>"
+          data-region="<%= row.region %>"
+          data-tracks="<%= (row.tracks || []).join(' ') %>"
+        >
+          <td class="admin__jobs-star-cell">
+            <button type="button"
+              class="admin__job-star<%= job.starred ? ' admin__job-star--on' : '' %>"
+              data-id="<%= job.id %>"
+              data-starred="<%= job.starred ? '1' : '' %>"
+              onclick="toggleJobStar(this)"
+              aria-label="<%= job.starred ? 'Remove star' : 'Star job' %>"
+              title="<%= job.starred ? 'Unstar' : 'Star' %>"><%= job.starred ? '★' : '☆' %></button>
+          </td>
           <td class="admin__jobs-num"><%= idx + 1 %></td>
           <td class="admin__jobs-co"><%= job.co %></td>
           <td>
@@ -34,9 +193,37 @@
             <% } %>
           </td>
           <td><%= job.loc %></td>
-          <td><span class="admin__pill admin__pill--status"><%= job.st %></span></td>
-          <td>
-            <span class="admin__pill admin__pill--pri admin__pill--pri-<%= String(job.pri || '').toLowerCase() %>"><%= job.pri %></span>
+          <td class="admin__jobs-status-cell">
+            <select
+              class="admin__job-status"
+              data-id="<%= job.id %>"
+              data-prev="<%= encodeURIComponent(_crmSt) %>"
+              aria-label="Status for <%= job.co %>"
+              onchange="updateCrmJobStatus(this)"
+            >
+              <% if (!_crmKnown) { %>
+              <option value="<%= _crmSt %>" selected><%= _crmSt %></option>
+              <% } %>
+              <% (crmStatusOptions || ['To Apply']).forEach(function(s) { %>
+              <option value="<%= s %>"<%= _crmSt === s ? ' selected' : '' %>><%= s %></option>
+              <% }); %>
+            </select>
+          </td>
+          <td class="admin__jobs-pri-cell">
+            <select
+              class="admin__job-priority admin__job-priority--<%= _crmPriClass %>"
+              data-id="<%= job.id %>"
+              data-prev="<%= encodeURIComponent(_crmPri) %>"
+              aria-label="Priority for <%= job.co %>"
+              onchange="updateCrmJobPriority(this)"
+            >
+              <% if (!_crmPriKnown) { %>
+              <option value="<%= _crmPri %>" selected><%= _crmPri %></option>
+              <% } %>
+              <% _crmPriOpts.forEach(function (p) { %>
+              <option value="<%= p %>"<%= _crmPri === p ? ' selected' : '' %>><%= p %></option>
+              <% }); %>
+            </select>
           </td>
           <td>
             <div class="admin__jobs-tags">
@@ -45,12 +232,30 @@
               <% }); %>
             </div>
           </td>
+          <td class="admin__jobs-skills-cell">
+            <div class="admin__jobs-skills">
+              <% if ((job.skills || []).length) { %>
+              <% (job.skills || []).forEach(function (sk) { %>
+              <span class="admin__tag admin__tag--skill"><%= sk %></span>
+              <% }); %>
+              <% } else { %>
+              <span class="admin__text-muted admin__jobs-skills--empty">—</span>
+              <% } %>
+            </div>
+            <button type="button" class="admin__btn admin__btn--tiny admin__btn--outline" onclick="editJobCrmSkills('<%= job.id %>')">Edit skills</button>
+          </td>
           <td>
             <% if (job.url) { %>
             <a href="<%= job.url %>" class="admin__jobs-link" target="_blank" rel="noopener noreferrer">Open</a>
             <% } else { %>
             <span class="admin__text-muted">—</span>
             <% } %>
+          </td>
+          <td class="admin__jobs-cover-cell">
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Generate and download a .txt cover letter">Download letter</button>
+          </td>
+          <td class="admin__jobs-actions">
+            <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteJobCrm('<%= job.id %>')">Remove</button>
           </td>
         </tr>
         <% }); %>

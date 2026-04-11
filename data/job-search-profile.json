@@ -1,0 +1,34 @@
+{
+  "applicant": {
+    "fullName": "Ana Machuca",
+    "email": "",
+    "phone": "",
+    "cityState": ""
+  },
+  "headline": "What you're looking for",
+  "summary": "Full-time entry-level marketing roles with hands-on campaign, brand, and digital work—teams that value experimentation, clear metrics, and collaboration.",
+  "keyDetails": [
+    "Campaign and brand execution (not only pure paid-media trafficking)",
+    "Exposure to analytics, reporting, or testing—not solely creative-only",
+    "Employers in Greater Boston, NYC, or RI, or strong hybrid/remote with East Coast touchpoints",
+    "Mission-driven, premium consumer, or high-trust brands (CPG, hospitality, education, health)"
+  ],
+  "targetSkillsToUse": [
+    "Campaign planning & messaging",
+    "Social & short-form content",
+    "Stakeholder and partner communication",
+    "Reporting, dashboards, and test-and-learn mindset"
+  ],
+  "locationsPreferred": [
+    "Greater Boston / Cambridge",
+    "New York City",
+    "Rhode Island & Providence",
+    "Hybrid with regular in-person"
+  ],
+  "roleTypesPreferred": [
+    "Coordinator",
+    "Associate",
+    "Specialist",
+    "Analyst (marketing / growth)"
+  ]
+}
