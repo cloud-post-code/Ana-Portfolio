@@ -2,7 +2,8 @@
 # Docs: https://docs.railway.com/reference/config-as-code
 
 [build]
-builder = "nixpacks"
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "npm start"
