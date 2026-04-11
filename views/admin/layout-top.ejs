@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title><%= typeof adminTitle !== 'undefined' ? adminTitle + ' — ' : '' %>Portfolio Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/admin.css" />
+</head>
+<body class="admin">
+  <aside class="admin__sidebar">
+    <div class="admin__brand">
+      <a href="/admin">AM Admin</a>
+    </div>
+    <nav class="admin__nav">
+      <a href="/admin" class="admin__nav-link">Dashboard</a>
+      <a href="/admin/experiences/new" class="admin__nav-link">+ New Experience</a>
+      <a href="/admin/projects/new" class="admin__nav-link">+ New Project</a>
+      <hr class="admin__nav-divider" />
+      <a href="/" class="admin__nav-link admin__nav-link--muted" target="_blank">View Site &rarr;</a>
+    </nav>
+  </aside>
+  <main class="admin__main">
+    <header class="admin__header">
+      <h1 class="admin__page-title"><%= typeof adminTitle !== 'undefined' ? adminTitle : 'Dashboard' %></h1>
+    </header>
+    <div class="admin__content">

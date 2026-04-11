@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head', { pageTitle: item.title + ' — ' + (itemType === 'experience' ? 'Work Experience' : 'Project') + ' — Ana Machuca', pageDesc: item.description }) %>
+</head>
+<body class="page-detail">
+  <%- include('partials/nav', { isDetail: true }) %>
+
+  <main class="detail">
+    <div class="container">
+      <article>
+        <header class="detail__header">
+          <a href="/<%= itemType === 'experience' ? '#brands' : '#projects' %>" class="detail__back">&larr; Back to portfolio</a>
+
+          <% if (item.headerStyle === 'card') { %>
+          <div class="detail__header-brand">
+            <div class="brand-tile brand-tile--detail">
+              <span class="brand-tile__logo brand-tile__logo--img" aria-hidden="true">
+                <img src="/<%= item.logo %>" alt="" width="88" height="88" loading="lazy" />
+              </span>
+              <span class="brand-tile__name"><%= item.title %></span>
+              <span class="brand-tile__cta"><%= item.sectionLabel %></span>
+            </div>
+            <div class="detail__header-main">
+              <div class="detail__header-text">
+                <p class="section__label"><%= item.sectionLabel %></p>
+                <h1 class="detail__title"><%= item.title %></h1>
+              </div>
+              <div class="detail__header-desc reveal-blur">
+                <% if (item.subtitle) { %>
+                <div class="detail__header-inline">
+                  <p class="detail__subtitle"><%= item.subtitle %></p>
+                  <% if (item.meta) { %><p class="detail__meta"><%= item.meta %></p><% } %>
+                </div>
+                <% } %>
+                <p><%= item.description %></p>
+                <div class="detail__tags">
+                  <% item.skills.forEach(function(skill) { %>
+                  <span><%= skill %></span>
+                  <% }); %>
+                </div>
+                <% if (item.meta && !item.subtitle) { %><p class="detail__meta"><%= item.meta %></p><% } %>
+              </div>
+            </div>
+          </div>
+          <% } else { %>
+          <div class="detail__header-brand detail__header-brand--experience">
+            <div class="detail__header-logo<%= item.logoWide ? ' detail__header-logo--wide' : '' %>">
+              <img src="/<%= item.logo %>" alt="<%= item.title %> logo" width="<%= item.logoWide ? 240 : 120 %>" height="<%= item.logoWide ? 96 : 120 %>" loading="lazy" />
+            </div>
+            <div class="detail__header-text">
+              <p class="section__label"><%= item.sectionLabel %></p>
+              <h1 class="detail__title"><%= item.title %></h1>
+            </div>
+          </div>
+          <% } %>
+        </header>
+
+        <% if (item.headerStyle !== 'card') { %>
+        <section class="detail__summary reveal-blur" aria-label="<%= itemType === 'experience' ? 'Role' : 'Project' %> overview">
+          <p class="detail__lead"><%= item.description %></p>
+          <div class="detail__skills">
+            <h2 class="detail__skills-heading">Skills</h2>
+            <div class="detail__tags">
+              <% item.skills.forEach(function(skill) { %>
+              <span><%= skill %></span>
+              <% }); %>
+            </div>
+          </div>
+        </section>
+        <% } %>
+
+        <% item.deliverables.forEach(function(del) { %>
+        <section class="detail__deliverable reveal-blur" aria-labelledby="<%= del.id %>-heading">
+          <h2 id="<%= del.id %>-heading" class="detail__deliverable-title"><%= del.title %></h2>
+          <p class="detail__deliverable-desc"><%= del.description %></p>
+          <% if (del.media && del.media.length > 0) { %>
+          <div class="detail__gallery<%= del.galleryClass ? ' ' + del.galleryClass : '' %>">
+            <% del.media.forEach(function(m) { %>
+              <% if (m.type === 'image') { %>
+            <img src="/<%= m.src %>" alt="<%= m.alt %>" loading="lazy" />
+              <% } else if (m.type === 'video-hover') { %>
+            <div class="detail__video-hover">
+              <video class="detail__video-hover__media" muted playsinline loop preload="metadata" aria-label="<%= m.alt %>">
+                <source src="/<%= m.src %>" type="video/mp4" />
+              </video>
+            </div>
+              <% } else if (m.type === 'video-still') { %>
+            <video class="detail__slide-still" muted playsinline preload="metadata" disablePictureInPicture aria-label="<%= m.alt %>">
+              <source src="/<%= m.src %>" type="video/mp4" />
+            </video>
+              <% } %>
+            <% }); %>
+          </div>
+          <% } %>
+        </section>
+        <% }); %>
+
+        <div class="detail__body detail__body--wide reveal-blur" style="margin-top: clamp(2rem, 4vw, 3rem);">
+          <p><a href="/#contact" class="btn btn--primary">Contact me about a role</a></p>
+        </div>
+      </article>
+    </div>
+  </main>
+
+  <%- include('partials/footer') %>
+  <script src="/main.js"></script>
+</body>
+</html>

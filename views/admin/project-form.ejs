@@ -1,0 +1,151 @@
+<%- include('layout-top', { adminTitle: isNew ? 'New Project' : 'Edit: ' + item.title }) %>
+
+<form id="entityForm" class="admin__form" data-entity="projects" data-id="<%= isNew ? '' : item.id %>" data-is-new="<%= isNew %>">
+  <div class="admin__form-grid">
+    <div class="admin__form-group admin__form-group--full">
+      <label>Title</label>
+      <input type="text" name="title" value="<%= isNew ? '' : item.title %>" required />
+    </div>
+
+    <div class="admin__form-group">
+      <label>Section Label</label>
+      <input type="text" name="sectionLabel" value="<%= isNew ? 'Personal project' : item.sectionLabel %>" placeholder="Personal project" />
+    </div>
+
+    <div class="admin__form-group">
+      <label>Header Style</label>
+      <select name="headerStyle">
+        <option value="standard" <%= !isNew && item.headerStyle === 'standard' ? 'selected' : '' %>>Standard (logo + title)</option>
+        <option value="card" <%= !isNew && item.headerStyle === 'card' ? 'selected' : '' %>>Card (tile + description)</option>
+      </select>
+    </div>
+
+    <div class="admin__form-group admin__form-group--full">
+      <label>Description / Lead Text</label>
+      <textarea name="description" rows="3"><%= isNew ? '' : item.description %></textarea>
+    </div>
+
+    <div class="admin__form-group">
+      <label>Logo</label>
+      <div class="admin__file-input">
+        <input type="text" name="logo" value="<%= isNew ? '' : item.logo %>" placeholder="Path or upload" />
+        <input type="file" accept="image/*" onchange="uploadFile(this, 'logo')" />
+        <button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload</button>
+      </div>
+      <% if (!isNew && item.logo) { %>
+      <img src="/<%= item.logo %>" class="admin__preview-thumb" alt="Current logo" />
+      <% } %>
+    </div>
+
+    <div class="admin__form-group">
+      <label>Tile CSS Class (optional)</label>
+      <input type="text" name="tileClass" value="<%= isNew ? '' : (item.tileClass || '') %>" placeholder="e.g. brand-tile--wide-logo" />
+    </div>
+
+    <div class="admin__form-group">
+      <label>Subtitle (card style only)</label>
+      <input type="text" name="subtitle" value="<%= isNew ? '' : (item.subtitle || '') %>" placeholder="e.g. Strategy project" />
+    </div>
+
+    <div class="admin__form-group">
+      <label>Meta Text (card style only)</label>
+      <input type="text" name="meta" value="<%= isNew ? '' : (item.meta || '') %>" placeholder="e.g. Full case study coming soon" />
+    </div>
+
+    <div class="admin__form-group">
+      <label>Display Order</label>
+      <input type="number" name="order" value="<%= isNew ? '' : item.order %>" min="1" />
+    </div>
+
+    <div class="admin__form-group admin__form-group--full">
+      <label>Skills (comma-separated)</label>
+      <input type="text" name="skills" value="<%= isNew ? '' : (item.skills || []).join(', ') %>" placeholder="Skill 1, Skill 2, Skill 3" />
+    </div>
+
+    <div class="admin__form-group admin__form-group--check">
+      <label><input type="checkbox" name="hidden" <%= !isNew && item.hidden ? 'checked' : '' %> /> Hidden from public site</label>
+    </div>
+
+    <div class="admin__form-group admin__form-group--check">
+      <label><input type="checkbox" name="logoWide" <%= !isNew && item.logoWide ? 'checked' : '' %> /> Wide logo</label>
+    </div>
+  </div>
+
+  <!-- Deliverables / Sub-groups -->
+  <section class="admin__deliverables">
+    <div class="admin__section-header">
+      <h2>Sub-groups (Deliverables)</h2>
+      <button type="button" class="admin__btn admin__btn--primary" onclick="addDeliverable()">+ Add Sub-group</button>
+    </div>
+
+    <div id="deliverablesList">
+      <% if (!isNew && item.deliverables) { item.deliverables.forEach(function(del, dIdx) { %>
+      <div class="admin__deliverable" data-del-id="<%= del.id %>">
+        <div class="admin__deliverable-header">
+          <span class="admin__deliverable-drag" title="Drag to reorder">&#9776;</span>
+          <h3 class="admin__deliverable-label">Sub-group <%= dIdx + 1 %></h3>
+          <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="removeDeliverable(this)">Remove</button>
+        </div>
+        <div class="admin__form-grid">
+          <div class="admin__form-group admin__form-group--full">
+            <label>Title</label>
+            <input type="text" name="del_title" value="<%= del.title %>" />
+          </div>
+          <div class="admin__form-group admin__form-group--full">
+            <label>Description</label>
+            <textarea name="del_description" rows="2"><%= del.description %></textarea>
+          </div>
+          <div class="admin__form-group">
+            <label>Gallery CSS Class (optional)</label>
+            <input type="text" name="del_galleryClass" value="<%= del.galleryClass || '' %>" placeholder="e.g. detail__gallery--farout-social" />
+          </div>
+        </div>
+
+        <!-- Media items -->
+        <div class="admin__media-section">
+          <div class="admin__section-header">
+            <h4>Media</h4>
+            <div>
+              <input type="file" accept="image/*,video/*" multiple onchange="uploadMedia(this)" style="display:none" />
+              <button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload Files</button>
+              <button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="addMediaManual(this)">+ Add Manually</button>
+            </div>
+          </div>
+          <div class="admin__media-grid">
+            <% if (del.media) { del.media.forEach(function(m) { %>
+            <div class="admin__media-item">
+              <div class="admin__media-preview">
+                <% if (m.type === 'image') { %>
+                <img src="/<%= m.src %>" alt="<%= m.alt %>" />
+                <% } else { %>
+                <video src="/<%= m.src %>" muted></video>
+                <% } %>
+              </div>
+              <div class="admin__media-fields">
+                <select name="media_type">
+                  <option value="image" <%= m.type === 'image' ? 'selected' : '' %>>Image</option>
+                  <option value="video-hover" <%= m.type === 'video-hover' ? 'selected' : '' %>>Video (hover play)</option>
+                  <option value="video-still" <%= m.type === 'video-still' ? 'selected' : '' %>>Video (still frame)</option>
+                </select>
+                <input type="text" name="media_src" value="<%= m.src %>" placeholder="File path" />
+                <input type="text" name="media_alt" value="<%= m.alt %>" placeholder="Alt text" />
+              </div>
+              <button type="button" class="admin__media-remove" onclick="this.closest('.admin__media-item').remove()" title="Remove">&times;</button>
+            </div>
+            <% }); } %>
+          </div>
+        </div>
+      </div>
+      <% }); } %>
+    </div>
+  </section>
+
+  <div class="admin__form-actions">
+    <button type="submit" class="admin__btn admin__btn--primary admin__btn--large">
+      <%= isNew ? 'Create Project' : 'Save Changes' %>
+    </button>
+    <a href="/admin" class="admin__btn admin__btn--outline admin__btn--large">Cancel</a>
+  </div>
+</form>
+
+<%- include('layout-bottom') %>

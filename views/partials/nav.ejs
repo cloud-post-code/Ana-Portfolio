@@ -1,0 +1,17 @@
+<div class="scroll-progress" id="scrollProgress"></div>
+<nav class="nav" id="nav" aria-label="Primary">
+  <div class="nav__inner">
+    <a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '#hero' %>" class="nav__logo"><span class="nav__logo-mark">AM</span></a>
+    <button type="button" class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+      <span class="nav__toggle-box" aria-hidden="true"><span></span><span></span><span></span></span>
+    </button>
+    <ul class="nav__links" id="navLinks">
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#about">About</a></li>
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#brands">Brands</a></li>
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#experience">Work Experience</a></li>
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#projects">Projects</a></li>
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#strengths">Strengths</a></li>
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#contact" class="nav__cta">Hire me</a></li>
+    </ul>
+  </div>
+</nav>

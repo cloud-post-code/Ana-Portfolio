@@ -1,0 +1,563 @@
+[
+  {
+    "id": "exp-farout",
+    "slug": "far-out-ice-cream",
+    "title": "Far Out Ice Cream",
+    "sectionLabel": "Work experience",
+    "type": "Marketing Internship",
+    "role": "Marketing Intern",
+    "company": "Far Out Ice Cream — Cambridge, MA",
+    "dateRange": "November 2025 – Present",
+    "description": "Drove foot traffic and local engagement through pop-up activations, social campaigns, and community outreach—enhancing brand presence in Cambridge.",
+    "logo": "logos/FarOut.png?v=2",
+    "skills": [
+      "Pop-up activations",
+      "Community outreach",
+      "Social media content",
+      "Short-form video",
+      "Campaign analytics"
+    ],
+    "headerStyle": "standard",
+    "deliverables": [
+      {
+        "id": "farout-social",
+        "title": "Social Media Content",
+        "description": "Sample social media content created for Far Out Ice Cream.",
+        "galleryClass": "detail__gallery--farout-social",
+        "media": [
+          {
+            "type": "image",
+            "src": "assets/projects/farout/ColdGirls%20Eat%20Ice%20Cream.png",
+            "alt": "Far Out Ice Cream social media content"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/THIS%20OR%20THAT%20(5).mp4",
+            "alt": "This or That video proposal"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/THIS%20OR%20THAT%20(5)%20copy.mp4",
+            "alt": "This or That video proposal, second cut"
+          }
+        ]
+      },
+      {
+        "id": "farout-videos",
+        "title": "Social Media Video Proposals",
+        "description": "Short-form video content proposals for social media campaigns. Hover a tile to preview the video.",
+        "galleryClass": "",
+        "media": [
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/1.mp4",
+            "alt": "Video proposal slide 1 (still)"
+          },
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/2.mp4",
+            "alt": "Video proposal slide 2 (still)"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/3.mp4",
+            "alt": "Video proposal slide 3"
+          },
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/4.mp4",
+            "alt": "Video proposal slide 4 (still)"
+          },
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/5.mp4",
+            "alt": "Video proposal slide 5 (still)"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/6.mp4",
+            "alt": "Video proposal slide 6"
+          },
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/7.mp4",
+            "alt": "Video proposal slide 7 (still)"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/8.mp4",
+            "alt": "Video proposal slide 8"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/9.mp4",
+            "alt": "Video proposal slide 9"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/10.mp4",
+            "alt": "Video proposal slide 10"
+          },
+          {
+            "type": "video-hover",
+            "src": "assets/projects/farout/11.mp4",
+            "alt": "Video proposal slide 11"
+          },
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/12.mp4",
+            "alt": "Video proposal slide 12 (still)"
+          },
+          {
+            "type": "video-still",
+            "src": "assets/projects/farout/13.mp4",
+            "alt": "Video proposal slide 13 (still)"
+          }
+        ]
+      }
+    ],
+    "order": 1
+  },
+  {
+    "id": "exp-4goodvibes",
+    "slug": "4goodvibes-marketplace",
+    "title": "4GoodVibes Marketplace",
+    "sectionLabel": "Work experience",
+    "type": "Marketing Role",
+    "role": "Marketing Assistant",
+    "company": "4GoodVibes Marketplace — Boston, MA",
+    "dateRange": "May 2024 – September 2024",
+    "description": "Supported brand growth through research-driven campaigns and content creation strategies for a new e-commerce platform.",
+    "logo": "logos/4GV.png?v=2",
+    "skills": [
+      "Social campaigns",
+      "Email marketing",
+      "Jobs-to-be-Done research",
+      "Content strategy",
+      "E-commerce growth"
+    ],
+    "headerStyle": "standard",
+    "deliverables": [
+      {
+        "id": "4gv-materials",
+        "title": "Marketing Materials",
+        "description": "Marketing and promotional content created for 4GoodVibes Marketplace.",
+        "galleryClass": "",
+        "media": [
+          {
+            "type": "image",
+            "src": "assets/projects/4gv/Envelope (5.5 x 4.25 in).png",
+            "alt": "4GoodVibes envelope design"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/4gv/Untitled design.png",
+            "alt": "4GoodVibes promotional design"
+          }
+        ]
+      }
+    ],
+    "order": 2
+  },
+  {
+    "id": "exp-mainstreet",
+    "slug": "main-street",
+    "title": "Main Street",
+    "sectionLabel": "Work Experience",
+    "type": "Experience",
+    "role": "Main Street",
+    "company": "Details coming soon",
+    "dateRange": "",
+    "description": "Main Street Hult Prize pitch presentation - a comprehensive business plan and pitch deck for a social entrepreneurship initiative.",
+    "logo": "logos/Main St.png?v=2",
+    "skills": [
+      "Business Strategy",
+      "Social Impact",
+      "Pitch Deck"
+    ],
+    "subtitle": "Hult Prize Pitch",
+    "meta": "Social Entrepreneurship Competition",
+    "headerStyle": "card",
+    "deliverables": [
+      {
+        "id": "mainst-slides",
+        "title": "Pitch Presentation",
+        "description": "Complete Hult Prize pitch deck.",
+        "galleryClass": "",
+        "media": [
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/1.png",
+            "alt": "Main Street Hult Prize pitch, slide 1"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/2.png",
+            "alt": "Main Street Hult Prize pitch, slide 2"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/3.png",
+            "alt": "Main Street Hult Prize pitch, slide 3"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/4.png",
+            "alt": "Main Street Hult Prize pitch, slide 4"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/5.png",
+            "alt": "Main Street Hult Prize pitch, slide 5"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/6.png",
+            "alt": "Main Street Hult Prize pitch, slide 6"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/7.png",
+            "alt": "Main Street Hult Prize pitch, slide 7"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/8.png",
+            "alt": "Main Street Hult Prize pitch, slide 8"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/9.png",
+            "alt": "Main Street Hult Prize pitch, slide 9"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/10.png",
+            "alt": "Main Street Hult Prize pitch, slide 10"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/11.png",
+            "alt": "Main Street Hult Prize pitch, slide 11"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/12.png",
+            "alt": "Main Street Hult Prize pitch, slide 12"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/13.png",
+            "alt": "Main Street Hult Prize pitch, slide 13"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/14.png",
+            "alt": "Main Street Hult Prize pitch, slide 14"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/15.png",
+            "alt": "Main Street Hult Prize pitch, slide 15"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/16.png",
+            "alt": "Main Street Hult Prize pitch, slide 16"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/17.png",
+            "alt": "Main Street Hult Prize pitch, slide 17"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/18.png",
+            "alt": "Main Street Hult Prize pitch, slide 18"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/19.png",
+            "alt": "Main Street Hult Prize pitch, slide 19"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/20.png",
+            "alt": "Main Street Hult Prize pitch, slide 20"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/21.png",
+            "alt": "Main Street Hult Prize pitch, slide 21"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/22.png",
+            "alt": "Main Street Hult Prize pitch, slide 22"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/23.png",
+            "alt": "Main Street Hult Prize pitch, slide 23"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/24.png",
+            "alt": "Main Street Hult Prize pitch, slide 24"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/25.png",
+            "alt": "Main Street Hult Prize pitch, slide 25"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/26.png",
+            "alt": "Main Street Hult Prize pitch, slide 26"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/27.png",
+            "alt": "Main Street Hult Prize pitch, slide 27"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/28.png",
+            "alt": "Main Street Hult Prize pitch, slide 28"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/29.png",
+            "alt": "Main Street Hult Prize pitch, slide 29"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/30.png",
+            "alt": "Main Street Hult Prize pitch, slide 30"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/31.png",
+            "alt": "Main Street Hult Prize pitch, slide 31"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/32.png",
+            "alt": "Main Street Hult Prize pitch, slide 32"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/33.png",
+            "alt": "Main Street Hult Prize pitch, slide 33"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/34.png",
+            "alt": "Main Street Hult Prize pitch, slide 34"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/35.png",
+            "alt": "Main Street Hult Prize pitch, slide 35"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/36.png",
+            "alt": "Main Street Hult Prize pitch, slide 36"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/37.png",
+            "alt": "Main Street Hult Prize pitch, slide 37"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/38.png",
+            "alt": "Main Street Hult Prize pitch, slide 38"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/39.png",
+            "alt": "Main Street Hult Prize pitch, slide 39"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/40.png",
+            "alt": "Main Street Hult Prize pitch, slide 40"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/41.png",
+            "alt": "Main Street Hult Prize pitch, slide 41"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/42.png",
+            "alt": "Main Street Hult Prize pitch, slide 42"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/43.png",
+            "alt": "Main Street Hult Prize pitch, slide 43"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/44.png",
+            "alt": "Main Street Hult Prize pitch, slide 44"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/45.png",
+            "alt": "Main Street Hult Prize pitch, slide 45"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/46.png",
+            "alt": "Main Street Hult Prize pitch, slide 46"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/47.png",
+            "alt": "Main Street Hult Prize pitch, slide 47"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/48.png",
+            "alt": "Main Street Hult Prize pitch, slide 48"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/49.png",
+            "alt": "Main Street Hult Prize pitch, slide 49"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/50.png",
+            "alt": "Main Street Hult Prize pitch, slide 50"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/51.png",
+            "alt": "Main Street Hult Prize pitch, slide 51"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/52.png",
+            "alt": "Main Street Hult Prize pitch, slide 52"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/53.png",
+            "alt": "Main Street Hult Prize pitch, slide 53"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/54.png",
+            "alt": "Main Street Hult Prize pitch, slide 54"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/55.png",
+            "alt": "Main Street Hult Prize pitch, slide 55"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/56.png",
+            "alt": "Main Street Hult Prize pitch, slide 56"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/57.png",
+            "alt": "Main Street Hult Prize pitch, slide 57"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/58.png",
+            "alt": "Main Street Hult Prize pitch, slide 58"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/59.png",
+            "alt": "Main Street Hult Prize pitch, slide 59"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/60.png",
+            "alt": "Main Street Hult Prize pitch, slide 60"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/61.png",
+            "alt": "Main Street Hult Prize pitch, slide 61"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/62.png",
+            "alt": "Main Street Hult Prize pitch, slide 62"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/63.png",
+            "alt": "Main Street Hult Prize pitch, slide 63"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/64.png",
+            "alt": "Main Street Hult Prize pitch, slide 64"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/65.png",
+            "alt": "Main Street Hult Prize pitch, slide 65"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/66.png",
+            "alt": "Main Street Hult Prize pitch, slide 66"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/67.png",
+            "alt": "Main Street Hult Prize pitch, slide 67"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/68.png",
+            "alt": "Main Street Hult Prize pitch, slide 68"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/69.png",
+            "alt": "Main Street Hult Prize pitch, slide 69"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/70.png",
+            "alt": "Main Street Hult Prize pitch, slide 70"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/71.png",
+            "alt": "Main Street Hult Prize pitch, slide 71"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/72.png",
+            "alt": "Main Street Hult Prize pitch, slide 72"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/73.png",
+            "alt": "Main Street Hult Prize pitch, slide 73"
+          },
+          {
+            "type": "image",
+            "src": "assets/projects/mainst/74.png",
+            "alt": "Main Street Hult Prize pitch, slide 74"
+          }
+        ]
+      }
+    ],
+    "order": 3
+  }
+]

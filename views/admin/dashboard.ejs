@@ -1,0 +1,63 @@
+<%- include('layout-top', { adminTitle: 'Dashboard' }) %>
+
+<section class="admin__section">
+  <div class="admin__section-header">
+    <h2>Work Experience</h2>
+    <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">+ Add Experience</a>
+  </div>
+  <div class="admin__card-grid">
+    <% experiences.forEach(function(exp) { %>
+    <div class="admin__card">
+      <div class="admin__card-header">
+        <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
+        <div>
+          <h3 class="admin__card-title"><%= exp.title %></h3>
+          <p class="admin__card-sub"><%= exp.role || exp.type || 'Experience' %></p>
+        </div>
+      </div>
+      <p class="admin__card-desc"><%= exp.description.slice(0, 120) %><%= exp.description.length > 120 ? '...' : '' %></p>
+      <div class="admin__card-meta">
+        <span><%= (exp.deliverables || []).length %> sub-group(s)</span>
+        <span><%= (exp.skills || []).length %> skill(s)</span>
+      </div>
+      <div class="admin__card-actions">
+        <a href="/admin/experiences/<%= exp.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
+        <a href="/experience/<%= exp.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
+        <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('experiences', '<%= exp.id %>')">Delete</button>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</section>
+
+<section class="admin__section">
+  <div class="admin__section-header">
+    <h2>Projects</h2>
+    <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add Project</a>
+  </div>
+  <div class="admin__card-grid">
+    <% projects.forEach(function(proj) { %>
+    <div class="admin__card<%= proj.hidden ? ' admin__card--hidden' : '' %>">
+      <div class="admin__card-header">
+        <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
+        <div>
+          <h3 class="admin__card-title"><%= proj.title %></h3>
+          <p class="admin__card-sub"><%= proj.sectionLabel %><%= proj.hidden ? ' (Hidden)' : '' %></p>
+        </div>
+      </div>
+      <p class="admin__card-desc"><%= proj.description.slice(0, 120) %><%= proj.description.length > 120 ? '...' : '' %></p>
+      <div class="admin__card-meta">
+        <span><%= (proj.deliverables || []).length %> sub-group(s)</span>
+        <span><%= (proj.skills || []).length %> skill(s)</span>
+      </div>
+      <div class="admin__card-actions">
+        <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
+        <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
+        <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>
+      </div>
+    </div>
+    <% }); %>
+  </div>
+</section>
+
+<%- include('layout-bottom') %>

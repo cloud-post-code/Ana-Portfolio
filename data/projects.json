@@ -1,0 +1,183 @@
+[
+  {
+    "id": "proj-hult",
+    "slug": "hult",
+    "title": "Hult",
+    "sectionLabel": "Personal project",
+    "type": "",
+    "role": "",
+    "company": "",
+    "dateRange": "",
+    "description": "Academic project for Hult International Business School featuring branded graphics, social media content, and promotional materials.",
+    "logo": "logos/Hult.png?v=2",
+    "skills": ["Brand Strategy", "Graphic Design", "Social Media"],
+    "headerStyle": "standard",
+    "deliverables": [
+      {
+        "id": "hult-bah",
+        "title": "Boston Agent Hack",
+        "description": "Deliverables and documentation from the Boston Agent Hack.",
+        "galleryClass": "",
+        "media": [
+          { "type": "image", "src": "assets/projects/hult/1.png", "alt": "Boston Agent Hack, documentation page 1" },
+          { "type": "image", "src": "assets/projects/hult/3.png", "alt": "Boston Agent Hack, documentation page 3" },
+          { "type": "image", "src": "assets/projects/hult/4.png", "alt": "Boston Agent Hack, documentation page 4" },
+          { "type": "image", "src": "assets/projects/hult/5.png", "alt": "Boston Agent Hack, documentation page 5" },
+          { "type": "image", "src": "assets/projects/hult/Scheduale 2.png", "alt": "Boston Agent Hack schedule" }
+        ]
+      },
+      {
+        "id": "hult-stickers",
+        "title": "Stickers",
+        "description": "Orientation stickers for Hult.",
+        "galleryClass": "",
+        "media": [
+          { "type": "image", "src": "assets/projects/hult/Stickers Orientation.png", "alt": "Hult orientation stickers" }
+        ]
+      },
+      {
+        "id": "hult-fliers",
+        "title": "Fliers",
+        "description": "Event and seasonal promotional fliers and print pieces.",
+        "galleryClass": "",
+        "media": [
+          { "type": "image", "src": "assets/projects/hult/fundraiser even (Your Story).png", "alt": "Hult fundraiser event flier" },
+          { "type": "image", "src": "assets/projects/hult/Merry Christmas.png", "alt": "Hult holiday greeting flier" },
+          { "type": "image", "src": "assets/projects/hult/Copy of Merry Christmas.png", "alt": "Hult holiday greeting flier variant" },
+          { "type": "image", "src": "assets/projects/hult/Winter bookmarks .png", "alt": "Hult winter bookmarks" }
+        ]
+      }
+    ],
+    "order": 1
+  },
+  {
+    "id": "proj-madamecurie",
+    "slug": "madame-curie-school",
+    "title": "Madame Curie School",
+    "sectionLabel": "Personal project",
+    "type": "",
+    "role": "",
+    "company": "",
+    "dateRange": "",
+    "description": "A brand and marketing project centered on humanizing an educational institution through storytelling and visual identity.",
+    "logo": "assets/projects/madamecurie/logo.png",
+    "logoWide": true,
+    "skills": ["Visual Identity", "Storytelling", "Brand Development"],
+    "headerStyle": "standard",
+    "tileClass": "brand-tile--wide-logo",
+    "deliverables": [
+      {
+        "id": "madamecurie-docs",
+        "title": "Project Documentation",
+        "description": "Brand strategy and marketing documentation for Madame Curie School.",
+        "galleryClass": "",
+        "media": [
+          { "type": "image", "src": "assets/projects/madamecurie/Ana.png", "alt": "Madame Curie School documentation, page 1" },
+          { "type": "image", "src": "assets/projects/madamecurie/Ana (2).png", "alt": "Madame Curie School documentation, page 2" },
+          { "type": "image", "src": "assets/projects/madamecurie/Ana (3).png", "alt": "Madame Curie School documentation, page 3" },
+          { "type": "image", "src": "assets/projects/madamecurie/Ana (4).png", "alt": "Madame Curie School documentation, page 4" },
+          { "type": "image", "src": "assets/projects/madamecurie/Ana (5).png", "alt": "Madame Curie School documentation, page 5" },
+          { "type": "image", "src": "assets/projects/madamecurie/Ana (6).png", "alt": "Madame Curie School documentation, page 6" },
+          { "type": "image", "src": "assets/projects/madamecurie/Ana (7).png", "alt": "Madame Curie School documentation, page 7" }
+        ]
+      }
+    ],
+    "order": 2
+  },
+  {
+    "id": "proj-fletcher",
+    "slug": "fletcher",
+    "title": "The Fletcher School",
+    "sectionLabel": "Academic project",
+    "type": "",
+    "role": "",
+    "company": "",
+    "dateRange": "",
+    "description": "MGA \u00b7 Team 6 — coursework for The Fletcher School (Tufts University): a full written report and supporting slide deck developed with Team 6.",
+    "logo": "logos/Tufts_Fletcher_scSchool.png?v=2",
+    "skills": ["Research", "Strategy", "Presentation"],
+    "headerStyle": "standard",
+    "deliverables": [
+      {
+        "id": "fletcher-report",
+        "title": "Report",
+        "description": "MGA Fletcher Report — Team 6 (full document, page by page).",
+        "galleryClass": "",
+        "media": []
+      },
+      {
+        "id": "fletcher-slides",
+        "title": "Presentation",
+        "description": "MGA Fletcher Slides — Team 6.",
+        "galleryClass": "",
+        "media": [
+          { "type": "image", "src": "assets/projects/fletcher/1.png", "alt": "MGA Fletcher presentation slide, page 1" },
+          { "type": "image", "src": "assets/projects/fletcher/2.png", "alt": "MGA Fletcher presentation slide, page 2" },
+          { "type": "image", "src": "assets/projects/fletcher/3.png", "alt": "MGA Fletcher presentation slide, page 3" },
+          { "type": "image", "src": "assets/projects/fletcher/4.png", "alt": "MGA Fletcher presentation slide, page 4" },
+          { "type": "image", "src": "assets/projects/fletcher/5.png", "alt": "MGA Fletcher presentation slide, page 5" },
+          { "type": "image", "src": "assets/projects/fletcher/6.png", "alt": "MGA Fletcher presentation slide, page 6" },
+          { "type": "image", "src": "assets/projects/fletcher/7.png", "alt": "MGA Fletcher presentation slide, page 7" },
+          { "type": "image", "src": "assets/projects/fletcher/8.png", "alt": "MGA Fletcher presentation slide, page 8" },
+          { "type": "image", "src": "assets/projects/fletcher/9.png", "alt": "MGA Fletcher presentation slide, page 9" },
+          { "type": "image", "src": "assets/projects/fletcher/10.png", "alt": "MGA Fletcher presentation slide, page 10" },
+          { "type": "image", "src": "assets/projects/fletcher/11.png", "alt": "MGA Fletcher presentation slide, page 11" },
+          { "type": "image", "src": "assets/projects/fletcher/12.png", "alt": "MGA Fletcher presentation slide, page 12" },
+          { "type": "image", "src": "assets/projects/fletcher/13.png", "alt": "MGA Fletcher presentation slide, page 13" },
+          { "type": "image", "src": "assets/projects/fletcher/14.png", "alt": "MGA Fletcher presentation slide, page 14" },
+          { "type": "image", "src": "assets/projects/fletcher/15.png", "alt": "MGA Fletcher presentation slide, page 15" },
+          { "type": "image", "src": "assets/projects/fletcher/16.png", "alt": "MGA Fletcher presentation slide, page 16" },
+          { "type": "image", "src": "assets/projects/fletcher/17.png", "alt": "MGA Fletcher presentation slide, page 17" },
+          { "type": "image", "src": "assets/projects/fletcher/18.png", "alt": "MGA Fletcher presentation slide, page 18" },
+          { "type": "image", "src": "assets/projects/fletcher/19.png", "alt": "MGA Fletcher presentation slide, page 19" },
+          { "type": "image", "src": "assets/projects/fletcher/20.png", "alt": "MGA Fletcher presentation slide, page 20" },
+          { "type": "image", "src": "assets/projects/fletcher/21.png", "alt": "MGA Fletcher presentation slide, page 21" },
+          { "type": "image", "src": "assets/projects/fletcher/22.png", "alt": "MGA Fletcher presentation slide, page 22" },
+          { "type": "image", "src": "assets/projects/fletcher/23.png", "alt": "MGA Fletcher presentation slide, page 23" },
+          { "type": "image", "src": "assets/projects/fletcher/24.png", "alt": "MGA Fletcher presentation slide, page 24" },
+          { "type": "image", "src": "assets/projects/fletcher/25.png", "alt": "MGA Fletcher presentation slide, page 25" },
+          { "type": "image", "src": "assets/projects/fletcher/26.png", "alt": "MGA Fletcher presentation slide, page 26" },
+          { "type": "image", "src": "assets/projects/fletcher/27.png", "alt": "MGA Fletcher presentation slide, page 27" },
+          { "type": "image", "src": "assets/projects/fletcher/28.png", "alt": "MGA Fletcher presentation slide, page 28" }
+        ]
+      }
+    ],
+    "order": 3
+  },
+  {
+    "id": "proj-tufts",
+    "slug": "tufts",
+    "title": "Tufts",
+    "sectionLabel": "Personal project",
+    "type": "",
+    "role": "",
+    "company": "",
+    "dateRange": "",
+    "description": "This academic brand project showcases strategic thinking and creative execution applied to a real institutional challenge. Deeper case materials, deliverables, and outcomes will be added here shortly.",
+    "logo": "logos/Tufts_Fletcher_scSchool.png?v=2",
+    "skills": ["Brand Strategy", "Research", "Creative Direction"],
+    "headerStyle": "standard",
+    "hidden": true,
+    "deliverables": [],
+    "order": 4
+  },
+  {
+    "id": "proj-airbnb",
+    "slug": "airbnb",
+    "title": "Airbnb",
+    "sectionLabel": "Personal project",
+    "type": "",
+    "role": "",
+    "company": "",
+    "dateRange": "",
+    "description": "A strategy-focused project exploring brand positioning, consumer insights, and campaign ideation for one of the world's most recognized platforms. Frameworks, visuals, and recommendations will be published here when finalized.",
+    "logo": "logos/Airbnb.png?v=2",
+    "subtitle": "Strategy project",
+    "meta": "Full case study coming soon",
+    "skills": ["Campaign Ideation", "Consumer Insights", "Storytelling"],
+    "headerStyle": "card",
+    "hidden": true,
+    "deliverables": [],
+    "order": 5
+  }
+]

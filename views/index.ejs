@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <%- include('partials/head') %>
+</head>
+<body>
+  <%- include('partials/nav') %>
+
+  <!-- Hero -->
+  <section class="hero" id="hero">
+    <div class="hero__content">
+      <p class="hero__intro reveal-blur">Marketing Strategist &amp; Brand Storyteller</p>
+      <h1 class="hero__title">
+        <span class="hero__title-line"><span class="hero__title-inner">Ana</span></span>
+        <span class="hero__title-line hero__title-line--accent"><span class="hero__title-inner">Machuca</span></span>
+      </h1>
+      <p class="hero__tagline reveal-blur">If you're hiring for marketing or brand roles,<br />here's how I combine strategy, creativity, and storytelling to drive <em>measurable</em> results—so you can decide if I'm the right fit.</p>
+      <div class="hero__actions reveal-scale">
+        <a href="#contact" class="btn btn--primary">Contact me about a role</a>
+        <a href="#experience" class="btn btn--outline">Review experience &amp; work</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Skills marquee -->
+  <section class="marquee-strip" aria-label="Core marketing skills">
+    <div class="marquee" role="presentation">
+      <div class="marquee__track">
+        <span>Storytelling</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Brand Strategy</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Creative Direction</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Consumer Insights</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Visual Identity</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Campaign Ideation</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Storytelling</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Brand Strategy</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Creative Direction</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Consumer Insights</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Visual Identity</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+        <span>Campaign Ideation</span>
+        <span class="marquee__dot" aria-hidden="true">●</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Brands strip: work experience -->
+  <section class="brands section" id="brands">
+    <div class="container">
+      <div class="brands__groups">
+        <div class="brands__group reveal-scale">
+          <h3 class="brands__group-title">WORK EXPERIENCE</h3>
+          <div class="brands__grid">
+            <% experiences.forEach(function(exp) { %>
+            <a href="/experience/<%= exp.slug %>" class="brand-tile">
+              <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
+              <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
+              <span class="brand-tile__cta">VIEW DETAILS</span>
+            </a>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects -->
+  <section class="brands section" id="projects">
+    <div class="container">
+      <div class="brands__groups">
+        <div class="brands__group reveal-scale">
+          <h3 class="brands__group-title">PROJECTS</h3>
+          <div class="brands__grid">
+            <% projects.filter(function(p) { return !p.hidden; }).forEach(function(proj) { %>
+            <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>">
+              <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
+              <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
+              <span class="brand-tile__cta">VIEW DETAILS</span>
+            </a>
+            <% }); %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="about section" id="about">
+    <div class="container">
+      <div class="about__grid">
+        <div class="about__visual reveal-left">
+          <div class="about__image-frame">
+            <img class="about__image" src="/assets/profile.png" alt="Ana Machuca" width="480" height="600" />
+          </div>
+          <div class="about__accent-shape" aria-hidden="true"></div>
+        </div>
+        <div class="about__text">
+          <p class="section__label reveal-right">About Me</p>
+          <h2 class="section__title reveal-clip">Brands are like<br /><span class="highlight">people.</span></h2>
+          <p class="about__description reveal-right">
+            Raised in Colombia, I bring a global and culturally aware perspective to everything I create. With a marketing major and a minor in design, I've built a strong foundation in brand assets, visual identity, and creative direction.
+          </p>
+          <p class="about__description reveal-right">
+            I'm passionate about building emotional connections between brands and audiences—by humanizing brand identity, voice, and experience. Every strategy I craft reflects authenticity, personality, and genuine relationship-building.
+          </p>
+          <div class="about__details reveal">
+            <div class="about__detail">
+              <span class="about__detail-label">Education</span>
+              <span class="about__detail-value">Hult International Business School, Class of 2026 — Dean's List</span>
+            </div>
+            <div class="about__detail">
+              <span class="about__detail-label">Major</span>
+              <span class="about__detail-value">Marketing, Minor in Design</span>
+            </div>
+            <div class="about__detail">
+              <span class="about__detail-label">Origin</span>
+              <span class="about__detail-value">Colombia 🇨🇴</span>
+            </div>
+            <div class="about__detail">
+              <span class="about__detail-label">Languages</span>
+              <span class="about__detail-value">English &amp; Spanish (Bilingual); French (Beginner)</span>
+            </div>
+            <div class="about__detail">
+              <span class="about__detail-label">Tools</span>
+              <span class="about__detail-value">Microsoft Office, Canva, Adobe Creative Cloud (InDesign, Illustrator)</span>
+            </div>
+            <div class="about__detail">
+              <span class="about__detail-label">Certifications</span>
+              <span class="about__detail-value">Inside LVMH Certificate; Hypothesis Testing in Python (DataCamp)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work Experience -->
+  <section class="experience section" id="experience">
+    <div class="container">
+      <p class="section__label reveal-blur">Work Experience</p>
+      <h2 class="section__title reveal-clip">Where I've <span class="highlight">grown.</span></h2>
+      <div class="experience__timeline">
+        <% experiences.forEach(function(exp) { %>
+        <a href="/experience/<%= exp.slug %>" class="experience__item reveal-right">
+          <div class="experience__marker"></div>
+          <div class="experience__card">
+            <span class="experience__type"><%= exp.type %></span>
+            <h3 class="experience__role"><%= exp.role || exp.title %></h3>
+            <p class="experience__company"><%= exp.company %></p>
+            <% if (exp.dateRange) { %><p class="experience__date"><%= exp.dateRange %></p><% } %>
+            <p class="experience__desc"><%= exp.description %></p>
+            <span class="experience__cta">View details</span>
+          </div>
+        </a>
+        <% }); %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Strengths -->
+  <section class="strengths section" id="strengths">
+    <div class="container">
+      <p class="section__label reveal-blur">Core Strengths</p>
+      <h2 class="section__title reveal-clip">What I bring to the <span class="highlight">table.</span></h2>
+      <div class="strengths__grid">
+        <div class="strengths__item reveal-rotate">
+          <div class="strengths__icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4L30 16L44 18L34 28L36 42L24 36L12 42L14 28L4 18L18 16L24 4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Creativity</h3>
+          <p>Bringing bold, original ideas to every project—from campaign concepts to visual identity—to make brands stand out and connect.</p>
+        </div>
+        <div class="strengths__item reveal-rotate">
+          <div class="strengths__icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 4C13 4 4 13 4 24C4 35 13 44 24 44C35 44 44 35 44 24" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M24 4C29 4 34 13 34 24C34 35 29 44 24 44" stroke="currentColor" stroke-width="2"/><path d="M4 24H34" stroke="currentColor" stroke-width="2"/><circle cx="40" cy="10" r="6" stroke="currentColor" stroke-width="2"/></svg>
+          </div>
+          <h3>Customer Engagement</h3>
+          <p>Building meaningful relationships with audiences through authentic interactions, community outreach, and experiences that resonate on a personal level.</p>
+        </div>
+        <div class="strengths__item reveal-rotate">
+          <div class="strengths__icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="16" cy="20" r="6" stroke="currentColor" stroke-width="2"/><circle cx="32" cy="20" r="6" stroke="currentColor" stroke-width="2"/><path d="M6 38C6 32 10 28 16 28C19 28 21 29 22 30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M26 30C27 29 29 28 32 28C38 28 42 32 42 38" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Team Collaboration</h3>
+          <p>Thriving in cross-functional teams—bridging strategy, design, and execution to deliver cohesive work that exceeds expectations.</p>
+        </div>
+        <div class="strengths__item reveal-rotate">
+          <div class="strengths__icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 40L20 28L28 36L40 20" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 20H40V28" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <h3>Data Analysis &amp; Marketing Insights</h3>
+          <p>Turning metrics into meaning—using engagement data, campaign analytics, and consumer research to inform smarter marketing decisions.</p>
+        </div>
+        <div class="strengths__item reveal-rotate">
+          <div class="strengths__icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M24 8C15 8 8 15 8 24C8 33 15 40 24 40C33 40 40 33 40 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-dasharray="4 4"/><path d="M24 16V24L30 30" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="24" cy="24" r="3" fill="currentColor"/></svg>
+          </div>
+          <h3>Adaptability &amp; Problem Solving</h3>
+          <p>Navigating ambiguity with confidence—pivoting strategies, solving challenges creatively, and staying effective in fast-paced environments.</p>
+        </div>
+        <div class="strengths__item reveal-rotate">
+          <div class="strengths__icon">
+            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="24" cy="24" r="20" stroke="currentColor" stroke-width="2"/><path d="M24 14V24L32 28" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </div>
+          <h3>Storytelling</h3>
+          <p>Crafting narratives that connect emotionally and drive action—turning consumer insights into brand stories people genuinely care about.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="contact section" id="contact">
+    <div class="container">
+      <div class="contact__content">
+        <p class="section__label reveal-blur">Next step for hiring</p>
+        <h2 class="section__title reveal-scale">Let's talk about<br />the <span class="highlight">role.</span></h2>
+        <p class="contact__desc reveal-blur">If you're hiring for marketing, brand, or creative strategy, I'm interested in full-time and internship opportunities. Use the buttons below to reach out—I reply quickly to serious hiring conversations.</p>
+        <div class="contact__links reveal-scale">
+          <a href="mailto:ana.machuca@email.com" class="btn btn--primary btn--large">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/></svg>
+            Email about a role
+          </a>
+          <a href="https://linkedin.com/in/" class="btn btn--outline btn--large" target="_blank" rel="noopener">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-4 0v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+            Message on LinkedIn
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%- include('partials/footer') %>
+  <script src="/main.js"></script>
+</body>
+</html>
