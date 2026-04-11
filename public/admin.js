@@ -225,6 +225,186 @@ function downloadJobCoverLetter(id) {
 }
 
 /* ─── Job Hunter (Claude skill: skills/job-hunter) ───────────────────── */
+function parseTagsCell(tagsStr) {
+  if (!tagsStr || String(tagsStr).trim() === '' || String(tagsStr).trim() === '—') return [];
+  return String(tagsStr)
+    .split(',')
+    .map(function (t) {
+      return t.trim();
+    })
+    .filter(Boolean)
+    .slice(0, 16);
+}
+
+function jobHunterPriorityClass(pri) {
+  var p = String(pri || 'Medium')
+    .trim()
+    .toLowerCase();
+  if (p === 'high' || p === 'medium' || p === 'low') return p;
+  return 'other';
+}
+
+function isListingUrl(s) {
+  return /^https?:\/\//i.test(String(s || '').trim());
+}
+
+/** Render CRM-shaped Open Roles table + full markdown report (helper aligns with server parse). */
+function renderJobHunterOutput(container, data) {
+  container.innerHTML = '';
+  var roles = data.openRoles;
+  var text = data.text || '';
+
+  if (roles && roles.length) {
+    var wrap = document.createElement('div');
+    wrap.className = 'admin__job-hunter__table-wrap admin__jobs-wrap';
+    var cap = document.createElement('p');
+    cap.className = 'admin__job-hunter__table-caption';
+    cap.innerHTML =
+      'Open roles <span class="admin__text-muted">(verify listings before applying). Rows with a left border were flagged by an automatic double-check—hover the row for details.</span>';
+    wrap.appendChild(cap);
+
+    var table = document.createElement('table');
+    table.className = 'admin__jobs-table admin__jobs-table--hunter';
+    var thead = document.createElement('thead');
+    var hr = document.createElement('tr');
+    [
+      '#',
+      'Company',
+      'Role',
+      'Yrs exp',
+      'Job details',
+      'Location',
+      'Deadline',
+      'Status',
+      'Priority',
+      'Tags',
+      'Listing'
+    ].forEach(function (label) {
+      var th = document.createElement('th');
+      th.scope = 'col';
+      th.textContent = label;
+      hr.appendChild(th);
+    });
+    thead.appendChild(hr);
+    table.appendChild(thead);
+
+    var tbody = document.createElement('tbody');
+    for (var i = 0; i < roles.length; i++) {
+      var r = roles[i];
+      var tr = document.createElement('tr');
+      var url = (r.url || '').trim();
+
+      var numEl = document.createElement('td');
+      numEl.className = 'admin__jobs-num';
+      numEl.textContent = r.idx != null && String(r.idx) !== '' ? String(r.idx) : String(i + 1);
+      tr.appendChild(numEl);
+
+      var coEl = document.createElement('td');
+      coEl.className = 'admin__jobs-co';
+      coEl.textContent = r.co || '';
+      tr.appendChild(coEl);
+
+      var roleWrap = document.createElement('td');
+      var roleDiv = document.createElement('div');
+      roleDiv.className = 'admin__jobs-role';
+      roleDiv.textContent = r.role || '';
+      roleWrap.appendChild(roleDiv);
+      tr.appendChild(roleWrap);
+
+      var yoeEl = document.createElement('td');
+      yoeEl.className = 'admin__jobs-yoe-cell';
+      yoeEl.textContent = r.yoe || '';
+      tr.appendChild(yoeEl);
+
+      var det = document.createElement('td');
+      det.className = 'admin__jobs-details-cell admin__job-hunter__cell-details';
+      det.textContent = r.notes || '';
+      tr.appendChild(det);
+
+      var locEl = document.createElement('td');
+      locEl.textContent = r.loc || '';
+      tr.appendChild(locEl);
+
+      var dlEl = document.createElement('td');
+      dlEl.className = 'admin__jobs-deadline-cell';
+      dlEl.textContent = r.deadline || '';
+      tr.appendChild(dlEl);
+
+      var stEl = document.createElement('td');
+      stEl.textContent = r.st || '';
+      tr.appendChild(stEl);
+
+      var priTd = document.createElement('td');
+      var priSpan = document.createElement('span');
+      priSpan.className =
+        'admin__job-priority admin__job-priority--' + jobHunterPriorityClass(r.pri);
+      priSpan.textContent = r.pri || '';
+      priTd.appendChild(priSpan);
+      tr.appendChild(priTd);
+
+      var tagsTd = document.createElement('td');
+      var tagsDiv = document.createElement('div');
+      tagsDiv.className = 'admin__jobs-tags';
+      parseTagsCell(r.tags).forEach(function (tag) {
+        var sp = document.createElement('span');
+        sp.className = 'admin__tag';
+        sp.textContent = tag;
+        tagsDiv.appendChild(sp);
+      });
+      if (!tagsDiv.childNodes.length && String(r.tags || '').trim() === '—') {
+        var tagDash = document.createElement('span');
+        tagDash.className = 'admin__text-muted';
+        tagDash.textContent = '—';
+        tagsDiv.appendChild(tagDash);
+      }
+      tagsTd.appendChild(tagsDiv);
+      tr.appendChild(tagsTd);
+
+      var listTd = document.createElement('td');
+      listTd.className = 'admin__jobs-listing-cell';
+      if (isListingUrl(url)) {
+        var a = document.createElement('a');
+        a.href = url;
+        a.className = 'admin__btn admin__btn--small admin__btn--outline admin__btn--icon';
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.setAttribute('aria-label', 'Open job listing');
+        a.innerHTML =
+          '<svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        listTd.appendChild(a);
+      } else if (url && url !== '—') {
+        var muted = document.createElement('span');
+        muted.className = 'admin__text-muted';
+        muted.textContent = url;
+        listTd.appendChild(muted);
+      } else {
+        listTd.innerHTML = '<span class="admin__text-muted">—</span>';
+      }
+      tr.appendChild(listTd);
+
+      if (r.verificationIssues && r.verificationIssues.length) {
+        tr.classList.add('admin__job-hunter__row--review');
+        tr.title = r.verificationIssues.join(' ');
+      }
+
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    wrap.appendChild(table);
+    container.appendChild(wrap);
+  }
+
+  var reportLabel = document.createElement('p');
+  reportLabel.className = 'admin__job-hunter__report-label';
+  reportLabel.textContent = roles && roles.length ? 'Full report' : 'Results';
+  container.appendChild(reportLabel);
+
+  var pre = document.createElement('pre');
+  pre.className = 'admin__job-hunter__report';
+  pre.textContent = text;
+  container.appendChild(pre);
+}
+
 function runJobHunterSkillSearch() {
   var qEl = document.getElementById('job-hunter-query');
   var ta = document.getElementById('job-hunter-criteria');
@@ -245,7 +425,7 @@ function runJobHunterSkillSearch() {
   }
   if (outEl) {
     outEl.hidden = true;
-    outEl.textContent = '';
+    outEl.innerHTML = '';
   }
   fetch('/api/job-hunter/find-jobs', {
     method: 'POST',
@@ -261,7 +441,7 @@ function runJobHunterSkillSearch() {
       if (!o.ok) throw new Error((o.j && o.j.error) || 'Request failed');
       if (outEl) {
         outEl.hidden = false;
-        outEl.textContent = o.j.text || '';
+        renderJobHunterOutput(outEl, o.j);
       }
       if (statusEl) {
         statusEl.className = 'admin__job-hunter__status admin__job-hunter__status--done';

@@ -204,9 +204,22 @@ Present everything in this structure:
 ### 🎯 [Industry] Marketing Jobs — [City]
 
 #### 📋 Open Roles
-| Role | Company | Type | Apply |
-|------|---------|------|-------|
-| ... | ... | ... | ... |
+
+Output **one** markdown pipe table whose columns match the portfolio **Job CRM** table (same field order as `/admin` → Job CRM). Copy the header row **exactly**:
+
+| # | Company | Role | Yrs exp | Job details | Location | Deadline | Status | Priority | Tags | Listing |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 1 | … | … | … | … | … | … | To Apply | Medium | … | https://… |
+
+- **Yrs exp**: from the posting (`0–2`, `3+`, `Entry`). Default if unknown: `—`.
+- **Job details**: 1–2 sentences; no `|` characters. Default if unknown: `—`.
+- **Deadline**: date, `Rolling`, or default `—` if unknown.
+- **Status**: default `To Apply` for new leads.
+- **Priority**: default `Medium` when unsure; `High`/`Low` when evidence supports it.
+- **Tags**: 2–4 comma-separated labels; default `—` if unknown.
+- **Listing**: full `https://…` only when verified in search/snippets; default `—` if unknown. Never invent URLs.
+
+**Double-check before you ship the table:** (1) Each company, title, and location matches the snippet or listing you used. (2) Each URL is a **single job** page, not a search results URL. (3) Prefer URLs that appear in your search results. (4) Remove duplicate company+role+location rows and any thin guesses.
 
 ---
 

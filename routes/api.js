@@ -395,6 +395,9 @@ router.post('/enhance', (req, res) => {
 });
 
 const { runJobHunterSkill } = require('../lib/job-hunter-claude');
+const { parseOpenRolesTable } = require('../lib/job-hunter-open-roles');
+const { verifyOpenRoleRows } = require('../lib/job-leads-verify');
+const { applyOpenRoleDefaults } = require('../lib/job-leads-defaults');
 
 router.post('/job-hunter/find-jobs', (req, res) => {
   const body = req.body || {};
@@ -424,7 +427,19 @@ router.post('/job-hunter/find-jobs', (req, res) => {
 
   return runJobHunterSkill({ searchQuery, criteria, existingJobs })
     .then(function (out) {
-      res.json({ ok: true, text: out.text, model: out.model });
+      const parsed = parseOpenRolesTable(out.text);
+      const openRoles = applyOpenRoleDefaults(
+        verifyOpenRoleRows(parsed.rows, {
+          existingJobs,
+          webSnippets: out.webSnippets || ''
+        })
+      );
+      res.json({
+        ok: true,
+        text: out.text,
+        model: out.model,
+        openRoles
+      });
     })
     .catch(function (e) {
       const msg = e.message || String(e);
