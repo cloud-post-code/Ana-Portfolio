@@ -52,40 +52,6 @@
   </div>
   <% } %>
 
-  <% if (typeof connectionSuggestions !== 'undefined' && connectionSuggestions && connectionSuggestions.length) { %>
-  <div class="admin__crm-connections">
-    <h3 class="admin__crm-connections__title">Potential connections (from your experience)</h3>
-    <p class="admin__crm-connections__lead">Roles that overlap your portfolio skills—use for outreach angles and coffee chats.</p>
-    <div class="admin__crm-connections__grid">
-      <% connectionSuggestions.forEach(function (block) { %>
-      <div class="admin__crm-connections__card">
-        <h4 class="admin__crm-connections__exp"><%= block.experienceTitle %></h4>
-        <p class="admin__crm-connections__meta"><%= block.experienceRole %> <% if (block.experienceCompany) { %>· <%= block.experienceCompany %><% } %></p>
-        <% if (block.topSkills && block.topSkills.length) { %>
-        <p class="admin__crm-connections__skills-label">Experience skills</p>
-        <div class="admin__crm-connections__chips">
-          <% block.topSkills.forEach(function (sk) { %>
-          <span class="admin__tag"><%= sk %></span>
-          <% }); %>
-        </div>
-        <% } %>
-        <ul class="admin__crm-connections__matches">
-          <% block.matches.forEach(function (m) { var j = m.job; %>
-          <li>
-            <strong><%= j.co %></strong> — <%= j.role %>
-            <span class="admin__crm-connections__score">match <%= m.score %></span>
-            <% if (j.url) { %>
-            <a href="<%= j.url %>" target="_blank" rel="noopener noreferrer" class="admin__crm-connections__link">Listing</a>
-            <% } %>
-          </li>
-          <% }); %>
-        </ul>
-      </div>
-      <% }); %>
-    </div>
-  </div>
-  <% } %>
-
   <% if ((crmJobRows || []).length) { %>
   <div class="admin__jobs-toolbar admin__jobs-toolbar--filters">
     <div class="admin__jobs-filters">
@@ -154,6 +120,7 @@
           <th scope="col">Role skills</th>
           <th scope="col">Listing</th>
           <th scope="col">Cover letter</th>
+          <th scope="col" class="admin__jobs-th-hult">Hult alumni</th>
           <th scope="col">Actions</th>
         </tr>
       </thead>
@@ -253,6 +220,19 @@
           </td>
           <td class="admin__jobs-cover-cell">
             <button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Generate and download a .txt cover letter">Download letter</button>
+          </td>
+          <td class="admin__jobs-hult-cell">
+            <% var _hultCo = String(job.co || '').trim().replace(/["<>]+/g, ' '); %>
+            <% var _hultQ = _hultCo
+              ? 'site:linkedin.com/in "Hult International Business School" ' + _hultCo
+              : 'site:linkedin.com/in "Hult International Business School" alumni'; %>
+            <% var _hultUrl = 'https://www.google.com/search?q=' + encodeURIComponent(_hultQ); %>
+            <a href="<%= _hultUrl %>"
+              class="admin__btn admin__btn--small admin__btn--outline"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Google search for LinkedIn profiles that mention Hult International Business School and this company (results vary; you may need to sign in to LinkedIn to view some profiles)."
+            >Find alumni</a>
           </td>
           <td class="admin__jobs-actions">
             <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteJobCrm('<%= job.id %>')">Remove</button>

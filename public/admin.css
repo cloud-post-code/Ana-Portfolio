@@ -592,86 +592,6 @@ body.admin {
   color: #1a4d3a;
 }
 
-.admin__crm-connections {
-  margin-bottom: 1.5rem;
-}
-
-.admin__crm-connections__title {
-  font-size: 1.05rem;
-  font-weight: 700;
-  margin-bottom: 0.25rem;
-}
-
-.admin__crm-connections__lead {
-  font-size: 0.85rem;
-  color: var(--admin-text-muted);
-  margin-bottom: 0.75rem;
-}
-
-.admin__crm-connections__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
-.admin__crm-connections__card {
-  background: var(--admin-card-bg);
-  border: 1px solid var(--admin-border);
-  border-radius: var(--admin-radius);
-  padding: 1rem 1.1rem;
-}
-
-.admin__crm-connections__exp {
-  font-size: 0.95rem;
-  font-weight: 700;
-  margin-bottom: 0.2rem;
-}
-
-.admin__crm-connections__meta {
-  font-size: 0.8rem;
-  color: var(--admin-text-muted);
-  margin-bottom: 0.5rem;
-}
-
-.admin__crm-connections__skills-label {
-  font-size: 0.68rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--admin-text-muted);
-  margin-bottom: 0.25rem;
-}
-
-.admin__crm-connections__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-  margin-bottom: 0.65rem;
-}
-
-.admin__crm-connections__matches {
-  margin: 0;
-  padding-left: 1rem;
-  font-size: 0.82rem;
-  line-height: 1.5;
-}
-
-.admin__crm-connections__matches li {
-  margin-bottom: 0.35rem;
-}
-
-.admin__crm-connections__score {
-  font-size: 0.72rem;
-  color: var(--admin-text-muted);
-  margin-left: 0.35rem;
-}
-
-.admin__crm-connections__link {
-  font-size: 0.78rem;
-  margin-left: 0.35rem;
-  color: var(--admin-accent);
-  font-weight: 600;
-}
-
 /* ─── Job CRM ──────────────────────────────────────────────────────────── */
 .admin__jobs-toolbar {
   display: flex;
@@ -860,6 +780,15 @@ body.admin {
 }
 
 .admin__jobs-cover-cell {
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.admin__jobs-th-hult {
+  white-space: nowrap;
+}
+
+.admin__jobs-hult-cell {
   vertical-align: top;
   white-space: nowrap;
 }
@@ -1059,6 +988,53 @@ body.admin {
   background: var(--admin-bg);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
+}
+
+.admin__resume-card {
+  max-width: 40rem;
+}
+
+.admin__resume-current {
+  margin-bottom: 1.5rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin__resume-meta {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.admin__resume-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.admin__resume-form {
+  margin-top: 0.5rem;
+}
+
+.admin__label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.admin__resume-upload-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.admin__resume-file {
+  font-size: 0.9rem;
+  max-width: 100%;
 }
 
 /* ─── Responsive ───────────────────────────────────────────────────────── */

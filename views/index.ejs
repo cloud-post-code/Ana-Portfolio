@@ -62,7 +62,7 @@
           <h3 class="brands__group-title">WORK EXPERIENCE</h3>
           <div class="brands__grid">
             <% experiences.forEach(function(exp) { %>
-            <a href="/experience/<%= exp.slug %>" class="brand-tile">
+            <a href="/experience/<%= exp.slug %>" class="brand-tile" data-site-search="<%= encodeURIComponent([exp.title, exp.role, exp.type, exp.company, exp.description].filter(Boolean).join(' ')) %>">
               <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
               <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
@@ -82,7 +82,7 @@
           <h3 class="brands__group-title">PROJECTS</h3>
           <div class="brands__grid">
             <% projects.filter(function(p) { return !p.hidden; }).forEach(function(proj) { %>
-            <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>">
+            <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>" data-site-search="<%= encodeURIComponent([proj.title, proj.sectionLabel, proj.role, proj.description, (proj.skills || []).join(' ')].filter(Boolean).join(' ')) %>">
               <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
               <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
@@ -151,7 +151,7 @@
       <h2 class="section__title reveal-clip">Where I've <span class="highlight">grown.</span></h2>
       <div class="experience__timeline">
         <% experiences.forEach(function(exp) { %>
-        <a href="/experience/<%= exp.slug %>" class="experience__item reveal-right">
+        <a href="/experience/<%= exp.slug %>" class="experience__item reveal-right" data-site-search="<%= encodeURIComponent([exp.title, exp.role, exp.type, exp.company, exp.description, (exp.skills || []).join(' ')].filter(Boolean).join(' ')) %>">
           <div class="experience__marker"></div>
           <div class="experience__card">
             <span class="experience__type"><%= exp.type %></span>
@@ -227,6 +227,12 @@
         <h2 class="section__title reveal-scale">Let's talk about<br />the <span class="highlight">role.</span></h2>
         <p class="contact__desc reveal-blur">If you're hiring for marketing, brand, or creative strategy, I'm interested in full-time and internship opportunities. Use the buttons below to reach out—I reply quickly to serious hiring conversations.</p>
         <div class="contact__links reveal-scale">
+          <% if (typeof resumeFileExists !== 'undefined' && resumeFileExists && resume && resume.path) { %>
+          <a href="<%= resume.path %>" class="btn btn--outline btn--large" download>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download resume (PDF)
+          </a>
+          <% } %>
           <a href="mailto:ana.machuca@email.com" class="btn btn--primary btn--large">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/></svg>
             Email about a role

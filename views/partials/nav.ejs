@@ -2,6 +2,19 @@
 <nav class="nav" id="nav" aria-label="Primary">
   <div class="nav__inner">
     <a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '#hero' %>" class="nav__logo"><span class="nav__logo-mark">AM</span></a>
+    <div class="nav__search-wrap">
+      <label for="siteSearch" class="nav__search-label">Search</label>
+      <input
+        type="search"
+        id="siteSearch"
+        class="nav__search-input"
+        placeholder="Search work…"
+        autocomplete="off"
+        enterkeyhint="search"
+        aria-describedby="siteSearchHint"
+      />
+      <span id="siteSearchHint" class="nav__search-hint" aria-live="polite"></span>
+    </div>
     <button type="button" class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
       <span class="nav__toggle-box" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>

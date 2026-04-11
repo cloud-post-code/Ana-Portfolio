@@ -28,6 +28,27 @@ const upload = multer({
   }
 });
 
+const resumeStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '..', 'public');
+    fs.mkdirSync(dir, { recursive: true });
+    cb(null, dir);
+  },
+  filename: (req, file, cb) => {
+    cb(null, 'resume.pdf');
+  }
+});
+
+const uploadResume = multer({
+  storage: resumeStorage,
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    const ok = ext === '.pdf' || file.mimetype === 'application/pdf';
+    cb(null, ok);
+  }
+});
+
 function dataPath(filename) {
   return path.join(__dirname, '..', 'data', filename);
 }
@@ -277,6 +298,30 @@ router.delete('/jobs-crm/:id', (req, res) => {
   if (idx === -1) return res.status(404).json({ error: 'Job not found' });
   data.splice(idx, 1);
   saveData(JOBS_CRM_FILE, data);
+  res.json({ success: true });
+});
+
+router.post('/resume', uploadResume.single('resume'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: 'Upload a PDF file.' });
+  }
+  const meta = {
+    path: '/resume.pdf',
+    originalFilename: req.file.originalname || 'resume.pdf',
+    updatedAt: new Date().toISOString()
+  };
+  saveData('resume.json', meta);
+  res.json(meta);
+});
+
+router.delete('/resume', (req, res) => {
+  const fp = path.join(__dirname, '..', 'public', 'resume.pdf');
+  try {
+    if (fs.existsSync(fp)) fs.unlinkSync(fp);
+  } catch (e) {
+    /* ignore */
+  }
+  saveData('resume.json', { path: null, originalFilename: null, updatedAt: null });
   res.json({ success: true });
 });
 

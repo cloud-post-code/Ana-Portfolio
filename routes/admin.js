@@ -6,8 +6,7 @@ const { CRM_JOB_STATUSES } = require('./crm-constants');
 const {
   regionFromLoc,
   tracksForJob,
-  TRACK_DEFS,
-  buildConnectionSuggestions
+  TRACK_DEFS
 } = require('./job-crm-helpers');
 
 function loadJSON(filename) {
@@ -48,8 +47,6 @@ router.get('/', (req, res) => {
     };
   });
 
-  const connectionSuggestions = buildConnectionSuggestions(experiences, jobsCrm);
-
   res.render('admin/dashboard', {
     experiences,
     projects,
@@ -58,8 +55,7 @@ router.get('/', (req, res) => {
     starredJobCount,
     crmStatusOptions: CRM_JOB_STATUSES,
     crmTrackOptions: TRACK_DEFS,
-    jobSearchProfile,
-    connectionSuggestions
+    jobSearchProfile
   });
 });
 
@@ -72,6 +68,18 @@ router.get('/experiences/:id/edit', (req, res) => {
   const item = experiences.find(e => e.id === req.params.id);
   if (!item) return res.status(404).send('Not found');
   res.render('admin/experience-form', { item, isNew: false });
+});
+
+router.get('/resume', (req, res) => {
+  let resume = { path: null, originalFilename: null, updatedAt: null };
+  try {
+    resume = loadJSON('resume.json');
+  } catch (e) {
+    /* optional */
+  }
+  const fp = path.join(__dirname, '..', 'public', 'resume.pdf');
+  const resumeFileExists = fs.existsSync(fp);
+  res.render('admin/resume', { adminTitle: 'Resume', resume, resumeFileExists });
 });
 
 router.get('/projects/new', (req, res) => {

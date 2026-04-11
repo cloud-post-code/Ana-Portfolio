@@ -11,7 +11,15 @@ function loadJSON(filename) {
 router.get('/', (req, res) => {
   const experiences = loadJSON('experiences.json').sort((a, b) => a.order - b.order);
   const projects = loadJSON('projects.json').sort((a, b) => a.order - b.order);
-  res.render('index', { experiences, projects });
+  let resume = { path: null, originalFilename: null, updatedAt: null };
+  try {
+    resume = loadJSON('resume.json');
+  } catch (e) {
+    /* optional */
+  }
+  const resumePdfPath = path.join(__dirname, '..', 'public', 'resume.pdf');
+  const resumeFileExists = fs.existsSync(resumePdfPath);
+  res.render('index', { experiences, projects, resume, resumeFileExists });
 });
 
 router.get('/experience/:slug', (req, res) => {

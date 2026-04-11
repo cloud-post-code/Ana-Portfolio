@@ -362,4 +362,62 @@
 
     wrap.setAttribute('tabindex', '0');
   });
+
+  // ---- Site search (portfolio work & experience) ----
+  const siteSearchInput = document.getElementById('siteSearch');
+  const siteSearchHint = document.getElementById('siteSearchHint');
+  if (siteSearchInput) {
+    const targets = document.querySelectorAll('[data-site-search]');
+
+    const applySiteSearch = () => {
+      const q = siteSearchInput.value.trim().toLowerCase();
+      const terms = q.split(/\s+/).filter(Boolean);
+      let visible = 0;
+
+      if (!targets.length) {
+        if (siteSearchHint) {
+          siteSearchHint.textContent =
+            q.length > 0 ? 'Open the homepage to filter work, or press Enter to go home with this search.' : '';
+        }
+        return;
+      }
+
+      targets.forEach((el) => {
+        let hay = '';
+        try {
+          hay = decodeURIComponent(el.getAttribute('data-site-search') || '');
+        } catch {
+          hay = el.getAttribute('data-site-search') || '';
+        }
+        hay = hay.toLowerCase();
+        const show = !terms.length || terms.every((t) => hay.includes(t));
+        el.classList.toggle('site-search--hidden', !show);
+        if (show) visible += 1;
+      });
+
+      if (siteSearchHint) {
+        if (!q) siteSearchHint.textContent = '';
+        else siteSearchHint.textContent = visible === 0 ? 'No matches' : `${visible} match${visible === 1 ? '' : 'es'}`;
+      }
+    };
+
+    siteSearchInput.addEventListener('input', applySiteSearch);
+    siteSearchInput.addEventListener('search', applySiteSearch);
+
+    const params = new URLSearchParams(window.location.search);
+    const preset = params.get('q');
+    if (preset) {
+      siteSearchInput.value = preset;
+      applySiteSearch();
+    }
+
+    siteSearchInput.addEventListener('keydown', (e) => {
+      if (e.key !== 'Enter') return;
+      if (targets.length) return;
+      const v = siteSearchInput.value.trim();
+      if (!v) return;
+      e.preventDefault();
+      window.location.href = '/?q=' + encodeURIComponent(v);
+    });
+  }
 })();

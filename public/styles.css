@@ -200,6 +200,74 @@ a {
     0 1px 0 rgba(255, 255, 255, 0.75) inset;
 }
 
+.nav__search-wrap {
+  flex: 1;
+  min-width: 0;
+  max-width: min(18rem, 42vw);
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  position: relative;
+}
+
+.nav__search-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.nav__search-input {
+  width: 100%;
+  padding: 0.42rem 0.75rem 0.42rem 2rem;
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--color-text);
+  background: rgba(255, 255, 255, 0.65);
+  border: 1px solid rgba(230, 224, 212, 0.9);
+  border-radius: 999px;
+  outline: none;
+  transition:
+    border-color 0.25s var(--ease-out),
+    box-shadow 0.25s var(--ease-out),
+    background 0.25s var(--ease-out);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='M20 20l-3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 0.65rem 50%;
+  background-size: 14px 14px;
+}
+
+.nav__search-input::placeholder {
+  color: rgba(26, 26, 26, 0.45);
+}
+
+.nav__search-input:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.18);
+  background-color: rgba(255, 255, 255, 0.92);
+}
+
+.nav--scrolled .nav__search-input {
+  background: rgba(255, 255, 255, 0.88);
+}
+
+.nav__search-hint {
+  font-size: 0.65rem;
+  color: rgba(26, 26, 26, 0.5);
+  padding-left: 0.5rem;
+  min-height: 0.9em;
+  line-height: 1.2;
+}
+
+.site-search--hidden {
+  display: none !important;
+}
+
 .nav__logo {
   display: inline-flex;
   align-items: center;
@@ -1447,11 +1515,31 @@ a.work__card:focus-visible {
   }
 
   .nav__inner {
+    flex-wrap: wrap;
     background: rgba(253, 250, 240, 0.94);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
     border-color: rgba(230, 224, 212, 0.92);
     box-shadow: 0 8px 28px rgba(26, 26, 26, 0.07);
+  }
+
+  .nav__logo {
+    order: 1;
+  }
+
+  .nav__toggle {
+    order: 2;
+    margin-left: auto;
+  }
+
+  .nav__search-wrap {
+    order: 3;
+    flex-basis: 100%;
+    max-width: none;
+  }
+
+  .nav__links {
+    order: 4;
   }
 
   .nav__links {

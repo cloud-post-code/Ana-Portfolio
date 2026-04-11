@@ -1,0 +1,86 @@
+<%- include('layout-top', { adminTitle: 'Resume' }) %>
+
+<section class="admin__section">
+  <div class="admin__section-header">
+    <div>
+      <h2>Resume</h2>
+      <p class="admin__section-lead">Upload a PDF. It is saved as <code>public/resume.pdf</code> and linked on your site as <code>/resume.pdf</code>.</p>
+    </div>
+  </div>
+
+  <div class="admin__card admin__resume-card">
+    <% if (resumeFileExists && resume && resume.path) { %>
+    <div class="admin__resume-current">
+      <p class="admin__resume-meta">
+        <strong>Current file:</strong> <%= resume.originalFilename || 'resume.pdf' %>
+        <% if (resume.updatedAt) { %>
+        <span class="admin__text-muted"> · Updated <%= new Date(resume.updatedAt).toLocaleString() %></span>
+        <% } %>
+      </p>
+      <div class="admin__resume-actions">
+        <a href="/resume.pdf" class="admin__btn admin__btn--outline" target="_blank" rel="noopener noreferrer">Open PDF</a>
+        <button type="button" class="admin__btn admin__btn--danger" onclick="deleteResumeFile()">Remove resume</button>
+      </div>
+    </div>
+    <% } else { %>
+    <p class="admin__empty-hint">No resume uploaded yet.</p>
+    <% } %>
+
+    <form class="admin__resume-form" id="resumeUploadForm">
+      <label class="admin__label" for="resumeFile">Upload PDF (max 8 MB)</label>
+      <div class="admin__resume-upload-row">
+        <input type="file" id="resumeFile" name="resume" accept="application/pdf,.pdf" required class="admin__resume-file" />
+        <button type="submit" class="admin__btn admin__btn--primary"><%= resumeFileExists ? 'Replace resume' : 'Upload resume' %></button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<%- include('layout-bottom') %>
+
+<script>
+(function () {
+  var form = document.getElementById('resumeUploadForm');
+  if (!form) return;
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var input = document.getElementById('resumeFile');
+    if (!input.files || !input.files[0]) return;
+    var fd = new FormData();
+    fd.append('resume', input.files[0]);
+    var btn = form.querySelector('button[type="submit"]');
+    if (btn) btn.disabled = true;
+    fetch('/api/resume', { method: 'POST', body: fd })
+      .then(function (res) {
+        if (!res.ok) return res.json().then(function (j) { throw new Error(j.error || 'Upload failed'); });
+        return res.json();
+      })
+      .then(function () {
+        if (typeof showToast === 'function') showToast('Resume saved', 'success');
+        setTimeout(function () { location.reload(); }, 400);
+      })
+      .catch(function (err) {
+        if (typeof showToast === 'function') showToast(err.message || 'Upload failed', 'error');
+        else alert(err.message || 'Upload failed');
+      })
+      .finally(function () {
+        if (btn) btn.disabled = false;
+      });
+  });
+})();
+function deleteResumeFile() {
+  if (!confirm('Remove the resume from your site?')) return;
+  fetch('/api/resume', { method: 'DELETE' })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      if (typeof showToast === 'function') showToast('Resume removed', 'success');
+      setTimeout(function () { location.reload(); }, 400);
+    })
+    .catch(function () {
+      if (typeof showToast === 'function') showToast('Could not remove resume', 'error');
+    });
+}
+</script>
