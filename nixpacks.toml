@@ -1,11 +1,10 @@
-# Ensure Git LFS assets (e.g. *.mp4) are materialized when the build has a .git directory.
-# If your deploy omits .git, re-enable LFS in Railway’s build or host large files externally.
+# Do not override [phases.install] — that removes Node/npm from the image (Railway/Railpack).
+# Git LFS runs in the build phase after the default `npm ci` from the Node provider.
 
 [phases.setup]
 nixPkgs = ["git", "git-lfs"]
 
-[phases.install]
+[phases.build]
 cmds = [
-  "if [ -d .git ]; then git lfs install && git lfs pull; fi",
-  "npm ci"
+  "if [ -d .git ]; then git lfs install && git lfs pull; fi"
 ]
