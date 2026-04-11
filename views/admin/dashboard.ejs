@@ -1,5 +1,67 @@
 <%- include('layout-top', { adminTitle: 'Dashboard' }) %>
 
+<section class="admin__section admin__section--jobs" id="job-crm">
+  <div class="admin__section-header">
+    <div>
+      <h2>Job CRM</h2>
+      <p class="admin__section-lead">Roles you are tracking (<%= (jobsCrm || []).length %> listings)</p>
+    </div>
+  </div>
+  <% if ((jobsCrm || []).length) { %>
+  <div class="admin__jobs-wrap">
+    <table class="admin__jobs-table">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Company</th>
+          <th scope="col">Role</th>
+          <th scope="col">Location</th>
+          <th scope="col">Status</th>
+          <th scope="col">Priority</th>
+          <th scope="col">Tags</th>
+          <th scope="col">Listing</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% (jobsCrm || []).forEach(function(job, idx) { %>
+        <tr>
+          <td class="admin__jobs-num"><%= idx + 1 %></td>
+          <td class="admin__jobs-co"><%= job.co %></td>
+          <td>
+            <div class="admin__jobs-role"><%= job.role %></div>
+            <% if (job.notes) { %>
+            <p class="admin__jobs-notes"><%= job.notes %></p>
+            <% } %>
+          </td>
+          <td><%= job.loc %></td>
+          <td><span class="admin__pill admin__pill--status"><%= job.st %></span></td>
+          <td>
+            <span class="admin__pill admin__pill--pri admin__pill--pri-<%= String(job.pri || '').toLowerCase() %>"><%= job.pri %></span>
+          </td>
+          <td>
+            <div class="admin__jobs-tags">
+              <% (job.tags || []).forEach(function(tag) { %>
+              <span class="admin__tag"><%= tag %></span>
+              <% }); %>
+            </div>
+          </td>
+          <td>
+            <% if (job.url) { %>
+            <a href="<%= job.url %>" class="admin__jobs-link" target="_blank" rel="noopener noreferrer">Open</a>
+            <% } else { %>
+            <span class="admin__text-muted">—</span>
+            <% } %>
+          </td>
+        </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+  <% } else { %>
+  <p class="admin__empty-hint">Add <code>data/jobs-crm.json</code> to show your job list.</p>
+  <% } %>
+</section>
+
 <section class="admin__section">
   <div class="admin__section-header">
     <h2>Work Experience</h2>

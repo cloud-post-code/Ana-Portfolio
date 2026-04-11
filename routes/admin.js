@@ -10,7 +10,13 @@ function loadJSON(filename) {
 router.get('/', (req, res) => {
   const experiences = loadJSON('experiences.json').sort((a, b) => a.order - b.order);
   const projects = loadJSON('projects.json').sort((a, b) => a.order - b.order);
-  res.render('admin/dashboard', { experiences, projects });
+  let jobsCrm = [];
+  try {
+    jobsCrm = loadJSON('jobs-crm.json');
+  } catch (e) {
+    /* optional data file */
+  }
+  res.render('admin/dashboard', { experiences, projects, jobsCrm });
 });
 
 router.get('/experiences/new', (req, res) => {

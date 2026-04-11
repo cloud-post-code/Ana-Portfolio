@@ -510,6 +510,160 @@ body.admin {
   background: var(--admin-danger);
 }
 
+/* ─── Job CRM ──────────────────────────────────────────────────────────── */
+.admin__section-lead {
+  font-size: 0.9rem;
+  color: var(--admin-text-muted);
+  margin-top: 0.35rem;
+  font-weight: 400;
+}
+
+.admin__jobs-wrap {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  overflow: auto;
+  max-height: min(70vh, 720px);
+  -webkit-overflow-scrolling: touch;
+}
+
+.admin__jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.admin__jobs-table thead {
+  position: sticky;
+  top: 0;
+  background: var(--admin-card-bg);
+  box-shadow: 0 1px 0 var(--admin-border);
+  z-index: 1;
+}
+
+.admin__jobs-table th,
+.admin__jobs-table td {
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--admin-border);
+}
+
+.admin__jobs-table th {
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-text-muted);
+  white-space: nowrap;
+}
+
+.admin__jobs-table tbody tr:hover {
+  background: rgba(220, 75, 116, 0.04);
+}
+
+.admin__jobs-num {
+  color: var(--admin-text-muted);
+  font-variant-numeric: tabular-nums;
+  width: 2.25rem;
+}
+
+.admin__jobs-co {
+  font-weight: 600;
+  max-width: 10rem;
+}
+
+.admin__jobs-role {
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.admin__jobs-notes {
+  font-size: 0.78rem;
+  color: var(--admin-text-muted);
+  margin-top: 0.35rem;
+  line-height: 1.4;
+  max-width: 22rem;
+}
+
+.admin__jobs-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 12rem;
+}
+
+.admin__tag {
+  display: inline-block;
+  font-size: 0.7rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid var(--admin-border);
+  color: var(--admin-text-muted);
+  background: var(--admin-bg);
+}
+
+.admin__pill {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.admin__pill--status {
+  background: #e8eef6;
+  color: #185fa5;
+}
+
+.admin__pill--pri-high {
+  background: #e1f5ee;
+  color: #0f6e56;
+}
+
+.admin__pill--pri-medium {
+  background: #faeeda;
+  color: #854f0b;
+}
+
+.admin__pill--pri-low {
+  background: #f1efe8;
+  color: #5f5e5a;
+}
+
+.admin__pill--pri {
+  background: var(--admin-bg);
+  color: var(--admin-text-muted);
+}
+
+.admin__jobs-link {
+  color: var(--admin-accent);
+  font-weight: 600;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.admin__jobs-link:hover {
+  text-decoration: underline;
+}
+
+.admin__text-muted {
+  color: var(--admin-text-muted);
+}
+
+.admin__empty-hint {
+  font-size: 0.9rem;
+  color: var(--admin-text-muted);
+}
+
+.admin__empty-hint code {
+  font-size: 0.85em;
+  background: var(--admin-bg);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
 /* ─── Responsive ───────────────────────────────────────────────────────── */
 @media (max-width: 900px) {
   .admin__sidebar {
