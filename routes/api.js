@@ -403,7 +403,26 @@ router.post('/job-hunter/find-jobs', (req, res) => {
   if (!searchQuery.trim() && !criteria.trim()) {
     return res.status(400).json({ error: 'Enter a search query and/or additional criteria.' });
   }
-  return runJobHunterSkill({ searchQuery, criteria })
+
+  let existingJobs = [];
+  try {
+    const crm = loadData(JOBS_CRM_FILE);
+    if (Array.isArray(crm)) {
+      existingJobs = crm.map(function (j) {
+        return {
+          id: j.id,
+          co: j.co,
+          role: j.role,
+          loc: j.loc || '',
+          url: j.url || ''
+        };
+      });
+    }
+  } catch (e) {
+    /* optional */
+  }
+
+  return runJobHunterSkill({ searchQuery, criteria, existingJobs })
     .then(function (out) {
       res.json({ ok: true, text: out.text, model: out.model });
     })

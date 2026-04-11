@@ -283,10 +283,18 @@ function runJobHunterSkillSearch() {
 }
 
 /* ─── AI / web enhancement ───────────────────────────────────────────── */
+function enhanceFetchHeaders() {
+  var h = { 'Content-Type': 'application/json' };
+  if (typeof window !== 'undefined' && window.__ADMIN_ENHANCE_SECRET__) {
+    h['x-enhance-secret'] = window.__ADMIN_ENHANCE_SECRET__;
+  }
+  return h;
+}
+
 function enhanceOne(collection, id) {
   fetch('/api/enhance', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: enhanceFetchHeaders(),
     body: JSON.stringify({ collection: collection, id: id })
   })
     .then(function (res) {
@@ -314,7 +322,7 @@ function enhanceAllCollection(collection) {
   showToast('Enhancing… this can take a few minutes.', 'success');
   fetch('/api/enhance', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: enhanceFetchHeaders(),
     body: JSON.stringify({ collection: collection, all: true })
   })
     .then(function (res) {

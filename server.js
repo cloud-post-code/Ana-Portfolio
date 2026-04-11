@@ -21,6 +21,10 @@ const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
 
 app.use('/api', apiRoutes);
+app.use('/admin', (req, res, next) => {
+  res.locals.adminEnhanceSecret = process.env.ADMIN_ENHANCE_SECRET || '';
+  next();
+});
 app.use('/admin', adminRoutes);
 app.use('/', siteRoutes);
 

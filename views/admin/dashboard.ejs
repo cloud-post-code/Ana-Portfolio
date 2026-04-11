@@ -8,14 +8,14 @@
     </div>
     <% if ((crmJobRows || []).length) { %>
     <div class="admin__section-header__actions">
-      <button type="button" class="admin__btn admin__btn--outline" title="Uses TAVILY + listing URL (optional) and AI. Set ANTHROPIC_API_KEY or OPENAI_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')">Enhance all</button>
+      <button type="button" class="admin__btn admin__btn--outline" title="Reconciles every Job CRM field with Tavily + listing page (optional) and AI. Set ANTHROPIC_API_KEY or OPENAI_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')">Enhance all</button>
     </div>
     <% } %>
   </div>
 
   <div class="admin__job-hunter" id="job-hunter-panel">
     <h3 class="admin__job-hunter__title">Job Hunter <span class="admin__text-muted">(Claude skill)</span></h3>
-    <p class="admin__job-hunter__lead">Search the web (optional Tavily) + Claude using the bundled <code>skills/job-hunter</code> skill. Set <code>ANTHROPIC_API_KEY</code> on the server.</p>
+    <p class="admin__job-hunter__lead">Search the web (optional Tavily, URLs deduplicated) + Claude using the bundled <code>skills/job-hunter</code> skill. Your current <strong>Job CRM</strong> rows are sent so the model should not suggest the same role twice. Set <code>ANTHROPIC_API_KEY</code> on the server.</p>
     <div class="admin__job-hunter__row">
       <div class="admin__job-hunter__field admin__job-hunter__field--grow">
         <label class="admin__job-hunter__label" for="job-hunter-query">Search</label>
@@ -257,7 +257,7 @@
             </a>
           </td>
           <td class="admin__jobs-actions">
-            <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill empty job fields" onclick="enhanceOne('jobs-crm','<%= job.id %>')">Enhance</button>
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: refresh company, role, location, notes, tags, URL, deadline, YoE from listing/context" onclick="enhanceOne('jobs-crm','<%= job.id %>')">Enhance</button>
             <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--remove" onclick="deleteJobCrm('<%= job.id %>')" title="Remove from CRM">Remove</button>
           </td>
         </tr>
