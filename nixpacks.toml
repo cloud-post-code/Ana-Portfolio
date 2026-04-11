@@ -1,0 +1,11 @@
+# Ensure Git LFS assets (e.g. *.mp4) are materialized when the build has a .git directory.
+# If your deploy omits .git, re-enable LFS in Railway’s build or host large files externally.
+
+[phases.setup]
+nixPkgs = ["git", "git-lfs"]
+
+[phases.install]
+cmds = [
+  "if [ -d .git ]; then git lfs install && git lfs pull; fi",
+  "npm ci"
+]

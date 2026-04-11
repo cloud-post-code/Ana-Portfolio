@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 3000;
+const HOST = process.env.HOST || '0.0.0.0';
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -23,7 +24,7 @@ app.use('/api', apiRoutes);
 app.use('/admin', adminRoutes);
 app.use('/', siteRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-  console.log(`Admin panel at http://localhost:${PORT}/admin`);
+app.listen(PORT, HOST, () => {
+  console.log(`Server listening on http://${HOST}:${PORT}`);
+  console.log(`Admin panel at /admin`);
 });

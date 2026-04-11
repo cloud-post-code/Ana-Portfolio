@@ -1,0 +1,10 @@
+# Railway: connect this repo, leave defaults; Railway sets PORT automatically.
+# Docs: https://docs.railway.com/reference/config-as-code
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/"
+healthcheckTimeout = 60
