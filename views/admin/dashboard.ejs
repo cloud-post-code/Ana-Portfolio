@@ -179,15 +179,14 @@
           </td>
           <td class="admin__jobs-hult-cell">
             <% var _hultCo = String(job.co || '').trim().replace(/["<>]+/g, ' '); %>
-            <% var _hultQ = _hultCo
-              ? 'site:linkedin.com/in "Hult International Business School" ' + _hultCo
-              : 'site:linkedin.com/in "Hult International Business School" alumni'; %>
-            <% var _hultUrl = 'https://www.google.com/search?q=' + encodeURIComponent(_hultQ); %>
+            <% var _hultUrl = _hultCo
+              ? 'https://www.linkedin.com/search/results/people/?keywords=' + encodeURIComponent('Hult International Business School ' + _hultCo)
+              : 'https://www.linkedin.com/school/hult-international-business-school/people/'; %>
             <a href="<%= _hultUrl %>"
               class="admin__btn admin__btn--small admin__btn--outline"
               target="_blank"
               rel="noopener noreferrer"
-              title="Google search for LinkedIn profiles that mention Hult International Business School and this company (results vary; you may need to sign in to LinkedIn to view some profiles)."
+              title="Opens LinkedIn people search with Hult + this company (sign in for full results; refine keywords or filters on LinkedIn)."
             >Find alumni</a>
           </td>
           <td class="admin__jobs-actions">
