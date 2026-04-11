@@ -394,4 +394,26 @@ router.post('/enhance', (req, res) => {
     });
 });
 
+const { runJobHunterSkill } = require('../lib/job-hunter-claude');
+
+router.post('/job-hunter/find-jobs', (req, res) => {
+  const body = req.body || {};
+  const searchQuery = body.searchQuery != null ? String(body.searchQuery) : '';
+  const criteria = body.criteria != null ? String(body.criteria) : '';
+  if (!searchQuery.trim() && !criteria.trim()) {
+    return res.status(400).json({ error: 'Enter a search query and/or additional criteria.' });
+  }
+  return runJobHunterSkill({ searchQuery, criteria })
+    .then(function (out) {
+      res.json({ ok: true, text: out.text, model: out.model });
+    })
+    .catch(function (e) {
+      const msg = e.message || String(e);
+      if (msg.includes('ANTHROPIC_API_KEY') || msg.includes('Job Hunter skill not found')) {
+        return res.status(503).json({ error: msg });
+      }
+      res.status(500).json({ error: msg });
+    });
+});
+
 module.exports = router;

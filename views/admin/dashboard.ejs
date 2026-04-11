@@ -13,6 +13,36 @@
     <% } %>
   </div>
 
+  <div class="admin__job-hunter" id="job-hunter-panel">
+    <h3 class="admin__job-hunter__title">Job Hunter <span class="admin__text-muted">(Claude skill)</span></h3>
+    <p class="admin__job-hunter__lead">Search the web (optional Tavily) + Claude using the bundled <code>skills/job-hunter</code> skill. Set <code>ANTHROPIC_API_KEY</code> on the server.</p>
+    <div class="admin__job-hunter__row">
+      <div class="admin__job-hunter__field admin__job-hunter__field--grow">
+        <label class="admin__job-hunter__label" for="job-hunter-query">Search</label>
+        <input
+          type="search"
+          id="job-hunter-query"
+          class="admin__job-hunter__search"
+          placeholder="Keywords, location, site:linkedin.com/jobs…"
+          autocomplete="off"
+          aria-describedby="job-hunter-hint"
+        />
+      </div>
+      <button type="button" class="admin__btn admin__btn--primary" id="job-hunter-run" onclick="runJobHunterSkillSearch()">Find jobs</button>
+    </div>
+    <label class="admin__job-hunter__label" for="job-hunter-criteria">More criteria <span class="admin__text-muted">(optional)</span></label>
+    <textarea
+      id="job-hunter-criteria"
+      class="admin__job-hunter__textarea"
+      rows="4"
+      placeholder="Industries, role titles, exclusions (-intern), seniority, remote/hybrid…"
+      aria-describedby="job-hunter-hint"
+    ></textarea>
+    <p id="job-hunter-hint" class="admin__job-hunter__hint">At least one of Search or More criteria must be filled. Results appear below (verify links before applying).</p>
+    <div id="job-hunter-status" class="admin__job-hunter__status" hidden></div>
+    <pre id="job-hunter-output" class="admin__job-hunter__output" hidden></pre>
+  </div>
+
   <% if ((crmJobRows || []).length) { %>
   <div class="admin__jobs-toolbar admin__jobs-toolbar--filters">
     <div class="admin__jobs-filters">

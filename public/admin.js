@@ -224,6 +224,64 @@ function downloadJobCoverLetter(id) {
     });
 }
 
+/* ─── Job Hunter (Claude skill: skills/job-hunter) ───────────────────── */
+function runJobHunterSkillSearch() {
+  var qEl = document.getElementById('job-hunter-query');
+  var ta = document.getElementById('job-hunter-criteria');
+  var statusEl = document.getElementById('job-hunter-status');
+  var outEl = document.getElementById('job-hunter-output');
+  var btn = document.getElementById('job-hunter-run');
+  var searchQuery = qEl ? qEl.value.trim() : '';
+  var criteria = ta ? ta.value.trim() : '';
+  if (!searchQuery && !criteria) {
+    showToast('Add a search query and/or more criteria', 'error');
+    return;
+  }
+  if (btn) btn.disabled = true;
+  if (statusEl) {
+    statusEl.hidden = false;
+    statusEl.className = 'admin__job-hunter__status admin__job-hunter__status--busy';
+    statusEl.textContent = 'Calling Claude with the Job Hunter skill…';
+  }
+  if (outEl) {
+    outEl.hidden = true;
+    outEl.textContent = '';
+  }
+  fetch('/api/job-hunter/find-jobs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ searchQuery: searchQuery, criteria: criteria })
+  })
+    .then(function (res) {
+      return res.json().then(function (j) {
+        return { ok: res.ok, j: j };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Request failed');
+      if (outEl) {
+        outEl.hidden = false;
+        outEl.textContent = o.j.text || '';
+      }
+      if (statusEl) {
+        statusEl.className = 'admin__job-hunter__status admin__job-hunter__status--done';
+        statusEl.textContent = o.j.model ? ('Done · ' + o.j.model) : 'Done';
+      }
+      showToast('Job Hunter results ready', 'success');
+    })
+    .catch(function (e) {
+      showToast(e.message || 'Job Hunter failed', 'error');
+      if (statusEl) {
+        statusEl.hidden = false;
+        statusEl.className = 'admin__job-hunter__status admin__job-hunter__status--err';
+        statusEl.textContent = e.message || 'Error';
+      }
+    })
+    .finally(function () {
+      if (btn) btn.disabled = false;
+    });
+}
+
 /* ─── AI / web enhancement ───────────────────────────────────────────── */
 function enhanceOne(collection, id) {
   fetch('/api/enhance', {

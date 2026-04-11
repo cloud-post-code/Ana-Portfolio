@@ -644,6 +644,141 @@ body.admin {
   font-weight: 400;
 }
 
+/* ─── Job Hunter (Claude skill panel) ─────────────────────────────────── */
+.admin__job-hunter {
+  background: var(--admin-card-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: var(--admin-radius);
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.admin__job-hunter__title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+}
+
+.admin__job-hunter__lead {
+  font-size: 0.85rem;
+  color: var(--admin-text-muted);
+  margin: 0 0 1rem;
+  line-height: 1.45;
+}
+
+.admin__job-hunter__lead code {
+  font-size: 0.8em;
+  background: var(--admin-bg);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.admin__job-hunter__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.65rem;
+  margin-bottom: 0.75rem;
+}
+
+.admin__job-hunter__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.admin__job-hunter__field--grow {
+  flex: 1;
+  min-width: min(100%, 14rem);
+}
+
+.admin__job-hunter__label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--admin-text-muted);
+}
+
+.admin__job-hunter__search {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--admin-font);
+  font-size: 0.9rem;
+  color: var(--admin-text);
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+}
+
+.admin__job-hunter__search:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+}
+
+.admin__job-hunter__textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.55rem 0.75rem;
+  font-family: var(--admin-font);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--admin-text);
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  resize: vertical;
+  min-height: 5rem;
+  margin-bottom: 0.35rem;
+}
+
+.admin__job-hunter__textarea:focus {
+  outline: none;
+  border-color: var(--admin-accent);
+  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+}
+
+.admin__job-hunter__hint {
+  font-size: 0.75rem;
+  color: var(--admin-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.admin__job-hunter__status {
+  font-size: 0.82rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.admin__job-hunter__status--busy {
+  color: var(--admin-accent);
+}
+
+.admin__job-hunter__status--done {
+  color: #0f6e56;
+}
+
+.admin__job-hunter__status--err {
+  color: var(--admin-danger);
+}
+
+.admin__job-hunter__output {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  word-break: break-word;
+  background: var(--admin-bg);
+  border: 1px solid var(--admin-border);
+  border-radius: 8px;
+  color: var(--admin-text);
+}
+
 .admin__jobs-wrap {
   background: var(--admin-card-bg);
   border: 1px solid var(--admin-border);
