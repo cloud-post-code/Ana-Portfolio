@@ -6,6 +6,11 @@
       <h2>Job CRM</h2>
       <p class="admin__section-lead">Roles you are tracking (<%= (jobsCrm || []).length %> listings<% if (typeof starredJobCount !== 'undefined' && starredJobCount) { %>, <strong><%= starredJobCount %> starred</strong><% } %>)</p>
     </div>
+    <% if ((crmJobRows || []).length) { %>
+    <div class="admin__section-header__actions">
+      <button type="button" class="admin__btn admin__btn--outline" title="Uses TAVILY + listing URL (optional) and AI. Set ANTHROPIC_API_KEY or OPENAI_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')">Enhance all</button>
+    </div>
+    <% } %>
   </div>
 
   <% if ((crmJobRows || []).length) { %>
@@ -54,7 +59,7 @@
       type="search"
       id="job-crm-search"
       class="admin__jobs-search-input"
-      placeholder="Company, role, location, status, tags, skills…"
+      placeholder="Company, role, years exp, details, location, status, tags…"
       autocomplete="off"
       aria-describedby="job-crm-search-hint"
     />
@@ -69,11 +74,13 @@
           <th scope="col">#</th>
           <th scope="col">Company</th>
           <th scope="col">Role</th>
+          <th scope="col" title="Years of experience required">Yrs exp</th>
+          <th scope="col">Job details</th>
           <th scope="col">Location</th>
+          <th scope="col">Deadline</th>
           <th scope="col">Status</th>
           <th scope="col">Priority</th>
           <th scope="col">Tags</th>
-          <th scope="col">Role skills</th>
           <th scope="col">Listing</th>
           <th scope="col">Cover letter</th>
           <th scope="col" class="admin__jobs-th-hult">Hult alumni</th>
@@ -88,7 +95,7 @@
         <% var _crmPriOpts = ['High', 'Medium', 'Low']; %>
         <% var _crmPriKnown = _crmPriOpts.indexOf(_crmPri) !== -1; %>
         <% var _crmPriClass = _crmPriKnown ? _crmPri.toLowerCase() : 'other'; %>
-        <% var _searchParts = [job.id, job.co, job.role, job.loc, _crmSt, job.pri, (job.tags || []).join(' '), (job.skills || []).join(' '), job.notes || '', job.url || '']; %>
+        <% var _searchParts = [job.id, job.co, job.role, job.yoe || '', job.loc, job.deadline || '', _crmSt, job.pri, (job.tags || []).join(' '), job.notes || '', job.url || '']; %>
         <% var _searchBlob = _searchParts.filter(function (p) { return p != null && String(p).length; }).map(function (p) { return String(p); }).join(' '); %>
         <tr class="<%= job.starred ? 'admin__jobs-row--starred' : '' %>"
           data-job-crm-search="<%= encodeURIComponent(_searchBlob) %>"
@@ -111,11 +118,46 @@
           <td class="admin__jobs-co"><%= job.co %></td>
           <td>
             <div class="admin__jobs-role"><%= job.role %></div>
-            <% if (job.notes) { %>
-            <p class="admin__jobs-notes"><%= job.notes %></p>
-            <% } %>
+          </td>
+          <td class="admin__jobs-yoe-cell">
+            <% var _yoeRaw = job.yoe != null ? String(job.yoe) : ''; %>
+            <input
+              type="text"
+              class="admin__job-yoe"
+              value="<%= _yoeRaw.replace(/&/g, '&amp;').replace(/"/g, '&quot;') %>"
+              data-id="<%= job.id %>"
+              data-prev="<%= encodeURIComponent(_yoeRaw) %>"
+              placeholder="e.g. 0–2, 3–5"
+              aria-label="Years of experience required for <%= job.co %>"
+              onchange="updateCrmJobYoe(this)"
+            />
+          </td>
+          <td class="admin__jobs-details-cell">
+            <% var _notesRaw = job.notes != null ? String(job.notes) : ''; %>
+            <textarea
+              class="admin__job-details"
+              rows="3"
+              data-id="<%= job.id %>"
+              data-prev="<%= encodeURIComponent(_notesRaw) %>"
+              placeholder="Requirements, salary, team notes…"
+              aria-label="Job details for <%= job.co %>"
+              onblur="updateCrmJobNotes(this)"
+            ><%= _notesRaw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;') %></textarea>
           </td>
           <td><%= job.loc %></td>
+          <td class="admin__jobs-deadline-cell">
+            <% var _dlRaw = job.deadline != null ? String(job.deadline) : ''; %>
+            <input
+              type="text"
+              class="admin__job-deadline"
+              value="<%= _dlRaw.replace(/&/g, '&amp;').replace(/"/g, '&quot;') %>"
+              data-id="<%= job.id %>"
+              data-prev="<%= encodeURIComponent(_dlRaw) %>"
+              placeholder="e.g. 2025-05-01, Rolling"
+              aria-label="Application deadline for <%= job.co %>"
+              onchange="updateCrmJobDeadline(this)"
+            />
+          </td>
           <td class="admin__jobs-status-cell">
             <select
               class="admin__job-status"
@@ -155,27 +197,19 @@
               <% }); %>
             </div>
           </td>
-          <td class="admin__jobs-skills-cell">
-            <div class="admin__jobs-skills">
-              <% if ((job.skills || []).length) { %>
-              <% (job.skills || []).forEach(function (sk) { %>
-              <span class="admin__tag admin__tag--skill"><%= sk %></span>
-              <% }); %>
-              <% } else { %>
-              <span class="admin__text-muted admin__jobs-skills--empty">—</span>
-              <% } %>
-            </div>
-            <button type="button" class="admin__btn admin__btn--tiny admin__btn--outline" onclick="editJobCrmSkills('<%= job.id %>')">Edit skills</button>
-          </td>
-          <td>
+          <td class="admin__jobs-listing-cell">
             <% if (job.url) { %>
-            <a href="<%= job.url %>" class="admin__jobs-link" target="_blank" rel="noopener noreferrer">Open</a>
+            <a href="<%= job.url %>" class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon" target="_blank" rel="noopener noreferrer" title="Open job listing" aria-label="Open job listing">
+              <svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            </a>
             <% } else { %>
             <span class="admin__text-muted">—</span>
             <% } %>
           </td>
           <td class="admin__jobs-cover-cell">
-            <button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Generate and download a .txt cover letter">Download letter</button>
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Download cover letter (.docx)" aria-label="Download cover letter">
+              <svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            </button>
           </td>
           <td class="admin__jobs-hult-cell">
             <% var _hultCo = String(job.co || '').trim().replace(/["<>]+/g, ' '); %>
@@ -183,14 +217,18 @@
               ? 'https://www.linkedin.com/search/results/people/?keywords=' + encodeURIComponent('Hult International Business School ' + _hultCo)
               : 'https://www.linkedin.com/school/hult-international-business-school/people/'; %>
             <a href="<%= _hultUrl %>"
-              class="admin__btn admin__btn--small admin__btn--outline"
+              class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon"
               target="_blank"
               rel="noopener noreferrer"
-              title="Opens LinkedIn people search with Hult + this company (sign in for full results; refine keywords or filters on LinkedIn)."
-            >Find alumni</a>
+              title="Search LinkedIn for Hult alumni at this company"
+              aria-label="Search LinkedIn for Hult alumni"
+            >
+              <svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </a>
           </td>
           <td class="admin__jobs-actions">
-            <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteJobCrm('<%= job.id %>')">Remove</button>
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill empty job fields" onclick="enhanceOne('jobs-crm','<%= job.id %>')">Enhance</button>
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--remove" onclick="deleteJobCrm('<%= job.id %>')" title="Remove from CRM">Remove</button>
           </td>
         </tr>
         <% }); %>
@@ -205,7 +243,10 @@
 <section class="admin__section">
   <div class="admin__section-header">
     <h2>Work Experience</h2>
-    <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">+ Add Experience</a>
+    <div class="admin__section-header__actions">
+      <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search: fill empty experience fields" onclick="enhanceAllCollection('experiences')">Enhance all</button>
+      <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">+ Add Experience</a>
+    </div>
   </div>
   <div class="admin__card-grid">
     <% experiences.forEach(function(exp) { %>
@@ -223,6 +264,7 @@
         <span><%= (exp.skills || []).length %> skill(s)</span>
       </div>
       <div class="admin__card-actions">
+        <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text/skills" onclick="enhanceOne('experiences','<%= exp.id %>')">Enhance</button>
         <a href="/admin/experiences/<%= exp.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
         <a href="/experience/<%= exp.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
         <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('experiences', '<%= exp.id %>')">Delete</button>
@@ -235,7 +277,10 @@
 <section class="admin__section">
   <div class="admin__section-header">
     <h2>Projects</h2>
-    <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add Project</a>
+    <div class="admin__section-header__actions">
+      <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search: fill empty project fields" onclick="enhanceAllCollection('projects')">Enhance all</button>
+      <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add Project</a>
+    </div>
   </div>
   <div class="admin__card-grid">
     <% projects.forEach(function(proj) { %>
@@ -253,6 +298,7 @@
         <span><%= (proj.skills || []).length %> skill(s)</span>
       </div>
       <div class="admin__card-actions">
+        <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text/skills" onclick="enhanceOne('projects','<%= proj.id %>')">Enhance</button>
         <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
         <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
         <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>

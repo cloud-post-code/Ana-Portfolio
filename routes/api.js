@@ -211,6 +211,7 @@ crudRoutes('projects', 'projects.json');
 
 const JOBS_CRM_FILE = 'jobs-crm.json';
 const { generateCoverLetter, slugify: coverLetterFileSlug } = require('../lib/cover-letter');
+const { plainTextToDocxBuffer } = require('../lib/cover-letter-docx');
 
 router.get('/jobs-crm/:id/cover-letter', (req, res) => {
   let jobs;
@@ -237,11 +238,21 @@ router.get('/jobs-crm/:id/cover-letter', (req, res) => {
   }
 
   const text = generateCoverLetter({ job, experiences, profile });
-  const filename = `Cover-letter-${coverLetterFileSlug(job.co)}.txt`;
+  const filename = `Cover-letter-${coverLetterFileSlug(job.co)}.docx`;
 
-  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
-  res.setHeader('Content-Disposition', `attachment; filename="${filename.replace(/"/g, '')}"`);
-  res.send(text);
+  plainTextToDocxBuffer(text)
+    .then(function (buf) {
+      res.setHeader(
+        'Content-Type',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+      );
+      res.setHeader('Content-Disposition', `attachment; filename="${filename.replace(/"/g, '')}"`);
+      res.send(buf);
+    })
+    .catch(function (err) {
+      console.error(err);
+      res.status(500).send('Could not generate Word document');
+    });
 });
 
 router.patch('/jobs-crm/:id', (req, res) => {
@@ -264,24 +275,32 @@ router.patch('/jobs-crm/:id', (req, res) => {
     data[idx].st = st;
     changed = true;
   }
-  if (req.body.skills !== undefined) {
-    if (!Array.isArray(req.body.skills)) {
-      return res.status(400).json({ error: 'skills must be an array of strings' });
-    }
-    data[idx].skills = req.body.skills
-      .map(s => String(s).trim().slice(0, 100))
-      .filter(Boolean)
-      .slice(0, 25);
-    changed = true;
-  }
   if (req.body.pri !== undefined) {
     const pri = String(req.body.pri).trim().slice(0, 40);
     if (!pri) return res.status(400).json({ error: 'pri cannot be empty' });
     data[idx].pri = pri;
     changed = true;
   }
+  if (req.body.deadline !== undefined) {
+    const dl = String(req.body.deadline).trim().slice(0, 120);
+    if (!dl) delete data[idx].deadline;
+    else data[idx].deadline = dl;
+    changed = true;
+  }
+  if (req.body.notes !== undefined) {
+    const n = String(req.body.notes).trim().slice(0, 8000);
+    if (!n) delete data[idx].notes;
+    else data[idx].notes = n;
+    changed = true;
+  }
+  if (req.body.yoe !== undefined) {
+    const y = String(req.body.yoe).trim().slice(0, 60);
+    if (!y) delete data[idx].yoe;
+    else data[idx].yoe = y;
+    changed = true;
+  }
   if (!changed) {
-    return res.status(400).json({ error: 'Provide starred, st, skills, and/or pri' });
+    return res.status(400).json({ error: 'Provide starred, st, pri, deadline, notes, and/or yoe' });
   }
   saveData(JOBS_CRM_FILE, data);
   res.json(data[idx]);
@@ -323,6 +342,56 @@ router.delete('/resume', (req, res) => {
   }
   saveData('resume.json', { path: null, originalFilename: null, updatedAt: null });
   res.json({ success: true });
+});
+
+const { enhanceItem, enhanceAll, assertConfigured, DATA_FILES: ENHANCE_DATA_FILES } = require('../lib/enhance-service');
+
+router.post('/enhance', (req, res) => {
+  const secret = process.env.ADMIN_ENHANCE_SECRET;
+  if (secret) {
+    const h = req.headers['x-enhance-secret'] || (req.headers.authorization && String(req.headers.authorization).replace(/^Bearer\s+/i, ''));
+    if (h !== secret) {
+      return res.status(401).json({ error: 'Set header x-enhance-secret to match ADMIN_ENHANCE_SECRET.' });
+    }
+  }
+
+  const body = req.body || {};
+  const collection = body.collection;
+  if (!collection || !ENHANCE_DATA_FILES[collection]) {
+    return res.status(400).json({ error: 'collection must be experiences, projects, or jobs-crm' });
+  }
+
+  try {
+    assertConfigured();
+  } catch (e) {
+    return res.status(503).json({ error: e.message || String(e) });
+  }
+
+  if (body.all === true) {
+    return enhanceAll(collection)
+      .then(function (out) {
+        res.json(out);
+      })
+      .catch(function (e) {
+        res.status(500).json({ error: e.message || String(e) });
+      });
+  }
+
+  const id = body.id;
+  if (!id || typeof id !== 'string') {
+    return res.status(400).json({ error: 'Provide id (string) or all: true' });
+  }
+
+  return enhanceItem(collection, id)
+    .then(function (out) {
+      res.json(out);
+    })
+    .catch(function (e) {
+      if (String(e.message).includes('Not found')) {
+        return res.status(404).json({ error: e.message });
+      }
+      res.status(500).json({ error: e.message || String(e) });
+    });
 });
 
 module.exports = router;

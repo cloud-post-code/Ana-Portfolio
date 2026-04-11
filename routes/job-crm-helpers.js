@@ -33,10 +33,11 @@ const TRACK_DEFS = [
 function tracksForJob(job) {
   const blob = [
     ...(job.tags || []),
-    ...(job.skills || []),
     job.role,
     job.notes,
-    job.co
+    job.co,
+    job.deadline,
+    job.yoe
   ].join(' ');
   const ids = [];
   TRACK_DEFS.forEach(function (def) {

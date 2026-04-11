@@ -44,6 +44,105 @@ function updateCrmJobStatus(selectEl) {
     });
 }
 
+function updateCrmJobYoe(inputEl) {
+  var id = inputEl.getAttribute('data-id');
+  var prev = '';
+  try {
+    prev = decodeURIComponent(inputEl.getAttribute('data-prev') || '');
+  } catch (e) {
+    prev = inputEl.getAttribute('data-prev') || '';
+  }
+  var next = inputEl.value.trim();
+  if (next === prev) return;
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ yoe: next })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      inputEl.setAttribute('data-prev', encodeURIComponent(next));
+      showToast('Years of experience updated', 'success');
+    })
+    .catch(function () {
+      showToast('Could not save years of experience', 'error');
+      try {
+        inputEl.value = decodeURIComponent(inputEl.getAttribute('data-prev') || '');
+      } catch (e2) {
+        inputEl.value = '';
+      }
+    });
+}
+
+function updateCrmJobNotes(textareaEl) {
+  var id = textareaEl.getAttribute('data-id');
+  var prev = '';
+  try {
+    prev = decodeURIComponent(textareaEl.getAttribute('data-prev') || '');
+  } catch (e) {
+    prev = textareaEl.getAttribute('data-prev') || '';
+  }
+  var next = textareaEl.value.trim();
+  if (next === prev) return;
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ notes: next })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      textareaEl.setAttribute('data-prev', encodeURIComponent(next));
+      showToast('Job details saved', 'success');
+    })
+    .catch(function () {
+      showToast('Could not save job details', 'error');
+      try {
+        textareaEl.value = decodeURIComponent(textareaEl.getAttribute('data-prev') || '');
+      } catch (e2) {
+        textareaEl.value = '';
+      }
+    });
+}
+
+function updateCrmJobDeadline(inputEl) {
+  var id = inputEl.getAttribute('data-id');
+  var prev = '';
+  try {
+    prev = decodeURIComponent(inputEl.getAttribute('data-prev') || '');
+  } catch (e) {
+    prev = inputEl.getAttribute('data-prev') || '';
+  }
+  var next = inputEl.value.trim();
+  if (next === prev) return;
+  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ deadline: next })
+  })
+    .then(function (res) {
+      if (!res.ok) throw new Error();
+      return res.json();
+    })
+    .then(function () {
+      inputEl.setAttribute('data-prev', encodeURIComponent(next));
+      showToast('Deadline updated', 'success');
+    })
+    .catch(function () {
+      showToast('Could not save deadline', 'error');
+      try {
+        inputEl.value = decodeURIComponent(inputEl.getAttribute('data-prev') || '');
+      } catch (e2) {
+        inputEl.value = '';
+      }
+    });
+}
+
 function updateCrmJobPriority(selectEl) {
   var id = selectEl.getAttribute('data-id');
   var prev = '';
@@ -104,7 +203,7 @@ function downloadJobCoverLetter(id) {
       if (!res.ok) throw new Error();
       var disposition = res.headers.get('Content-Disposition') || '';
       var m = /filename="([^"]+)"/.exec(disposition);
-      var fname = m && m[1] ? m[1] : 'cover-letter.txt';
+      var fname = m && m[1] ? m[1] : 'cover-letter.docx';
       return res.blob().then(function (blob) {
         return { fname: fname, blob: blob };
       });
@@ -125,24 +224,59 @@ function downloadJobCoverLetter(id) {
     });
 }
 
-function editJobCrmSkills(id) {
-  var raw = window.prompt('Comma-separated role skills (aligned with your experience — e.g. Campaign planning, Social content, Stakeholder comms):');
-  if (raw === null) return;
-  var skills = raw.split(',').map(function (s) { return s.trim(); }).filter(Boolean);
-  fetch('/api/jobs-crm/' + encodeURIComponent(id), {
-    method: 'PATCH',
+/* ─── AI / web enhancement ───────────────────────────────────────────── */
+function enhanceOne(collection, id) {
+  fetch('/api/enhance', {
+    method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ skills: skills })
+    body: JSON.stringify({ collection: collection, id: id })
   })
     .then(function (res) {
-      if (!res.ok) throw new Error();
-      return res.json();
+      return res.json().then(function (j) {
+        return { ok: res.ok, j: j };
+      });
     })
-    .then(function () {
-      showToast('Skills updated', 'success');
-      setTimeout(function () { location.reload(); }, 400);
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Enhance failed');
+      var msg = (o.j.updated && o.j.updated.length)
+        ? ('Updated: ' + o.j.updated.join(', '))
+        : (o.j.message || 'Done');
+      showToast(msg, 'success');
+      setTimeout(function () {
+        location.reload();
+      }, 700);
     })
-    .catch(function () { showToast('Could not save skills', 'error'); });
+    .catch(function (e) {
+      showToast(e.message || 'Enhance failed', 'error');
+    });
+}
+
+function enhanceAllCollection(collection) {
+  if (!confirm('Fill empty fields using web context + AI (up to 20 items per run). Uses API credits. Continue?')) return;
+  showToast('Enhancing… this can take a few minutes.', 'success');
+  fetch('/api/enhance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ collection: collection, all: true })
+  })
+    .then(function (res) {
+      return res.json().then(function (j) {
+        return { ok: res.ok, j: j };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Enhance failed');
+      var j = o.j;
+      var msg = 'Processed ' + j.processed + (j.total > j.processed ? (' of ' + j.total + ' total') : '');
+      if (j.errors && j.errors.length) msg += ' (' + j.errors.length + ' errors)';
+      showToast(msg, 'success');
+      setTimeout(function () {
+        location.reload();
+      }, 800);
+    })
+    .catch(function (e) {
+      showToast(e.message || 'Enhance failed', 'error');
+    });
 }
 
 function deleteJobCrm(id) {
