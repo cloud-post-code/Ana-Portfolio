@@ -8,50 +8,6 @@
     </div>
   </div>
 
-  <% if (typeof jobSearchProfile !== 'undefined' && jobSearchProfile) { %>
-  <div class="admin__crm-profile">
-    <h3 class="admin__crm-profile__title"><%= jobSearchProfile.headline || 'What you are looking for' %></h3>
-    <% if (jobSearchProfile.summary) { %>
-    <p class="admin__crm-profile__summary"><%= jobSearchProfile.summary %></p>
-    <% } %>
-    <div class="admin__crm-profile__grid">
-      <% if (jobSearchProfile.keyDetails && jobSearchProfile.keyDetails.length) { %>
-      <div class="admin__crm-profile__block">
-        <h4 class="admin__crm-profile__label">Key details</h4>
-        <ul class="admin__crm-profile__list">
-          <% jobSearchProfile.keyDetails.forEach(function (line) { %>
-          <li><%= line %></li>
-          <% }); %>
-        </ul>
-      </div>
-      <% } %>
-      <% if (jobSearchProfile.targetSkillsToUse && jobSearchProfile.targetSkillsToUse.length) { %>
-      <div class="admin__crm-profile__block">
-        <h4 class="admin__crm-profile__label">Skills you want to use next</h4>
-        <ul class="admin__crm-profile__list admin__crm-profile__list--tags">
-          <% jobSearchProfile.targetSkillsToUse.forEach(function (s) { %>
-          <li><span class="admin__tag admin__tag--emph"><%= s %></span></li>
-          <% }); %>
-        </ul>
-      </div>
-      <% } %>
-      <% if (jobSearchProfile.locationsPreferred && jobSearchProfile.locationsPreferred.length) { %>
-      <div class="admin__crm-profile__block">
-        <h4 class="admin__crm-profile__label">Locations</h4>
-        <p class="admin__crm-profile__inline"><%= jobSearchProfile.locationsPreferred.join(' · ') %></p>
-      </div>
-      <% } %>
-      <% if (jobSearchProfile.roleTypesPreferred && jobSearchProfile.roleTypesPreferred.length) { %>
-      <div class="admin__crm-profile__block">
-        <h4 class="admin__crm-profile__label">Role types</h4>
-        <p class="admin__crm-profile__inline"><%= jobSearchProfile.roleTypesPreferred.join(' · ') %></p>
-      </div>
-      <% } %>
-    </div>
-    <p class="admin__crm-profile__file-hint">Edit <code>data/job-search-profile.json</code> to update this section. The <code>applicant</code> block (name, email, phone, city) is used for cover letter downloads.</p>
-  </div>
-  <% } %>
-
   <% if ((crmJobRows || []).length) { %>
   <div class="admin__jobs-toolbar admin__jobs-toolbar--filters">
     <div class="admin__jobs-filters">

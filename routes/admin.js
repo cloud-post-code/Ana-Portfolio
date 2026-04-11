@@ -32,13 +32,6 @@ router.get('/', (req, res) => {
     /* optional data file */
   }
 
-  let jobSearchProfile = null;
-  try {
-    jobSearchProfile = loadJSON('job-search-profile.json');
-  } catch (e) {
-    /* optional */
-  }
-
   const crmJobRows = jobsCrm.map(function (job) {
     return {
       job,
@@ -54,8 +47,7 @@ router.get('/', (req, res) => {
     crmJobRows,
     starredJobCount,
     crmStatusOptions: CRM_JOB_STATUSES,
-    crmTrackOptions: TRACK_DEFS,
-    jobSearchProfile
+    crmTrackOptions: TRACK_DEFS
   });
 });
 
