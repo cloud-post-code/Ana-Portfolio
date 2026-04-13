@@ -406,7 +406,7 @@ router.post('/enhance', (req, res) => {
     });
 });
 
-const { runJobHunterSkill } = require('../lib/job-hunter-claude');
+const { runJobHunterSkill, normalizeTargetJobCount } = require('../lib/job-hunter-claude');
 const { parseOpenRolesTable } = require('../lib/job-hunter-open-roles');
 const { verifyOpenRoleRows } = require('../lib/job-leads-verify');
 const { applyOpenRoleDefaults } = require('../lib/job-leads-defaults');
@@ -420,6 +420,8 @@ router.post('/job-hunter/find-jobs', (req, res) => {
   if (!searchQuery.trim() && !criteria.trim()) {
     return res.status(400).json({ error: 'Enter a search query and/or additional criteria.' });
   }
+
+  const targetJobCount = normalizeTargetJobCount(body.targetJobCount);
 
   let existingJobs = [];
   try {
@@ -439,12 +441,12 @@ router.post('/job-hunter/find-jobs', (req, res) => {
     /* optional */
   }
 
-  return runJobHunterSkill({ searchQuery, criteria, existingJobs })
+  return runJobHunterSkill({ searchQuery, criteria, existingJobs, targetJobCount })
     .then(async function (out) {
       const parsed = parseOpenRolesTable(out.text);
       let rows = parsed.rows;
       rows = await resolveUrlsOnRows(rows);
-      rows = await enrichOpenRolesRows(rows);
+      rows = await enrichOpenRolesRows(rows, { maxRows: targetJobCount });
       const openRoles = applyOpenRoleDefaults(
         verifyOpenRoleRows(rows, {
           existingJobs,
@@ -455,6 +457,7 @@ router.post('/job-hunter/find-jobs', (req, res) => {
         ok: true,
         text: out.text,
         model: out.model,
+        targetJobCount: out.targetJobCount != null ? out.targetJobCount : targetJobCount,
         openRoles
       });
     })

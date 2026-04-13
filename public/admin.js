@@ -408,11 +408,14 @@ function renderJobHunterOutput(container, data) {
 function runJobHunterSkillSearch() {
   var qEl = document.getElementById('job-hunter-query');
   var ta = document.getElementById('job-hunter-criteria');
+  var countEl = document.getElementById('job-hunter-count');
   var statusEl = document.getElementById('job-hunter-status');
   var outEl = document.getElementById('job-hunter-output');
   var btn = document.getElementById('job-hunter-run');
   var searchQuery = qEl ? qEl.value.trim() : '';
   var criteria = ta ? ta.value.trim() : '';
+  var rawCount = countEl ? parseInt(String(countEl.value), 10) : 8;
+  var targetJobCount = Number.isNaN(rawCount) ? 8 : Math.min(25, Math.max(1, rawCount));
   if (!searchQuery && !criteria) {
     showToast('Add a search query and/or more criteria', 'error');
     return;
@@ -430,7 +433,11 @@ function runJobHunterSkillSearch() {
   fetch('/api/job-hunter/find-jobs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ searchQuery: searchQuery, criteria: criteria })
+    body: JSON.stringify({
+      searchQuery: searchQuery,
+      criteria: criteria,
+      targetJobCount: targetJobCount
+    })
   })
     .then(function (res) {
       return res.json().then(function (j) {
@@ -445,7 +452,12 @@ function runJobHunterSkillSearch() {
       }
       if (statusEl) {
         statusEl.className = 'admin__job-hunter__status admin__job-hunter__status--done';
-        statusEl.textContent = o.j.model ? ('Done · ' + o.j.model) : 'Done';
+        statusEl.textContent =
+          o.j.model
+            ? 'Done · ' +
+              o.j.model +
+              (typeof o.j.targetJobCount === 'number' ? ' · target ' + o.j.targetJobCount + ' roles' : '')
+            : 'Done';
       }
       showToast('Job Hunter results ready', 'success');
     })

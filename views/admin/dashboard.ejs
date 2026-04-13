@@ -28,6 +28,21 @@
           aria-describedby="job-hunter-hint"
         />
       </div>
+      <div class="admin__job-hunter__field admin__job-hunter__field--count">
+        <label class="admin__job-hunter__label" for="job-hunter-count"># Jobs</label>
+        <input
+          type="number"
+          id="job-hunter-count"
+          class="admin__job-hunter__search admin__job-hunter__count"
+          min="1"
+          max="25"
+          step="1"
+          value="8"
+          inputmode="numeric"
+          aria-describedby="job-hunter-hint"
+          title="How many job leads to aim for in the Open Roles table (1–25)"
+        />
+      </div>
       <button type="button" class="admin__btn admin__btn--primary" id="job-hunter-run" onclick="runJobHunterSkillSearch()">Find jobs</button>
     </div>
     <label class="admin__job-hunter__label" for="job-hunter-criteria">More criteria <span class="admin__text-muted">(optional)</span></label>

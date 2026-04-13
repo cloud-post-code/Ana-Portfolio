@@ -115,7 +115,7 @@ Run **2–4 web searches** targeting entry-level marketing roles (or the user’
 - Key responsibilities (bullet summary)
 - Required skills
 
-Target **5–8 roles** across a mix of company sizes (startup, mid-size, enterprise), unless the user asked for a different count or a **full scrape** of a single board (then cap at what is reasonable and note truncation).
+Target **5–8 roles** by default, or the **exact count** the user or admin UI requested for the **📋 Open Roles** table (typically **1–25**), across a mix of company sizes (startup, mid-size, enterprise). For a **full scrape** of a single board, cap at what is reasonable and note truncation.
 
 **After this step:** If the user asked to **add jobs to the list** / **save to CRM**, perform **Persisting jobs to the Job CRM list** for the roles you are recommending (or for all found roles if they asked to save everything).
 
