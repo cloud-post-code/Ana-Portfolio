@@ -6,12 +6,11 @@
       <h2>Job CRM</h2>
       <p class="admin__section-lead">Roles you are tracking (<%= (jobsCrm || []).length %> listings<% if (typeof starredJobCount !== 'undefined' && starredJobCount) { %>, <strong><%= starredJobCount %> starred</strong><% } %>)</p>
     </div>
-    <% if ((crmJobRows || []).length) { %>
     <div class="admin__section-header__actions">
-      <button type="button" class="admin__btn admin__btn--outline" title="Reconciles every Job CRM field with Tavily + listing page (optional) and AI. Set ANTHROPIC_API_KEY or OPENAI_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')">Enhance all</button>
-      <button type="button" class="admin__btn admin__btn--outline admin__btn--danger" title="Delete every job in the CRM" onclick="deleteAllJobsCrm()">Remove all</button>
+      <% var _crmCount = (crmJobRows || []).length; %>
+      <button type="button" class="admin__btn admin__btn--outline" title="Reconciles every Job CRM field with Tavily + listing page (optional) and AI. Set ANTHROPIC_API_KEY or OPENAI_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')"<%= _crmCount ? '' : ' disabled' %>>Enhance all</button>
+      <button type="button" class="admin__btn admin__btn--outline admin__btn--danger" title="Delete every job in the CRM" onclick="deleteAllJobsCrm()"<%= _crmCount ? '' : ' disabled' %>>Remove all</button>
     </div>
-    <% } %>
   </div>
 
   <div class="admin__job-hunter" id="job-hunter-panel">
