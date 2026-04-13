@@ -203,9 +203,10 @@ function downloadJobCoverLetter(id) {
       if (!res.ok) throw new Error();
       var disposition = res.headers.get('Content-Disposition') || '';
       var m = /filename="([^"]+)"/.exec(disposition);
-      var fname = m && m[1] ? m[1] : 'cover-letter.docx';
+      var fname = m && m[1] ? m[1] : 'application-pack.zip';
+      var inclResume = (res.headers.get('X-Application-Pack-Includes-Resume') || '').toLowerCase() === 'yes';
       return res.blob().then(function (blob) {
-        return { fname: fname, blob: blob };
+        return { fname: fname, blob: blob, inclResume: inclResume };
       });
     })
     .then(function (o) {
@@ -217,10 +218,13 @@ function downloadJobCoverLetter(id) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
-      showToast('Cover letter downloaded', 'success');
+      var msg = o.inclResume
+        ? 'Application pack downloaded (cover letter + resume PDF)'
+        : 'Application pack downloaded (cover letter only — upload a resume PDF under Admin → Resume to include it)';
+      showToast(msg, 'success');
     })
     .catch(function () {
-      showToast('Could not generate cover letter', 'error');
+      showToast('Could not build application pack', 'error');
     });
 }
 

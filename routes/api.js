@@ -253,8 +253,10 @@ function crudRoutes(entityName, filename) {
 crudRoutes('experiences', 'experiences.json');
 crudRoutes('projects', 'projects.json');
 
-const { generateCoverLetter, slugify: coverLetterFileSlug } = require('../lib/cover-letter');
+const { slugify: coverLetterFileSlug } = require('../lib/cover-letter');
+const { generateCoverLetterSmart } = require('../lib/cover-letter-ai');
 const { plainTextToDocxBuffer } = require('../lib/cover-letter-docx');
+const { buildApplicationPackZip } = require('../lib/application-pack');
 
 router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
   try {
@@ -277,16 +279,38 @@ router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
       /* optional */
     }
 
-    const text = generateCoverLetter({ job, experiences, profile });
-    const filename = `Cover-letter-${coverLetterFileSlug(job.co)}.docx`;
+    const text = await generateCoverLetterSmart({ job, experiences, profile });
+    const slug = coverLetterFileSlug(job.co);
+    const coverBuf = await plainTextToDocxBuffer(text);
 
-    const buf = await plainTextToDocxBuffer(text);
-    res.setHeader(
-      'Content-Type',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    );
-    res.setHeader('Content-Disposition', `attachment; filename="${filename.replace(/"/g, '')}"`);
-    res.send(buf);
+    const resumePdfPath = path.join(__dirname, '..', 'public', 'resume.pdf');
+    let resumeBuf = null;
+    let resumeMeta = null;
+    try {
+      resumeMeta = await loadData('resume.json');
+    } catch (e) {
+      /* optional */
+    }
+    if (fs.existsSync(resumePdfPath)) {
+      try {
+        resumeBuf = await fs.promises.readFile(resumePdfPath);
+      } catch (readErr) {
+        console.warn('[application-pack] Could not read resume.pdf:', readErr.message || readErr);
+      }
+    }
+
+    const zipBuf = await buildApplicationPackZip({
+      coverDocxBuffer: coverBuf,
+      resumePdfBuffer: resumeBuf,
+      resumeEntryName: resumeMeta && resumeMeta.originalFilename,
+      slug
+    });
+
+    const zipName = `Application-${slug}.zip`;
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${zipName.replace(/"/g, '')}"`);
+    res.setHeader('X-Application-Pack-Includes-Resume', resumeBuf ? 'yes' : 'no');
+    res.send(zipBuf);
   } catch (e) {
     if (e && (e.code === 'ENOENT' || String(e.message).includes('JSON'))) {
       return res.status(404).send('Jobs CRM data not found');
