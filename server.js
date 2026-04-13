@@ -19,6 +19,7 @@ app.use('/Logos portfolio', express.static(path.join(__dirname, 'Logos portfolio
 const siteRoutes = require('./routes/site');
 const apiRoutes = require('./routes/api');
 const adminRoutes = require('./routes/admin');
+const { initDb, isDatabaseEnabled } = require('./lib/db');
 
 app.use('/api', apiRoutes);
 app.use('/admin', (req, res, next) => {
@@ -28,7 +29,33 @@ app.use('/admin', (req, res, next) => {
 app.use('/admin', adminRoutes);
 app.use('/', siteRoutes);
 
-app.listen(PORT, HOST, () => {
-  console.log(`Server listening on http://${HOST}:${PORT}`);
-  console.log(`Admin panel at /admin`);
+app.use(function (err, req, res, next) {
+  console.error(err);
+  if (res.headersSent) return next(err);
+  const msg = err.message || String(err);
+  if (req.originalUrl && String(req.originalUrl).indexOf('/api') === 0) {
+    return res.status(500).json({ error: msg });
+  }
+  res.status(500).send(process.env.NODE_ENV === 'production' ? 'Server error' : msg);
 });
+
+async function boot() {
+  try {
+    if (isDatabaseEnabled()) {
+      await initDb();
+      console.log('PostgreSQL: connected and schema ready');
+    } else {
+      console.log('CMS: using JSON files under data/ (set DATABASE_URL for PostgreSQL)');
+    }
+  } catch (e) {
+    console.error('Database init failed:', e.message || e);
+    process.exit(1);
+  }
+
+  app.listen(PORT, HOST, () => {
+    console.log(`Server listening on http://${HOST}:${PORT}`);
+    console.log(`Admin panel at /admin`);
+  });
+}
+
+boot();

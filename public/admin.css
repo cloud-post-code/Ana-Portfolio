@@ -783,6 +783,45 @@ body.admin {
   color: var(--admin-text);
 }
 
+.admin__job-hunter__results-heading {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--admin-text);
+  margin: 0 0 0.65rem;
+}
+
+.admin__job-hunter__empty-results {
+  margin: 0 0 0.75rem;
+  font-size: 0.85rem;
+}
+
+.admin__job-hunter__details {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--admin-border);
+  padding-top: 0.65rem;
+}
+
+.admin__job-hunter__details-summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--admin-text-muted);
+  list-style-position: outside;
+}
+
+.admin__job-hunter__details-summary:hover {
+  color: var(--admin-text);
+}
+
+.admin__job-hunter__report--secondary {
+  max-height: min(40vh, 320px);
+  margin-top: 0.5rem;
+  font-size: 0.74rem;
+  opacity: 0.95;
+}
+
 .admin__job-hunter__table-wrap {
   margin-bottom: 1rem;
 }
@@ -1195,6 +1234,69 @@ body.admin {
   background: var(--admin-bg);
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
+}
+
+.admin__crm-empty {
+  margin: 0.5rem 0 0;
+  padding: 1rem 1.1rem;
+  border: 1px dashed var(--admin-border);
+  border-radius: 10px;
+  background: var(--admin-bg);
+}
+
+.admin__crm-empty-lead {
+  margin: 0 0 0.65rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--admin-text);
+}
+
+.admin__crm-empty-details {
+  margin: 0;
+}
+
+.admin__crm-empty-summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--admin-text-muted);
+  list-style-position: outside;
+}
+
+.admin__crm-empty-summary:hover {
+  color: var(--admin-accent);
+}
+
+.admin__crm-empty-reason {
+  margin-top: 0.65rem;
+  padding-top: 0.65rem;
+  border-top: 1px solid var(--admin-border);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--admin-text-muted);
+}
+
+.admin__crm-empty-reason p {
+  margin: 0 0 0.5rem;
+}
+
+.admin__crm-empty-reason p:last-child {
+  margin-bottom: 0;
+}
+
+.admin__crm-empty-reason code {
+  font-size: 0.88em;
+  background: var(--admin-bg);
+  padding: 0.08rem 0.32rem;
+  border-radius: 4px;
+  border: 1px solid var(--admin-border);
+}
+
+.admin__crm-empty-reason-note {
+  font-size: 0.78rem !important;
+  opacity: 0.95;
 }
 
 .admin__resume-card {

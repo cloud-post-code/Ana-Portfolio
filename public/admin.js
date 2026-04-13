@@ -248,19 +248,24 @@ function isListingUrl(s) {
   return /^https?:\/\//i.test(String(s || '').trim());
 }
 
-/** Render CRM-shaped Open Roles table + full markdown report (helper aligns with server parse). */
+/** Render CRM-shaped table from server JSON (openRoles); optional collapsible raw model text. */
 function renderJobHunterOutput(container, data) {
   container.innerHTML = '';
-  var roles = data.openRoles;
+  var roles = data.openRoles || [];
   var text = data.text || '';
 
-  if (roles && roles.length) {
+  var heading = document.createElement('h4');
+  heading.className = 'admin__job-hunter__results-heading';
+  heading.textContent = 'Results';
+  container.appendChild(heading);
+
+  if (roles.length) {
     var wrap = document.createElement('div');
     wrap.className = 'admin__job-hunter__table-wrap admin__jobs-wrap';
     var cap = document.createElement('p');
     cap.className = 'admin__job-hunter__table-caption';
     cap.innerHTML =
-      'Open roles <span class="admin__text-muted">(verify listings before applying). Rows with a left border were flagged by an automatic double-check—hover the row for details.</span>';
+      'Open roles <span class="admin__text-muted">(from parsed search results — verify listings before applying). Rows with a left border were flagged by an automatic double-check—hover the row for details.</span>';
     wrap.appendChild(cap);
 
     var table = document.createElement('table');
@@ -392,17 +397,27 @@ function renderJobHunterOutput(container, data) {
     table.appendChild(tbody);
     wrap.appendChild(table);
     container.appendChild(wrap);
+  } else {
+    var empty = document.createElement('p');
+    empty.className = 'admin__text-muted admin__job-hunter__empty-results';
+    empty.textContent =
+      'No job rows were parsed into the table. Expand “Full model output” below if the model returned text, or try different keywords.';
+    container.appendChild(empty);
   }
 
-  var reportLabel = document.createElement('p');
-  reportLabel.className = 'admin__job-hunter__report-label';
-  reportLabel.textContent = roles && roles.length ? 'Full report' : 'Results';
-  container.appendChild(reportLabel);
-
-  var pre = document.createElement('pre');
-  pre.className = 'admin__job-hunter__report';
-  pre.textContent = text;
-  container.appendChild(pre);
+  if (text && String(text).trim()) {
+    var details = document.createElement('details');
+    details.className = 'admin__job-hunter__details';
+    var sum = document.createElement('summary');
+    sum.className = 'admin__job-hunter__details-summary';
+    sum.textContent = roles.length ? 'Full model output (optional)' : 'Model output';
+    details.appendChild(sum);
+    var pre = document.createElement('pre');
+    pre.className = 'admin__job-hunter__report admin__job-hunter__report--secondary';
+    pre.textContent = text;
+    details.appendChild(pre);
+    container.appendChild(details);
+  }
 }
 
 function runJobHunterSkillSearch() {

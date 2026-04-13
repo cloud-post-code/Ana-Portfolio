@@ -30,7 +30,7 @@ This skill does **not** call Claude by itself; **Cursor** already uses an AI mod
 
 When triggered, follow these steps **in order**, combining web search calls efficiently:
 
-1. **Clarify (if needed)** — Confirm industry focus and location if not already stated; capture **custom search** input if the user provided it (see below).
+1. **Do not stall on questions** — If the user (or the portfolio **Job Hunter** admin search box) provided any keywords, criteria, or constraints, **proceed immediately** to Find Jobs. Infer missing city/industry/sub-focus from context; only ask a follow-up when the user message is completely empty.
 2. **Find Jobs** — Search for entry-level marketing/campaign roles in target industry + city, **merging in custom search terms** when supplied.
 3. **Optional: Add jobs to CRM** — If the user wants roles saved to the list, update `data/jobs-crm.json` (see **Persisting jobs to the Job CRM list**).
 4. **Extract Resume Requirements** — From job listings, identify the most commonly required skills.
@@ -45,7 +45,7 @@ When triggered, follow these steps **in order**, combining web search calls effi
 
 Users may supply **their own search parameters** instead of or in addition to the default templates. Treat these as **mandatory constraints** for web search.
 
-**Accept any of the following (ask only if nothing at all is stated):**
+**Accept any of the following (from the portfolio admin, the Search + criteria fields count as stated—infer the rest; do not ask first):**
 
 | Input | How to use it |
 |-------|----------------|
@@ -82,14 +82,11 @@ If the agent **cannot** write files, output a **ready-to-paste JSON array snippe
 
 ---
 
-## Step 1: Industry & Location Clarification
+## Step 1: Industry & Location (infer — do not block)
 
-If the user hasn't specified, ask:
-- Which industry? (Fashion, Beauty/Makeup, CPG, Tech, Media, Retail, Lifestyle, Luxury, Sports, other)
-- Which city or remote?
-- Any specific role type? (e.g., Social Media, Campaigns, Brand, Influencer, Email Marketing)
+**Portfolio admin / API:** Do **not** ask clarifying questions. Use Search + criteria text, CRM context, and reasonable defaults (e.g. major US metros or “Remote” if unstated).
 
-If already specified in context, skip asking and proceed directly.
+For interactive chat only, if the user truly sent **no** keywords and **no** constraints, you may ask briefly—otherwise **infer** industry/city/role type and proceed.
 
 If the user already provided **custom search** terms (keywords, sites, exclusions), **do not** override them — fold them into the queries in Step 2.
 

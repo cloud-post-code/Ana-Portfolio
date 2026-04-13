@@ -2,38 +2,43 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const cms = require('../lib/cms-store');
 
-function loadJSON(filename) {
-  const filePath = path.join(__dirname, '..', 'data', filename);
-  return JSON.parse(fs.readFileSync(filePath, 'utf8'));
-}
-
-router.get('/', (req, res) => {
-  const experiences = loadJSON('experiences.json').sort((a, b) => a.order - b.order);
-  const projects = loadJSON('projects.json').sort((a, b) => a.order - b.order);
-  let resume = { path: null, originalFilename: null, updatedAt: null };
+router.get('/', async function (req, res, next) {
   try {
-    resume = loadJSON('resume.json');
+    const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => a.order - b.order);
+    const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
+    let resume = { path: null, originalFilename: null, updatedAt: null };
+    const v = await cms.getKv('resume');
+    if (v != null) resume = v;
+    const resumePdfPath = path.join(__dirname, '..', 'public', 'resume.pdf');
+    const resumeFileExists = fs.existsSync(resumePdfPath);
+    res.render('index', { experiences, projects, resume, resumeFileExists });
   } catch (e) {
-    /* optional */
+    next(e);
   }
-  const resumePdfPath = path.join(__dirname, '..', 'public', 'resume.pdf');
-  const resumeFileExists = fs.existsSync(resumePdfPath);
-  res.render('index', { experiences, projects, resume, resumeFileExists });
 });
 
-router.get('/experience/:slug', (req, res) => {
-  const experiences = loadJSON('experiences.json');
-  const item = experiences.find(e => e.slug === req.params.slug);
-  if (!item) return res.status(404).send('Experience not found');
-  res.render('detail', { item, itemType: 'experience' });
+router.get('/experience/:slug', async function (req, res, next) {
+  try {
+    const experiences = await cms.getPortfolio('experiences');
+    const item = experiences.find(e => e.slug === req.params.slug);
+    if (!item) return res.status(404).send('Experience not found');
+    res.render('detail', { item, itemType: 'experience' });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.get('/project/:slug', (req, res) => {
-  const projects = loadJSON('projects.json');
-  const item = projects.find(p => p.slug === req.params.slug);
-  if (!item) return res.status(404).send('Project not found');
-  res.render('detail', { item, itemType: 'project' });
+router.get('/project/:slug', async function (req, res, next) {
+  try {
+    const projects = await cms.getPortfolio('projects');
+    const item = projects.find(p => p.slug === req.params.slug);
+    if (!item) return res.status(404).send('Project not found');
+    res.render('detail', { item, itemType: 'project' });
+  } catch (e) {
+    next(e);
+  }
 });
 
 module.exports = router;

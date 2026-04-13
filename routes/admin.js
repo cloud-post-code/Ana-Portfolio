@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const path = require('path');
 const fs = require('fs');
+const cms = require('../lib/cms-store');
 const { CRM_JOB_STATUSES } = require('./crm-constants');
 const {
   regionFromLoc,
@@ -9,80 +10,90 @@ const {
   TRACK_DEFS
 } = require('./job-crm-helpers');
 
-function loadJSON(filename) {
-  return JSON.parse(fs.readFileSync(path.join(__dirname, '..', 'data', filename), 'utf8'));
-}
-
-router.get('/', (req, res) => {
-  const experiences = loadJSON('experiences.json').sort((a, b) => a.order - b.order);
-  const projects = loadJSON('projects.json').sort((a, b) => a.order - b.order);
-  let jobsCrm = [];
-  let starredJobCount = 0;
+router.get('/', async function (req, res, next) {
   try {
-    const raw = loadJSON('jobs-crm.json');
-    const starred = [];
-    const rest = [];
-    raw.forEach(function (j) {
-      if (j.starred) starred.push(j);
-      else rest.push(j);
+    const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => a.order - b.order);
+    const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
+    let jobsCrm = [];
+    let starredJobCount = 0;
+    try {
+      const raw = await cms.getJobsCrm();
+      const starred = [];
+      const rest = [];
+      raw.forEach(function (j) {
+        if (j.starred) starred.push(j);
+        else rest.push(j);
+      });
+      starredJobCount = starred.length;
+      jobsCrm = starred.concat(rest);
+    } catch (e) {
+      /* optional */
+    }
+
+    const crmJobRows = jobsCrm.map(function (job) {
+      return {
+        job,
+        region: regionFromLoc(job.loc),
+        tracks: tracksForJob(job)
+      };
     });
-    starredJobCount = starred.length;
-    jobsCrm = starred.concat(rest);
+
+    res.render('admin/dashboard', {
+      experiences,
+      projects,
+      jobsCrm,
+      crmJobRows,
+      starredJobCount,
+      crmStatusOptions: CRM_JOB_STATUSES,
+      crmTrackOptions: TRACK_DEFS,
+      usePostgres: cms.isDatabaseEnabled()
+    });
   } catch (e) {
-    /* optional data file */
+    next(e);
   }
-
-  const crmJobRows = jobsCrm.map(function (job) {
-    return {
-      job,
-      region: regionFromLoc(job.loc),
-      tracks: tracksForJob(job)
-    };
-  });
-
-  res.render('admin/dashboard', {
-    experiences,
-    projects,
-    jobsCrm,
-    crmJobRows,
-    starredJobCount,
-    crmStatusOptions: CRM_JOB_STATUSES,
-    crmTrackOptions: TRACK_DEFS
-  });
 });
 
 router.get('/experiences/new', (req, res) => {
   res.render('admin/experience-form', { item: null, isNew: true });
 });
 
-router.get('/experiences/:id/edit', (req, res) => {
-  const experiences = loadJSON('experiences.json');
-  const item = experiences.find(e => e.id === req.params.id);
-  if (!item) return res.status(404).send('Not found');
-  res.render('admin/experience-form', { item, isNew: false });
+router.get('/experiences/:id/edit', async function (req, res, next) {
+  try {
+    const experiences = await cms.getPortfolio('experiences');
+    const item = experiences.find(e => e.id === req.params.id);
+    if (!item) return res.status(404).send('Not found');
+    res.render('admin/experience-form', { item, isNew: false });
+  } catch (e) {
+    next(e);
+  }
 });
 
-router.get('/resume', (req, res) => {
-  let resume = { path: null, originalFilename: null, updatedAt: null };
+router.get('/resume', async function (req, res, next) {
   try {
-    resume = loadJSON('resume.json');
+    let resume = { path: null, originalFilename: null, updatedAt: null };
+    const v = await cms.getKv('resume');
+    if (v != null) resume = v;
+    const fp = path.join(__dirname, '..', 'public', 'resume.pdf');
+    const resumeFileExists = fs.existsSync(fp);
+    res.render('admin/resume', { adminTitle: 'Resume', resume, resumeFileExists });
   } catch (e) {
-    /* optional */
+    next(e);
   }
-  const fp = path.join(__dirname, '..', 'public', 'resume.pdf');
-  const resumeFileExists = fs.existsSync(fp);
-  res.render('admin/resume', { adminTitle: 'Resume', resume, resumeFileExists });
 });
 
 router.get('/projects/new', (req, res) => {
   res.render('admin/project-form', { item: null, isNew: true });
 });
 
-router.get('/projects/:id/edit', (req, res) => {
-  const projects = loadJSON('projects.json');
-  const item = projects.find(p => p.id === req.params.id);
-  if (!item) return res.status(404).send('Not found');
-  res.render('admin/project-form', { item, isNew: false });
+router.get('/projects/:id/edit', async function (req, res, next) {
+  try {
+    const projects = await cms.getPortfolio('projects');
+    const item = projects.find(p => p.id === req.params.id);
+    if (!item) return res.status(404).send('Not found');
+    res.render('admin/project-form', { item, isNew: false });
+  } catch (e) {
+    next(e);
+  }
 });
 
 module.exports = router;

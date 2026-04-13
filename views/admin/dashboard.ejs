@@ -15,7 +15,7 @@
 
   <div class="admin__job-hunter" id="job-hunter-panel">
     <h3 class="admin__job-hunter__title">Job Hunter <span class="admin__text-muted">(Claude skill)</span></h3>
-    <p class="admin__job-hunter__lead">Search the web (optional Tavily, URLs deduplicated) + Claude using the bundled <code>skills/job-hunter</code> skill. Your current <strong>Job CRM</strong> rows are sent so the model should not suggest the same role twice. <strong>Each new lead is merged into <code>data/jobs-crm.json</code></strong> with full CRM fields (company, role, location, notes, tags, status, priority, listing URL when available, YoE, deadline). Deduped by URL and by company+role+location. Set <code>ANTHROPIC_API_KEY</code> on the server.</p>
+    <p class="admin__job-hunter__lead">Search the web (optional Tavily, URLs deduplicated) + Claude using the bundled <code>skills/job-hunter</code> skill. Your current <strong>Job CRM</strong> rows are sent so the model should not suggest the same role twice. <strong>Each new lead is saved</strong> with full CRM fields (company, role, location, notes, tags, status, priority, listing URL when available, YoE, deadline)<% if (typeof usePostgres !== 'undefined' && usePostgres) { %> to the <strong>PostgreSQL</strong> database<% } else { %> to <code>data/jobs-crm.json</code><% } %>. Deduped by URL and by company+role+location. Set <code>ANTHROPIC_API_KEY</code> on the server.</p>
     <div class="admin__job-hunter__row">
       <div class="admin__job-hunter__field admin__job-hunter__field--grow">
         <label class="admin__job-hunter__label" for="job-hunter-query">Search</label>
@@ -281,7 +281,20 @@
     </table>
   </div>
   <% } else { %>
-  <p class="admin__empty-hint">Add <code>data/jobs-crm.json</code> to show your job list.</p>
+  <div class="admin__crm-empty">
+    <p class="admin__crm-empty-lead">Your job list will appear here once you add roles — use <strong>Find jobs</strong> above or import data.</p>
+    <details class="admin__crm-empty-details">
+      <summary class="admin__crm-empty-summary">Storage &amp; why the list is empty</summary>
+      <div class="admin__crm-empty-reason">
+        <% if (typeof usePostgres !== 'undefined' && usePostgres) { %>
+        <p>Job CRM is backed by <strong>PostgreSQL</strong> (<code>DATABASE_URL</code>). This table is empty until you save leads from Job Hunter or run a seed/migration.</p>
+        <% } else { %>
+        <p>With no database configured, jobs are stored in <code>data/jobs-crm.json</code> in this project. Add that file (or run Job Hunter) so rows load here.</p>
+        <% } %>
+        <p class="admin__crm-empty-reason-note">Set <code>ANTHROPIC_API_KEY</code> on the server for Job Hunter; optional <code>TAVILY_API_KEY</code> for web snippets.</p>
+      </div>
+    </details>
+  </div>
   <% } %>
 </section>
 
