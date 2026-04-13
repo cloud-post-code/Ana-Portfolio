@@ -225,6 +225,145 @@ function downloadJobCoverLetter(id) {
 }
 
 /* ─── Job Hunter (Claude skill: skills/job-hunter) ───────────────────── */
+var JOB_HUNTER_US_STATES = [
+  ['AL', 'Alabama'],
+  ['AK', 'Alaska'],
+  ['AZ', 'Arizona'],
+  ['AR', 'Arkansas'],
+  ['CA', 'California'],
+  ['CO', 'Colorado'],
+  ['CT', 'Connecticut'],
+  ['DE', 'Delaware'],
+  ['DC', 'District of Columbia'],
+  ['FL', 'Florida'],
+  ['GA', 'Georgia'],
+  ['HI', 'Hawaii'],
+  ['ID', 'Idaho'],
+  ['IL', 'Illinois'],
+  ['IN', 'Indiana'],
+  ['IA', 'Iowa'],
+  ['KS', 'Kansas'],
+  ['KY', 'Kentucky'],
+  ['LA', 'Louisiana'],
+  ['ME', 'Maine'],
+  ['MD', 'Maryland'],
+  ['MA', 'Massachusetts'],
+  ['MI', 'Michigan'],
+  ['MN', 'Minnesota'],
+  ['MS', 'Mississippi'],
+  ['MO', 'Missouri'],
+  ['MT', 'Montana'],
+  ['NE', 'Nebraska'],
+  ['NV', 'Nevada'],
+  ['NH', 'New Hampshire'],
+  ['NJ', 'New Jersey'],
+  ['NM', 'New Mexico'],
+  ['NY', 'New York'],
+  ['NC', 'North Carolina'],
+  ['ND', 'North Dakota'],
+  ['OH', 'Ohio'],
+  ['OK', 'Oklahoma'],
+  ['OR', 'Oregon'],
+  ['PA', 'Pennsylvania'],
+  ['RI', 'Rhode Island'],
+  ['SC', 'South Carolina'],
+  ['SD', 'South Dakota'],
+  ['TN', 'Tennessee'],
+  ['TX', 'Texas'],
+  ['UT', 'Utah'],
+  ['VT', 'Vermont'],
+  ['VA', 'Virginia'],
+  ['WA', 'Washington'],
+  ['WV', 'West Virginia'],
+  ['WI', 'Wisconsin'],
+  ['WY', 'Wyoming']
+];
+
+function initJobHunterCriteriaForm() {
+  var sel = document.getElementById('job-hunter-state');
+  if (!sel || sel.querySelector('option[value="AL"]')) return;
+  JOB_HUNTER_US_STATES.forEach(function (pair) {
+    var opt = document.createElement('option');
+    opt.value = pair[0];
+    opt.textContent = pair[1];
+    sel.appendChild(opt);
+  });
+}
+
+var JOB_HUNTER_YOE_LABELS = {
+  any: 'Any level',
+  entry: 'Entry-level (about 0–1 years)',
+  '1-3': 'About 1–3 years',
+  '3-5': 'About 3–5 years',
+  '5-8': 'About 5–8 years',
+  '8+': 'About 8+ years'
+};
+
+var JOB_HUNTER_WORK_LABELS = {
+  any: 'No preference (remote, hybrid, or on-site)',
+  remote: 'Remote only',
+  hybrid: 'Hybrid only',
+  onsite: 'On-site / in-person only',
+  'remote-hybrid': 'Remote or hybrid (exclude fully on-site)'
+};
+
+function buildJobHunterStructuredCriteria() {
+  var lines = ['Structured search criteria (apply all that are set):'];
+  var roleEl = document.getElementById('job-hunter-role-title');
+  var role = roleEl ? String(roleEl.value || '').trim() : '';
+  if (role) {
+    lines.push('- Role title / focus: ' + role);
+  }
+  var stEl = document.getElementById('job-hunter-state');
+  var st = stEl ? String(stEl.value || '').trim() : '';
+  if (st) {
+    var label = '';
+    for (var i = 0; i < JOB_HUNTER_US_STATES.length; i++) {
+      if (JOB_HUNTER_US_STATES[i][0] === st) {
+        label = JOB_HUNTER_US_STATES[i][1];
+        break;
+      }
+    }
+    lines.push('- Location: US state = ' + (label || st) + ' (include jobs in or tied to this state).');
+  }
+  var yoeEl = document.getElementById('job-hunter-yoe');
+  var yoe = yoeEl ? String(yoeEl.value || 'any') : 'any';
+  if (yoe !== 'any') {
+    lines.push('- Years of experience: prefer postings that match ' + (JOB_HUNTER_YOE_LABELS[yoe] || yoe) + '.');
+  }
+  var workEl = document.getElementById('job-hunter-work');
+  var work = workEl ? String(workEl.value || 'any') : 'any';
+  if (work !== 'any') {
+    lines.push('- Work arrangement: ' + (JOB_HUNTER_WORK_LABELS[work] || work) + '.');
+  }
+  var incEl = document.getElementById('job-hunter-include-internships');
+  var includeIntern = incEl && incEl.checked;
+  lines.push(
+    includeIntern
+      ? '- Internships: Include internship roles when relevant.'
+      : '- Internships: Exclude internship-only roles; prioritize full-time and experienced-hire postings.'
+  );
+  return lines.join('\n');
+}
+
+function jobHunterFormHasIntent() {
+  var qEl = document.getElementById('job-hunter-query');
+  if (qEl && String(qEl.value || '').trim()) return true;
+  var roleEl = document.getElementById('job-hunter-role-title');
+  if (roleEl && String(roleEl.value || '').trim()) return true;
+  var ta = document.getElementById('job-hunter-criteria');
+  if (ta && String(ta.value || '').trim()) return true;
+  var stEl = document.getElementById('job-hunter-state');
+  if (stEl && String(stEl.value || '').trim()) return true;
+  var yoeEl = document.getElementById('job-hunter-yoe');
+  if (yoeEl && yoeEl.value && yoeEl.value !== 'any') return true;
+  var workEl = document.getElementById('job-hunter-work');
+  if (workEl && workEl.value && workEl.value !== 'any') return true;
+  var incEl = document.getElementById('job-hunter-include-internships');
+  if (incEl && incEl.checked) return true;
+  return false;
+}
+
 function parseTagsCell(tagsStr) {
   if (!tagsStr || String(tagsStr).trim() === '' || String(tagsStr).trim() === '—') return [];
   return String(tagsStr)
@@ -428,11 +567,16 @@ function runJobHunterSkillSearch() {
   var outEl = document.getElementById('job-hunter-output');
   var btn = document.getElementById('job-hunter-run');
   var searchQuery = qEl ? qEl.value.trim() : '';
-  var criteria = ta ? ta.value.trim() : '';
+  var notes = ta ? ta.value.trim() : '';
+  var structured = buildJobHunterStructuredCriteria();
+  var criteria = structured;
+  if (notes) {
+    criteria += '\n\nAdditional notes:\n' + notes;
+  }
   var rawCount = countEl ? parseInt(String(countEl.value), 10) : 8;
   var targetJobCount = Number.isNaN(rawCount) ? 8 : Math.min(25, Math.max(1, rawCount));
-  if (!searchQuery && !criteria) {
-    showToast('Add a search query and/or more criteria', 'error');
+  if (!jobHunterFormHasIntent()) {
+    showToast('Add a search query and/or at least one criterion (role, state, experience, work style, internships, or notes)', 'error');
     return;
   }
   if (btn) btn.disabled = true;
@@ -969,4 +1113,5 @@ function initJobCrmSearch() {
 document.addEventListener('DOMContentLoaded', function () {
   initDragAndDrop();
   initJobCrmSearch();
+  initJobHunterCriteriaForm();
 });

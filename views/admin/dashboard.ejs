@@ -45,15 +45,66 @@
       </div>
       <button type="button" class="admin__btn admin__btn--primary" id="job-hunter-run" onclick="runJobHunterSkillSearch()">Find jobs</button>
     </div>
-    <label class="admin__job-hunter__label" for="job-hunter-criteria">More criteria <span class="admin__text-muted">(optional)</span></label>
+    <p class="admin__job-hunter__criteria-heading">Criteria</p>
+    <div class="admin__job-hunter__criteria-grid" role="group" aria-label="Job search criteria">
+      <div class="admin__job-hunter__field admin__job-hunter__field--grow">
+        <label class="admin__job-hunter__label" for="job-hunter-role-title">Role title</label>
+        <input
+          type="text"
+          id="job-hunter-role-title"
+          class="admin__job-hunter__search"
+          placeholder="e.g. Marketing Manager, Growth Marketing"
+          autocomplete="off"
+          aria-describedby="job-hunter-hint"
+        />
+      </div>
+      <div class="admin__job-hunter__field">
+        <label class="admin__job-hunter__label" for="job-hunter-state">State</label>
+        <select id="job-hunter-state" class="admin__job-hunter__search admin__job-hunter__select" aria-describedby="job-hunter-hint">
+          <option value="">— Any US state —</option>
+        </select>
+      </div>
+      <div class="admin__job-hunter__field">
+        <label class="admin__job-hunter__label" for="job-hunter-yoe">Years of experience</label>
+        <select id="job-hunter-yoe" class="admin__job-hunter__search admin__job-hunter__select" aria-describedby="job-hunter-hint">
+          <option value="any">Any</option>
+          <option value="entry">Entry-level (0–1 yrs)</option>
+          <option value="1-3">1–3 years</option>
+          <option value="3-5">3–5 years</option>
+          <option value="5-8">5–8 years</option>
+          <option value="8+">8+ years</option>
+        </select>
+      </div>
+      <div class="admin__job-hunter__field">
+        <label class="admin__job-hunter__label" for="job-hunter-work">Work arrangement</label>
+        <select id="job-hunter-work" class="admin__job-hunter__search admin__job-hunter__select" aria-describedby="job-hunter-hint">
+          <option value="any">Any (remote, hybrid, or on-site)</option>
+          <option value="remote">Remote only</option>
+          <option value="hybrid">Hybrid only</option>
+          <option value="onsite">On-site / in-person only</option>
+          <option value="remote-hybrid">Remote or hybrid (not fully on-site)</option>
+        </select>
+      </div>
+      <div class="admin__job-hunter__field admin__job-hunter__field--intern">
+        <span class="admin__job-hunter__label" id="job-hunter-intern-label">Internships</span>
+        <div class="admin__job-hunter__intern-row">
+          <label class="admin__job-hunter__checkbox-label">
+            <input type="checkbox" id="job-hunter-include-internships" class="admin__job-hunter__checkbox" aria-labelledby="job-hunter-intern-label" />
+            <span>Include internship roles</span>
+          </label>
+          <span class="admin__job-hunter__hint-inline" id="job-hunter-intern-hint">When unchecked, de-prioritize or skip internship-only postings.</span>
+        </div>
+      </div>
+    </div>
+    <label class="admin__job-hunter__label" for="job-hunter-criteria">Additional notes <span class="admin__text-muted">(optional)</span></label>
     <textarea
       id="job-hunter-criteria"
       class="admin__job-hunter__textarea"
-      rows="4"
-      placeholder="Industries, role titles, exclusions (-intern), seniority, remote/hybrid…"
+      rows="3"
+      placeholder="Industry, salary, company size, must-have tools…"
       aria-describedby="job-hunter-hint"
     ></textarea>
-    <p id="job-hunter-hint" class="admin__job-hunter__hint">At least one of Search or More criteria must be filled. Results appear below (verify links before applying).</p>
+    <p id="job-hunter-hint" class="admin__job-hunter__hint">Fill <strong>Search</strong> and/or at least one criterion (role title, state, experience, work style, internships, or notes). Results appear below (verify links before applying).</p>
     <div id="job-hunter-status" class="admin__job-hunter__status" hidden></div>
     <div id="job-hunter-output" class="admin__job-hunter__output" hidden></div>
   </div>
@@ -259,7 +310,7 @@
           <td class="admin__jobs-hult-cell">
             <% var _hultCo = String(job.co || '').trim().replace(/["<>]+/g, ' '); %>
             <% var _hultUrl = _hultCo
-              ? 'https://www.linkedin.com/search/results/people/?keywords=' + encodeURIComponent('Hult International Business School ' + _hultCo)
+              ? 'https://www.linkedin.com/search/results/people/?keywords=' + encodeURIComponent(_hultCo + ' - Hult International Business School')
               : 'https://www.linkedin.com/school/hult-international-business-school/people/'; %>
             <a href="<%= _hultUrl %>"
               class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon"
