@@ -18,7 +18,7 @@ Use this when **adding jobs to the list** (portfolio admin Job CRM at `/admin#jo
 | `st` | string | yes | Status: `To Apply`, `Applied`, `Interview`, `Offer`, `Passed`, `To Reach Out`, `Messaged`, `Replied`, `Coffee Chat`, `Engaged`, `Research`, … |
 | `pri` | string | yes | `High`, `Medium`, or `Low`. |
 | `notes` | string | yes | Short summary (responsibilities, fit, years exp). |
-| `url` | string | yes | Listing or search URL; use best canonical apply link when possible. |
+| `url` | string | yes | **Apply** URL for this role (ATS or single-job posting). Prefer employer apply link over search/hub pages. |
 | `tags` | string[] | yes | 2–4 labels, e.g. `["Digital","Agency","NYC"]`. |
 
 ## Example

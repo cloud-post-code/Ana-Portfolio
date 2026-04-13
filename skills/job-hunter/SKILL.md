@@ -217,9 +217,9 @@ Output **one** markdown pipe table whose columns match the portfolio **Job CRM**
 - **Status**: default `To Apply` for new leads.
 - **Priority**: default `Medium` when unsure; `High`/`Low` when evidence supports it.
 - **Tags**: 2–4 comma-separated labels; default `—` if unknown.
-- **Listing**: full `https://…` only when verified in search/snippets; default `—` if unknown. Never invent URLs.
+- **Listing**: the **Apply** link for this role—where the candidate starts or submits an application (employer ATS such as Greenhouse/Lever/Workday preferred when shown). Use a **single-requisition** URL, not a generic careers or “all jobs” home, not a search results URL. Full `https://…` only when verified in search/snippets; default `—` if unknown. Never invent URLs.
 
-**Double-check before you ship the table:** (1) Each company, title, and location matches the snippet or listing you used. (2) Each URL is a **single job** page, not a search results URL. (3) Prefer URLs that appear in your search results. (4) Remove duplicate company+role+location rows and any thin guesses.
+**Double-check before you ship the table:** (1) Each company, title, and location matches the snippet or listing you used. (2) Each URL is a **direct apply or single-job posting** for that vacancy—not a hub or search page. Prefer employer/ATS apply URLs over board wrappers when both appear. (3) Prefer URLs that appear in your search results. (4) Remove duplicate company+role+location rows and any thin guesses.
 
 ---
 

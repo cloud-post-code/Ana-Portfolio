@@ -451,15 +451,26 @@ function runJobHunterSkillSearch() {
         renderJobHunterOutput(outEl, o.j);
       }
       if (statusEl) {
+        var doneParts = [];
+        if (o.j.model) doneParts.push(o.j.model);
+        if (typeof o.j.targetJobCount === 'number') doneParts.push('target ' + o.j.targetJobCount + ' roles');
+        var cs = o.j.crmSave;
+        if (cs && typeof cs.added === 'number' && cs.added > 0) {
+          doneParts.push('saved ' + cs.added + ' to Job CRM');
+        } else if (cs && cs.error) {
+          doneParts.push('CRM save failed');
+        }
         statusEl.className = 'admin__job-hunter__status admin__job-hunter__status--done';
-        statusEl.textContent =
-          o.j.model
-            ? 'Done · ' +
-              o.j.model +
-              (typeof o.j.targetJobCount === 'number' ? ' · target ' + o.j.targetJobCount + ' roles' : '')
-            : 'Done';
+        statusEl.textContent = doneParts.length ? 'Done · ' + doneParts.join(' · ') : 'Done';
       }
-      showToast('Job Hunter results ready', 'success');
+      var toastMsg = 'Job Hunter results ready';
+      if (o.j.crmSave && typeof o.j.crmSave.added === 'number' && o.j.crmSave.added > 0) {
+        toastMsg +=
+          ' · ' + o.j.crmSave.added + ' new job(s) saved to your list — refresh the page to see them in Job CRM.';
+      } else if (o.j.crmSave && o.j.crmSave.error) {
+        toastMsg += ' (could not save to CRM — check server logs)';
+      }
+      showToast(toastMsg, 'success');
     })
     .catch(function (e) {
       showToast(e.message || 'Job Hunter failed', 'error');

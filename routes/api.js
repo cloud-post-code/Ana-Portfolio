@@ -412,6 +412,7 @@ const { verifyOpenRoleRows } = require('../lib/job-leads-verify');
 const { applyOpenRoleDefaults } = require('../lib/job-leads-defaults');
 const { resolveUrlsOnRows } = require('../lib/resolve-employer-url');
 const { enrichOpenRolesRows } = require('../lib/job-hunter-enrich');
+const { mergeJobHunterOpenRolesIntoCrm } = require('../lib/job-hunter-persist');
 
 router.post('/job-hunter/find-jobs', (req, res) => {
   const body = req.body || {};
@@ -445,20 +446,40 @@ router.post('/job-hunter/find-jobs', (req, res) => {
     .then(async function (out) {
       const parsed = parseOpenRolesTable(out.text);
       let rows = parsed.rows;
-      rows = await resolveUrlsOnRows(rows);
-      rows = await enrichOpenRolesRows(rows, { maxRows: targetJobCount });
+      const listingFetchCache = new Map();
+      rows = await resolveUrlsOnRows(rows, 4, listingFetchCache);
+      rows = await enrichOpenRolesRows(rows, {
+        maxRows: targetJobCount,
+        listingFetchCache: listingFetchCache,
+        fetchConcurrency: 4
+      });
       const openRoles = applyOpenRoleDefaults(
         verifyOpenRoleRows(rows, {
           existingJobs,
           webSnippets: out.webSnippets || ''
         })
       );
+
+      let crmSave = { added: 0, skipped: 0, newIds: [] };
+      try {
+        crmSave = mergeJobHunterOpenRolesIntoCrm(JOBS_CRM_FILE, openRoles);
+      } catch (saveErr) {
+        console.error('[job-hunter] CRM save failed:', saveErr);
+        crmSave = {
+          added: 0,
+          skipped: 0,
+          newIds: [],
+          error: saveErr.message || String(saveErr)
+        };
+      }
+
       res.json({
         ok: true,
         text: out.text,
         model: out.model,
         targetJobCount: out.targetJobCount != null ? out.targetJobCount : targetJobCount,
-        openRoles
+        openRoles,
+        crmSave: crmSave
       });
     })
     .catch(function (e) {
