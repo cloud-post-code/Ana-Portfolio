@@ -211,8 +211,8 @@ Output **one** markdown pipe table whose columns match the portfolio **Job CRM**
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | … | … | … | … | … | … | To Apply | Medium | … | https://… |
 
-- **Yrs exp**: from the posting (`0–2`, `3+`, `Entry`). Default if unknown: `—`.
-- **Job details**: 1–2 sentences; no `|` characters. Default if unknown: `—`.
+- **Yrs exp**: copy the exact phrase from the posting (`2+ years`, `Entry level`, etc.). Default if unknown: `—`.
+- **Job details**: enough for resume + cover letter (responsibilities, requirements, skills/tools, work arrangement; comp only if stated). Use `; ` between ideas, no `|`. Default if unknown: `—`.
 - **Deadline**: date, `Rolling`, or default `—` if unknown.
 - **Status**: default `To Apply` for new leads.
 - **Priority**: default `Medium` when unsure; `High`/`Low` when evidence supports it.

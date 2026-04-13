@@ -306,6 +306,18 @@ router.patch('/jobs-crm/:id', (req, res) => {
   res.json(data[idx]);
 });
 
+router.delete('/jobs-crm', (req, res) => {
+  let data;
+  try {
+    data = loadData(JOBS_CRM_FILE);
+  } catch (e) {
+    return res.status(404).json({ error: 'Jobs CRM data not found' });
+  }
+  const removed = Array.isArray(data) ? data.length : 0;
+  saveData(JOBS_CRM_FILE, []);
+  res.json({ success: true, removed });
+});
+
 router.delete('/jobs-crm/:id', (req, res) => {
   let data;
   try {
@@ -398,6 +410,8 @@ const { runJobHunterSkill } = require('../lib/job-hunter-claude');
 const { parseOpenRolesTable } = require('../lib/job-hunter-open-roles');
 const { verifyOpenRoleRows } = require('../lib/job-leads-verify');
 const { applyOpenRoleDefaults } = require('../lib/job-leads-defaults');
+const { resolveUrlsOnRows } = require('../lib/resolve-employer-url');
+const { enrichOpenRolesRows } = require('../lib/job-hunter-enrich');
 
 router.post('/job-hunter/find-jobs', (req, res) => {
   const body = req.body || {};
@@ -426,10 +440,13 @@ router.post('/job-hunter/find-jobs', (req, res) => {
   }
 
   return runJobHunterSkill({ searchQuery, criteria, existingJobs })
-    .then(function (out) {
+    .then(async function (out) {
       const parsed = parseOpenRolesTable(out.text);
+      let rows = parsed.rows;
+      rows = await resolveUrlsOnRows(rows);
+      rows = await enrichOpenRolesRows(rows);
       const openRoles = applyOpenRoleDefaults(
-        verifyOpenRoleRows(parsed.rows, {
+        verifyOpenRoleRows(rows, {
           existingJobs,
           webSnippets: out.webSnippets || ''
         })

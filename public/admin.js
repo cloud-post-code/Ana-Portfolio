@@ -525,6 +525,27 @@ function enhanceAllCollection(collection) {
     });
 }
 
+function deleteAllJobsCrm() {
+  if (!confirm('Remove ALL jobs from the CRM? This cannot be undone.')) return;
+  fetch('/api/jobs-crm', { method: 'DELETE' })
+    .then(function (res) {
+      return res.json().then(function (j) {
+        return { ok: res.ok, j: j };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Request failed');
+      var n = o.j && typeof o.j.removed === 'number' ? o.j.removed : 0;
+      showToast('Removed ' + n + ' job(s)', 'success');
+      setTimeout(function () {
+        location.reload();
+      }, 400);
+    })
+    .catch(function (e) {
+      showToast(e.message || 'Remove all failed', 'error');
+    });
+}
+
 function deleteJobCrm(id) {
   if (!confirm('Remove this job from your CRM list? This cannot be undone.')) return;
   fetch('/api/jobs-crm/' + encodeURIComponent(id), { method: 'DELETE' })
