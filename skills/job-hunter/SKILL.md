@@ -214,9 +214,9 @@ Output **one** markdown pipe table whose columns match the portfolio **Job CRM**
 - **Status**: default `To Apply` for new leads.
 - **Priority**: default `Medium` when unsure; `High`/`Low` when evidence supports it.
 - **Tags**: 2–4 comma-separated labels; default `—` if unknown.
-- **Listing**: **Always try a real link first**—apply or single-job posting URL (ATS, `/jobs/view/…`, etc.) from snippets or clearly tied to this role. Avoid generic career hubs and board **search** pages when a better URL exists. **Last resort only:** if no direct URL is available after re-checking snippets, use `https://www.google.com/search?q=` plus a URL-encoded query (company, role, location, e.g. `apply` or `careers`) so the user can find the posting. Do **not** default to `—` when a real URL or this Google fallback is possible. Never invent plausible-looking fake domains.
+- **Listing**: **Exact source URL only**—copy the full `https://…` that **appears verbatim** in your web search/snippet results for that vacancy (the page you used as evidence). **Never** invent URLs, **never** use Google search links, and do not substitute a URL that is not in your results. If no result URL clearly matches the row, use `—`.
 
-**Double-check before you ship the table:** (1) Each company, title, and location matches the snippet or listing you used. (2) Prefer a **direct apply or single-job posting** URL; only use a Google search link as **last resort** when no better URL exists. (3) Prefer URLs that appear in your search results. (4) Remove duplicate company+role+location rows and any thin guesses.
+**Double-check before you ship the table:** (1) Each company, title, and location matches the snippet you used. (2) Each Listing URL is **copied character-for-character** from a snippet URL—not guessed. (3) Remove duplicate company+role+location rows and any thin guesses.
 
 ---
 

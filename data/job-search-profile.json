@@ -3,8 +3,22 @@
     "fullName": "Ana Machuca",
     "email": "",
     "phone": "",
-    "cityState": ""
+    "cityState": "",
+    "linkedIn": "",
+    "portfolio": ""
   },
+  "education": [],
+  "skillsGroups": {
+    "technical": "",
+    "professional": "",
+    "certifications": "",
+    "languages": "",
+    "toolsPlatforms": ""
+  },
+  "additionalExperienceNotes": "",
+  "resumeNotesForAi": "",
+  "resumeIncludedExperienceIds": null,
+  "resumeIncludedProjectIds": null,
   "headline": "What you're looking for",
   "summary": "Full-time entry-level marketing roles with hands-on campaign, brand, and digital work—teams that value experimentation, clear metrics, and collaboration.",
   "keyDetails": [

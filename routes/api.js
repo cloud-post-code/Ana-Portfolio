@@ -50,6 +50,7 @@ const uploadResume = multer({
 });
 
 const cms = require('../lib/cms-store');
+const { mergeProfile } = require('../lib/job-search-profile');
 const JOBS_CRM_FILE = 'jobs-crm.json';
 
 function dataPath(filename) {
@@ -66,7 +67,15 @@ async function loadData(filename) {
     return { path: null, originalFilename: null, updatedAt: null };
   }
   if (filename === 'job-search-profile.json') {
-    return cms.getKv('job_search_profile');
+    let v = await cms.getKv('job_search_profile');
+    if (v == null) {
+      try {
+        v = JSON.parse(fs.readFileSync(dataPath('job-search-profile.json'), 'utf8'));
+      } catch (e) {
+        v = {};
+      }
+    }
+    return mergeProfile(v);
   }
   return JSON.parse(fs.readFileSync(dataPath(filename), 'utf8'));
 }
@@ -76,6 +85,12 @@ async function saveData(filename, data) {
   if (filename === 'experiences.json') return cms.savePortfolio('experiences', data);
   if (filename === 'projects.json') return cms.savePortfolio('projects', data);
   if (filename === 'resume.json') return cms.setKv('resume', data);
+  if (filename === 'job-search-profile.json') {
+    await cms.setKv('job_search_profile', data);
+    fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
+    fs.writeFileSync(dataPath(filename), JSON.stringify(data, null, 2));
+    return;
+  }
   fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
   fs.writeFileSync(dataPath(filename), JSON.stringify(data, null, 2));
 }
@@ -255,11 +270,19 @@ crudRoutes('projects', 'projects.json');
 
 const { slugify: coverLetterFileSlug } = require('../lib/cover-letter');
 const { generateCoverLetterSmart } = require('../lib/cover-letter-ai');
+const { generateTailoredResumeForJob } = require('../lib/resume-tailor-ai');
 const { plainTextToDocxBuffer } = require('../lib/cover-letter-docx');
 const { buildApplicationPackZip } = require('../lib/application-pack');
 
 router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
   try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({
+        error:
+          'Application pack requires ANTHROPIC_API_KEY (Claude generates the tailored resume and cover letter).'
+      });
+    }
+
     const jobs = await loadData(JOBS_CRM_FILE);
     const job = jobs.find(j => j.id === req.params.id);
     if (!job) return res.status(404).send('Job not found');
@@ -272,49 +295,56 @@ router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
       /* optional */
     }
 
-    let profile = null;
+    let projects = [];
     try {
-      profile = await loadData('job-search-profile.json');
+      const pr = await loadData('projects.json');
+      projects = pr.sort((a, b) => (a.order || 0) - (b.order || 0));
     } catch (e) {
       /* optional */
     }
 
-    const text = await generateCoverLetterSmart({ job, experiences, profile });
+    let profile = await loadData('job-search-profile.json');
+
+    const coverText = await generateCoverLetterSmart({ job, experiences, profile });
+    const resumeText = await generateTailoredResumeForJob({ job, profile, experiences, projects });
     const slug = coverLetterFileSlug(job.co);
-    const coverBuf = await plainTextToDocxBuffer(text);
-
-    const resumePdfPath = path.join(__dirname, '..', 'public', 'resume.pdf');
-    let resumeBuf = null;
-    let resumeMeta = null;
-    try {
-      resumeMeta = await loadData('resume.json');
-    } catch (e) {
-      /* optional */
-    }
-    if (fs.existsSync(resumePdfPath)) {
-      try {
-        resumeBuf = await fs.promises.readFile(resumePdfPath);
-      } catch (readErr) {
-        console.warn('[application-pack] Could not read resume.pdf:', readErr.message || readErr);
-      }
-    }
+    const coverBuf = await plainTextToDocxBuffer(coverText);
+    const tailoredResumeBuf = await plainTextToDocxBuffer(resumeText);
 
     const zipBuf = await buildApplicationPackZip({
       coverDocxBuffer: coverBuf,
-      resumePdfBuffer: resumeBuf,
-      resumeEntryName: resumeMeta && resumeMeta.originalFilename,
+      tailoredResumeDocxBuffer: tailoredResumeBuf,
       slug
     });
 
     const zipName = `Application-${slug}.zip`;
     res.setHeader('Content-Type', 'application/zip');
     res.setHeader('Content-Disposition', `attachment; filename="${zipName.replace(/"/g, '')}"`);
-    res.setHeader('X-Application-Pack-Includes-Resume', resumeBuf ? 'yes' : 'no');
+    res.setHeader('X-Application-Pack-Includes-Tailored-Resume', 'yes');
     res.send(zipBuf);
   } catch (e) {
     if (e && (e.code === 'ENOENT' || String(e.message).includes('JSON'))) {
       return res.status(404).send('Jobs CRM data not found');
     }
+    next(e);
+  }
+});
+
+router.get('/job-search-profile', async function (req, res, next) {
+  try {
+    const profile = await loadData('job-search-profile.json');
+    res.json(profile);
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put('/job-search-profile', async function (req, res, next) {
+  try {
+    const merged = mergeProfile(req.body || {});
+    await saveData('job-search-profile.json', merged);
+    res.json(merged);
+  } catch (e) {
     next(e);
   }
 });

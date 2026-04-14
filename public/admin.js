@@ -200,13 +200,21 @@ function toggleJobStar(btn) {
 function downloadJobCoverLetter(id) {
   fetch('/api/jobs-crm/' + encodeURIComponent(id) + '/cover-letter')
     .then(function (res) {
-      if (!res.ok) throw new Error();
+      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (!res.ok) {
+        if (ct.indexOf('application/json') >= 0) {
+          return res.json().then(function (j) {
+            throw new Error(j.error || 'Could not build application pack');
+          });
+        }
+        throw new Error('Could not build application pack');
+      }
       var disposition = res.headers.get('Content-Disposition') || '';
       var m = /filename="([^"]+)"/.exec(disposition);
       var fname = m && m[1] ? m[1] : 'application-pack.zip';
-      var inclResume = (res.headers.get('X-Application-Pack-Includes-Resume') || '').toLowerCase() === 'yes';
+      var inclTailored = (res.headers.get('X-Application-Pack-Includes-Tailored-Resume') || '').toLowerCase() === 'yes';
       return res.blob().then(function (blob) {
-        return { fname: fname, blob: blob, inclResume: inclResume };
+        return { fname: fname, blob: blob, inclTailored: inclTailored };
       });
     })
     .then(function (o) {
@@ -218,13 +226,13 @@ function downloadJobCoverLetter(id) {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
-      var msg = o.inclResume
-        ? 'Application pack downloaded (cover letter + resume PDF)'
-        : 'Application pack downloaded (cover letter only — upload a resume PDF under Admin → Resume to include it)';
+      var msg = o.inclTailored
+        ? 'Application pack downloaded (cover letter + tailored resume as .docx files)'
+        : 'Application pack downloaded';
       showToast(msg, 'success');
     })
-    .catch(function () {
-      showToast('Could not build application pack', 'error');
+    .catch(function (err) {
+      showToast(err && err.message ? err.message : 'Could not build application pack', 'error');
     });
 }
 
@@ -516,7 +524,7 @@ function renderJobHunterOutput(container, data) {
         a.className = 'admin__btn admin__btn--small admin__btn--outline admin__btn--icon';
         a.target = '_blank';
         a.rel = 'noopener noreferrer';
-        a.setAttribute('aria-label', 'Open job listing');
+        a.setAttribute('aria-label', 'Open posting source URL');
         a.innerHTML =
           '<svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
         listTd.appendChild(a);

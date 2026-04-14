@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
+const { mergeProfile } = require('../lib/job-search-profile');
 const { CRM_JOB_STATUSES } = require('./crm-constants');
 const {
   regionFromLoc,
@@ -75,7 +76,31 @@ router.get('/resume', async function (req, res, next) {
     if (v != null) resume = v;
     const fp = path.join(__dirname, '..', 'public', 'resume.pdf');
     const resumeFileExists = fs.existsSync(fp);
-    res.render('admin/resume', { adminTitle: 'Resume', resume, resumeFileExists });
+
+    let profileRaw = await cms.getKv('job_search_profile');
+    if (profileRaw == null) {
+      try {
+        const jf = path.join(__dirname, '..', 'data', 'job-search-profile.json');
+        if (fs.existsSync(jf)) {
+          profileRaw = JSON.parse(fs.readFileSync(jf, 'utf8'));
+        }
+      } catch (e) {
+        profileRaw = null;
+      }
+    }
+    const jobProfile = mergeProfile(profileRaw);
+
+    const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => (a.order || 0) - (b.order || 0));
+    const projects = (await cms.getPortfolio('projects')).sort((a, b) => (a.order || 0) - (b.order || 0));
+
+    res.render('admin/resume', {
+      adminTitle: 'Resume',
+      resume,
+      resumeFileExists,
+      jobProfile,
+      experiences,
+      projects
+    });
   } catch (e) {
     next(e);
   }

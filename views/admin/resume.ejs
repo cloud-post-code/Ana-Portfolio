@@ -4,7 +4,10 @@
   <div class="admin__section-header">
     <div>
       <h2>Resume</h2>
-      <p class="admin__section-lead">Upload a PDF. It is saved as <code>public/resume.pdf</code> and linked on your site as <code>/resume.pdf</code>.</p>
+      <p class="admin__section-lead">
+        <strong>Public PDF:</strong> upload a file saved as <code>public/resume.pdf</code> and linked on your site as <code>/resume.pdf</code>.
+        <strong>Job CRM pack:</strong> each row’s download is a ZIP with a tailored <strong>cover letter</strong> and <strong>AI-tailored resume</strong> (both .docx), built from the fields below plus selected work experience and projects. Requires <code>ANTHROPIC_API_KEY</code> on the server.
+      </p>
     </div>
   </div>
 
@@ -23,7 +26,7 @@
       </div>
     </div>
     <% } else { %>
-    <p class="admin__empty-hint">No resume uploaded yet.</p>
+    <p class="admin__empty-hint">No resume PDF uploaded for the public site yet.</p>
     <% } %>
 
     <form class="admin__resume-form" id="resumeUploadForm">
@@ -33,6 +36,185 @@
         <button type="submit" class="admin__btn admin__btn--primary"><%= resumeFileExists ? 'Replace resume' : 'Upload resume' %></button>
       </div>
     </form>
+  </div>
+</section>
+
+<section class="admin__section">
+  <div class="admin__section-header">
+    <div>
+      <h2>Resume &amp; cover letter sources</h2>
+      <p class="admin__section-lead">These fields feed the AI that writes your <strong>tailored resume</strong> (and support your cover letter profile). Save before downloading packs from the Job CRM.</p>
+    </div>
+    <button type="button" class="admin__btn admin__btn--primary" id="saveJobProfileBtn" onclick="saveJobSearchProfile()">Save profile</button>
+  </div>
+
+  <div class="admin__card">
+    <h3 class="admin__subsection-title">Contact / header</h3>
+    <div class="admin__form-grid">
+      <div class="admin__form-group">
+        <label class="admin__label" for="applicant_fullName">Full name</label>
+        <input type="text" id="applicant_fullName" class="admin__resume-profile-input" value="<%= jobProfile.applicant.fullName %>" autocomplete="name" />
+      </div>
+      <div class="admin__form-group">
+        <label class="admin__label" for="applicant_cityState">Location</label>
+        <input type="text" id="applicant_cityState" class="admin__resume-profile-input" value="<%= jobProfile.applicant.cityState %>" placeholder="City, ST" />
+      </div>
+      <div class="admin__form-group">
+        <label class="admin__label" for="applicant_phone">Phone</label>
+        <input type="text" id="applicant_phone" class="admin__resume-profile-input" value="<%= jobProfile.applicant.phone %>" autocomplete="tel" />
+      </div>
+      <div class="admin__form-group">
+        <label class="admin__label" for="applicant_email">Email</label>
+        <input type="email" id="applicant_email" class="admin__resume-profile-input" value="<%= jobProfile.applicant.email %>" autocomplete="email" />
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="applicant_linkedIn">LinkedIn URL</label>
+        <input type="url" id="applicant_linkedIn" class="admin__resume-profile-input" value="<%= jobProfile.applicant.linkedIn %>" placeholder="https://linkedin.com/in/..." />
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="applicant_portfolio">Portfolio URL</label>
+        <input type="url" id="applicant_portfolio" class="admin__resume-profile-input" value="<%= jobProfile.applicant.portfolio %>" placeholder="https://..." />
+      </div>
+    </div>
+
+    <h3 class="admin__subsection-title">Career narrative (cover letter + context)</h3>
+    <div class="admin__form-grid">
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="headline">Headline</label>
+        <input type="text" id="headline" class="admin__resume-profile-input" value="<%= jobProfile.headline %>" />
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="summary">Summary / goals</label>
+        <textarea id="summary" class="admin__resume-profile-input" rows="3"><%= jobProfile.summary %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="keyDetails">Key details (one per line)</label>
+        <textarea id="keyDetails" class="admin__resume-profile-input" rows="4" placeholder="Campaign and brand execution…"><% (jobProfile.keyDetails || []).forEach(function(line, i) { %><%= i > 0 ? '\n' : '' %><%= line %><% }) %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="targetSkillsToUse">Skills to emphasize (one per line)</label>
+        <textarea id="targetSkillsToUse" class="admin__resume-profile-input" rows="3"><% (jobProfile.targetSkillsToUse || []).forEach(function(line, i) { %><%= i > 0 ? '\n' : '' %><%= line %><% }) %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="locationsPreferred">Locations preferred (one per line)</label>
+        <textarea id="locationsPreferred" class="admin__resume-profile-input" rows="2"><% (jobProfile.locationsPreferred || []).forEach(function(line, i) { %><%= i > 0 ? '\n' : '' %><%= line %><% }) %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="roleTypesPreferred">Role types preferred (one per line)</label>
+        <textarea id="roleTypesPreferred" class="admin__resume-profile-input" rows="2"><% (jobProfile.roleTypesPreferred || []).forEach(function(line, i) { %><%= i > 0 ? '\n' : '' %><%= line %><% }) %></textarea>
+      </div>
+    </div>
+
+    <h3 class="admin__subsection-title">Education</h3>
+    <div id="educationRows">
+      <% var eduList = jobProfile.education && jobProfile.education.length ? jobProfile.education : [{ degree: '', dates: '', institution: '', location: '', bullets: '' }]; %>
+      <% eduList.forEach(function(ed, idx) { %>
+      <div class="admin__education-row" data-edu-index="<%= idx %>">
+        <div class="admin__form-grid">
+          <div class="admin__form-group">
+            <label class="admin__label">Degree / certification</label>
+            <input type="text" class="edu-degree admin__resume-profile-input" value="<%= ed.degree %>" />
+          </div>
+          <div class="admin__form-group">
+            <label class="admin__label">Dates</label>
+            <input type="text" class="edu-dates admin__resume-profile-input" value="<%= ed.dates %>" placeholder="Aug 2022 – May 2026" />
+          </div>
+          <div class="admin__form-group">
+            <label class="admin__label">Institution</label>
+            <input type="text" class="edu-institution admin__resume-profile-input" value="<%= ed.institution %>" />
+          </div>
+          <div class="admin__form-group">
+            <label class="admin__label">School location</label>
+            <input type="text" class="edu-location admin__resume-profile-input" value="<%= ed.location %>" />
+          </div>
+          <div class="admin__form-group admin__form-group--full">
+            <label class="admin__label">Bullets (one per line)</label>
+            <textarea class="edu-bullets admin__resume-profile-input" rows="3"><%= ed.bullets %></textarea>
+          </div>
+        </div>
+        <button type="button" class="admin__btn admin__btn--small admin__btn--danger admin__education-remove" onclick="removeEducationRow(this)" aria-label="Remove education row">Remove</button>
+        <hr class="admin__education-sep" />
+      </div>
+      <% }); %>
+    </div>
+    <button type="button" class="admin__btn admin__btn--outline" onclick="addEducationRow()">+ Add education</button>
+
+    <h3 class="admin__subsection-title">Skills &amp; additional information</h3>
+    <div class="admin__form-grid">
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="sk_technical">Technical skills</label>
+        <textarea id="sk_technical" class="admin__resume-profile-input" rows="2"><%= jobProfile.skillsGroups.technical %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="sk_professional">Professional skills</label>
+        <textarea id="sk_professional" class="admin__resume-profile-input" rows="2"><%= jobProfile.skillsGroups.professional %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="sk_certifications">Certifications / licenses</label>
+        <textarea id="sk_certifications" class="admin__resume-profile-input" rows="2"><%= jobProfile.skillsGroups.certifications %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="sk_languages">Languages</label>
+        <textarea id="sk_languages" class="admin__resume-profile-input" rows="2"><%= jobProfile.skillsGroups.languages %></textarea>
+      </div>
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="sk_toolsPlatforms">Tools / platforms</label>
+        <textarea id="sk_toolsPlatforms" class="admin__resume-profile-input" rows="2"><%= jobProfile.skillsGroups.toolsPlatforms %></textarea>
+      </div>
+    </div>
+
+    <h3 class="admin__subsection-title">Additional experience notes (optional)</h3>
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="additionalExperienceNotes">Short notes for roles to keep brief or “additional experience”</label>
+      <textarea id="additionalExperienceNotes" class="admin__resume-profile-input" rows="3"><%= jobProfile.additionalExperienceNotes %></textarea>
+    </div>
+
+    <h3 class="admin__subsection-title">Notes for AI (optional)</h3>
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="resumeNotesForAi">Constraints or emphasis for tailored resume</label>
+      <textarea id="resumeNotesForAi" class="admin__resume-profile-input" rows="3" maxlength="8000"><%= jobProfile.resumeNotesForAi %></textarea>
+    </div>
+
+    <h3 class="admin__subsection-title">Include in tailored resume</h3>
+    <p class="admin__text-muted admin__resume-include-hint">Unchecked items are omitted from the AI resume for Job CRM downloads. Default is all visible (non-hidden) entries.</p>
+
+    <div class="admin__resume-include-block">
+      <h4 class="admin__resume-include-heading">Work experience</h4>
+      <% if (!experiences.length) { %>
+      <p class="admin__text-muted">No experiences yet — add some under <a href="/admin">Dashboard</a>.</p>
+      <% } else { %>
+      <ul class="admin__resume-include-list">
+        <% experiences.forEach(function(e) { %>
+        <% var expChecked = jobProfile.resumeIncludedExperienceIds == null ? !e.hidden : (jobProfile.resumeIncludedExperienceIds.indexOf(e.id) >= 0); %>
+        <li>
+          <label class="admin__resume-include-label">
+            <input type="checkbox" class="resume-inc-exp" value="<%= e.id %>" <%= expChecked ? 'checked' : '' %> <%= e.hidden ? 'data-hidden="1"' : '' %> />
+            <span><strong><%= e.title || e.company || 'Untitled' %></strong><% if (e.role) { %> — <%= e.role %><% } %><% if (e.hidden) { %> <span class="admin__text-muted">(hidden on site)</span><% } %></span>
+          </label>
+        </li>
+        <% }); %>
+      </ul>
+      <% } %>
+    </div>
+
+    <div class="admin__resume-include-block">
+      <h4 class="admin__resume-include-heading">Projects</h4>
+      <% if (!projects.length) { %>
+      <p class="admin__text-muted">No projects yet.</p>
+      <% } else { %>
+      <ul class="admin__resume-include-list">
+        <% projects.forEach(function(p) { %>
+        <% var projChecked = jobProfile.resumeIncludedProjectIds == null ? !p.hidden : (jobProfile.resumeIncludedProjectIds.indexOf(p.id) >= 0); %>
+        <li>
+          <label class="admin__resume-include-label">
+            <input type="checkbox" class="resume-inc-proj" value="<%= p.id %>" <%= projChecked ? 'checked' : '' %> <%= p.hidden ? 'data-hidden="1"' : '' %> />
+            <span><strong><%= p.title || 'Untitled' %></strong><% if (p.hidden) { %> <span class="admin__text-muted">(hidden on site)</span><% } %></span>
+          </label>
+        </li>
+        <% }); %>
+      </ul>
+      <% } %>
+    </div>
   </div>
 </section>
 
@@ -82,5 +264,124 @@ function deleteResumeFile() {
     .catch(function () {
       if (typeof showToast === 'function') showToast('Could not remove resume', 'error');
     });
+}
+
+function splitLines(text) {
+  return String(text || '')
+    .split(/\n+/)
+    .map(function (s) { return s.trim(); })
+    .filter(Boolean);
+}
+
+function collectEducation() {
+  var rows = document.querySelectorAll('#educationRows .admin__education-row');
+  var out = [];
+  rows.forEach(function (row) {
+    var degree = row.querySelector('.edu-degree');
+    var dates = row.querySelector('.edu-dates');
+    var institution = row.querySelector('.edu-institution');
+    var location = row.querySelector('.edu-location');
+    var bullets = row.querySelector('.edu-bullets');
+    var o = {
+      degree: degree ? degree.value.trim() : '',
+      dates: dates ? dates.value.trim() : '',
+      institution: institution ? institution.value.trim() : '',
+      location: location ? location.value.trim() : '',
+      bullets: bullets ? bullets.value.trim() : ''
+    };
+    if (o.degree || o.dates || o.institution || o.location || o.bullets) out.push(o);
+  });
+  return out;
+}
+
+function collectIncludedIds(className) {
+  var boxes = document.querySelectorAll('.' + className);
+  var ids = [];
+  boxes.forEach(function (cb) {
+    if (cb.checked) ids.push(cb.value);
+  });
+  return ids;
+}
+
+function saveJobSearchProfile() {
+  var btn = document.getElementById('saveJobProfileBtn');
+  if (btn) btn.disabled = true;
+  var body = {
+    applicant: {
+      fullName: document.getElementById('applicant_fullName').value.trim(),
+      email: document.getElementById('applicant_email').value.trim(),
+      phone: document.getElementById('applicant_phone').value.trim(),
+      cityState: document.getElementById('applicant_cityState').value.trim(),
+      linkedIn: document.getElementById('applicant_linkedIn').value.trim(),
+      portfolio: document.getElementById('applicant_portfolio').value.trim()
+    },
+    headline: document.getElementById('headline').value.trim(),
+    summary: document.getElementById('summary').value.trim(),
+    keyDetails: splitLines(document.getElementById('keyDetails').value),
+    targetSkillsToUse: splitLines(document.getElementById('targetSkillsToUse').value),
+    locationsPreferred: splitLines(document.getElementById('locationsPreferred').value),
+    roleTypesPreferred: splitLines(document.getElementById('roleTypesPreferred').value),
+    education: collectEducation(),
+    skillsGroups: {
+      technical: document.getElementById('sk_technical').value.trim(),
+      professional: document.getElementById('sk_professional').value.trim(),
+      certifications: document.getElementById('sk_certifications').value.trim(),
+      languages: document.getElementById('sk_languages').value.trim(),
+      toolsPlatforms: document.getElementById('sk_toolsPlatforms').value.trim()
+    },
+    additionalExperienceNotes: document.getElementById('additionalExperienceNotes').value.trim(),
+    resumeNotesForAi: document.getElementById('resumeNotesForAi').value.trim(),
+    resumeIncludedExperienceIds: collectIncludedIds('resume-inc-exp'),
+    resumeIncludedProjectIds: collectIncludedIds('resume-inc-proj')
+  };
+
+  fetch('/api/job-search-profile', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  })
+    .then(function (res) {
+      if (!res.ok) return res.json().then(function (j) { throw new Error(j.error || 'Save failed'); });
+      return res.json();
+    })
+    .then(function () {
+      if (typeof showToast === 'function') showToast('Profile saved', 'success');
+    })
+    .catch(function (err) {
+      if (typeof showToast === 'function') showToast(err.message || 'Save failed', 'error');
+      else alert(err.message || 'Save failed');
+    })
+    .finally(function () {
+      if (btn) btn.disabled = false;
+    });
+}
+
+function addEducationRow() {
+  var wrap = document.getElementById('educationRows');
+  if (!wrap) return;
+  var div = document.createElement('div');
+  div.className = 'admin__education-row';
+  div.innerHTML =
+    '<div class="admin__form-grid">' +
+    '<div class="admin__form-group"><label class="admin__label">Degree / certification</label><input type="text" class="edu-degree admin__resume-profile-input" value="" /></div>' +
+    '<div class="admin__form-group"><label class="admin__label">Dates</label><input type="text" class="edu-dates admin__resume-profile-input" value="" /></div>' +
+    '<div class="admin__form-group"><label class="admin__label">Institution</label><input type="text" class="edu-institution admin__resume-profile-input" value="" /></div>' +
+    '<div class="admin__form-group"><label class="admin__label">School location</label><input type="text" class="edu-location admin__resume-profile-input" value="" /></div>' +
+    '<div class="admin__form-group admin__form-group--full"><label class="admin__label">Bullets (one per line)</label><textarea class="edu-bullets admin__resume-profile-input" rows="3"></textarea></div>' +
+    '</div>' +
+    '<button type="button" class="admin__btn admin__btn--small admin__btn--danger admin__education-remove" onclick="removeEducationRow(this)">Remove</button>' +
+    '<hr class="admin__education-sep" />';
+  wrap.appendChild(div);
+}
+
+function removeEducationRow(btn) {
+  var row = btn.closest('.admin__education-row');
+  var wrap = document.getElementById('educationRows');
+  if (!row || !wrap) return;
+  if (wrap.querySelectorAll('.admin__education-row').length <= 1) {
+    row.querySelectorAll('input, textarea').forEach(function (el) { el.value = ''; });
+    return;
+  }
+  row.remove();
 }
 </script>
