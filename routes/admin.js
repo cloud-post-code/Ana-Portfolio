@@ -74,8 +74,17 @@ router.get('/resume', async function (req, res, next) {
     let resume = { path: null, originalFilename: null, updatedAt: null };
     const v = await cms.getKv('resume');
     if (v != null) resume = v;
-    const fp = path.join(__dirname, '..', 'public', 'resume.pdf');
-    const resumeFileExists = fs.existsSync(fp);
+    const publicDir = path.join(__dirname, '..', 'public');
+    const hasPdf = fs.existsSync(path.join(publicDir, 'resume.pdf'));
+    const hasDocx = fs.existsSync(path.join(publicDir, 'resume.docx'));
+    const resumeFileExists = hasPdf || hasDocx;
+    const baselineResumePath = path.join(publicDir, 'baseline-resume.docx');
+    const legacyGenPath = path.join(publicDir, 'generated-resume.docx');
+    const baselineResumeFileExists =
+      fs.existsSync(baselineResumePath) || fs.existsSync(legacyGenPath);
+    const baselineResumePublicHref = fs.existsSync(baselineResumePath)
+      ? '/baseline-resume.docx'
+      : '/generated-resume.docx';
 
     let profileRaw = await cms.getKv('job_search_profile');
     if (profileRaw == null) {
@@ -97,6 +106,8 @@ router.get('/resume', async function (req, res, next) {
       adminTitle: 'Resume',
       resume,
       resumeFileExists,
+      baselineResumeFileExists,
+      baselineResumePublicHref,
       jobProfile,
       experiences,
       projects

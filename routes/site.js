@@ -8,11 +8,20 @@ router.get('/', async function (req, res, next) {
   try {
     const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => a.order - b.order);
     const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
+    const publicDir = path.join(__dirname, '..', 'public');
     let resume = { path: null, originalFilename: null, updatedAt: null };
     const v = await cms.getKv('resume');
-    if (v != null) resume = v;
-    const resumePdfPath = path.join(__dirname, '..', 'public', 'resume.pdf');
-    const resumeFileExists = fs.existsSync(resumePdfPath);
+    if (v != null) resume = { ...resume, ...v };
+    const pdfPath = path.join(publicDir, 'resume.pdf');
+    const docxPath = path.join(publicDir, 'resume.docx');
+    const hasPdf = fs.existsSync(pdfPath);
+    const hasDocx = fs.existsSync(docxPath);
+    const rel = resume.path ? String(resume.path).replace(/^\//, '') : '';
+    const metaOk = rel && fs.existsSync(path.join(publicDir, rel));
+    let resumeFileExists = metaOk || hasPdf || hasDocx;
+    if (resumeFileExists && !metaOk) {
+      resume.path = hasPdf ? '/resume.pdf' : '/resume.docx';
+    }
     res.render('index', { experiences, projects, resume, resumeFileExists });
   } catch (e) {
     next(e);

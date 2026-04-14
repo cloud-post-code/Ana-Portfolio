@@ -1369,6 +1369,34 @@ body.admin {
   max-width: 40rem;
 }
 
+.admin__resume-generated {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin__resume-generated__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin: 0 0 0.35rem;
+  color: var(--admin-text);
+}
+
+.admin__resume-generated__lead {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--admin-text-muted);
+  margin: 0 0 0.75rem;
+}
+
+.admin__resume-generated__empty {
+  margin-bottom: 0.65rem;
+}
+
+.admin__resume-regenerate {
+  margin-top: 0.75rem;
+}
+
 .admin__resume-current {
   margin-bottom: 1.5rem;
   padding-bottom: 1.25rem;
@@ -1412,6 +1440,14 @@ body.admin {
   color: var(--admin-text-muted);
 }
 
+.admin__resume-upload-field {
+  position: relative;
+}
+
+label.admin__resume-dropzone {
+  display: block;
+}
+
 .admin__resume-dropzone {
   position: relative;
   border: 1.5px dashed var(--admin-border);
@@ -1447,7 +1483,23 @@ body.admin {
   background: #fff;
 }
 
-.admin__resume-file-input {
+.admin__resume-file-input-native {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.admin__visually-hidden {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -1459,20 +1511,11 @@ body.admin {
   border: 0;
 }
 
-.admin__resume-dropzone__body {
-  pointer-events: none;
-}
-
 .admin__resume-browse {
-  pointer-events: auto;
   font: inherit;
   font-size: 0.875rem;
   font-weight: 600;
   color: var(--admin-accent);
-  background: none;
-  border: none;
-  padding: 0;
-  cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
@@ -1545,7 +1588,10 @@ body.admin {
 
 textarea.admin__resume-profile-input {
   resize: vertical;
-  min-height: 2.5rem;
+  min-height: 3rem;
+  max-height: min(65vh, 720px);
+  overflow-y: auto;
+  line-height: 1.45;
 }
 
 .admin__education-row {
