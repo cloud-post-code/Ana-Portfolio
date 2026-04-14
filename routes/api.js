@@ -50,7 +50,8 @@ const uploadResume = multer({
 });
 
 const cms = require('../lib/cms-store');
-const { mergeProfile } = require('../lib/job-search-profile');
+const { mergeProfile, mergeProfileWithExtracted } = require('../lib/job-search-profile');
+const { extractPdfText, profileFromResumeText } = require('../lib/resume-pdf-to-profile');
 const JOBS_CRM_FILE = 'jobs-crm.json';
 
 function dataPath(filename) {
@@ -339,6 +340,18 @@ router.get('/job-search-profile', async function (req, res, next) {
   }
 });
 
+router.get('/job-search-profile/download', async function (req, res, next) {
+  try {
+    const profile = await loadData('job-search-profile.json');
+    const body = JSON.stringify(profile, null, 2);
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
+    res.setHeader('Content-Disposition', 'attachment; filename="job-search-profile.json"');
+    res.send(body);
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.put('/job-search-profile', async function (req, res, next) {
   try {
     const merged = mergeProfile(req.body || {});
@@ -434,7 +447,41 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
       updatedAt: new Date().toISOString()
     };
     await saveData('resume.json', meta);
-    res.json(meta);
+
+    let profileAutofill = 'skipped_no_api_key';
+    let profileAutofillDetail = null;
+    let profile = null;
+
+    if (process.env.ANTHROPIC_API_KEY) {
+      try {
+        const buf = await fs.promises.readFile(req.file.path);
+        const { text, error: extractErr } = await extractPdfText(buf);
+        if (extractErr || !text) {
+          profileAutofill = 'skipped_extraction_failed';
+          profileAutofillDetail = extractErr || 'No text extracted from PDF.';
+        } else {
+          const current = await loadData('job-search-profile.json');
+          const extracted = await profileFromResumeText(text);
+          const merged = mergeProfileWithExtracted(current, extracted);
+          await saveData('job-search-profile.json', merged);
+          profile = merged;
+          profileAutofill = 'ok';
+        }
+      } catch (e) {
+        console.warn('[resume-autofill]', e.message || e);
+        profileAutofill = 'skipped_parse_failed';
+        profileAutofillDetail = e.message || String(e);
+      }
+    } else {
+      profileAutofillDetail = 'Set ANTHROPIC_API_KEY to auto-fill the profile from the PDF.';
+    }
+
+    res.json({
+      ...meta,
+      profile,
+      profileAutofill,
+      profileAutofillDetail
+    });
   } catch (e) {
     next(e);
   }
