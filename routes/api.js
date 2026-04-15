@@ -276,10 +276,10 @@ const { buildApplicationPackZip } = require('../lib/application-pack');
 
 router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
       return res.status(503).json({
         error:
-          'Application pack requires ANTHROPIC_API_KEY (Claude generates the tailored resume and cover letter).'
+          'Application pack requires OPENAI_API_KEY or ANTHROPIC_API_KEY (generates the tailored resume and cover letter).'
       });
     }
 
@@ -481,8 +481,10 @@ router.put('/resume/md', async function (req, res, next) {
 
 router.post('/resume/md/ai-edit', async function (req, res, next) {
   try {
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(503).json({ error: 'OPENAI_API_KEY is required to edit with AI.' });
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({
+        error: 'OPENAI_API_KEY or ANTHROPIC_API_KEY is required to edit with AI.'
+      });
     }
     const body = req.body || {};
     const markdown = body.markdown != null ? String(body.markdown) : '';
@@ -716,7 +718,11 @@ router.post('/job-hunter/find-jobs', async function (req, res, next) {
     });
   } catch (e) {
     const msg = e.message || String(e);
-    if (msg.includes('ANTHROPIC_API_KEY') || msg.includes('Job Hunter skill not found')) {
+    if (
+      msg.includes('OPENAI_API_KEY') ||
+      msg.includes('ANTHROPIC_API_KEY') ||
+      msg.includes('Job Hunter skill not found')
+    ) {
       return res.status(503).json({ error: msg });
     }
     next(e);

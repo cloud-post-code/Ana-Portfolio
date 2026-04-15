@@ -83,7 +83,7 @@ router.get('/resume', async function (req, res, next) {
       adminTitle: 'Resume',
       resume,
       resumeFileExists,
-      hasOpenAiKey: !!process.env.OPENAI_API_KEY
+      hasLlmKey: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY)
     });
   } catch (e) {
     next(e);

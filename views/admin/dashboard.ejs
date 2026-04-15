@@ -8,14 +8,14 @@
     </div>
     <div class="admin__section-header__actions">
       <% var _crmCount = (crmJobRows || []).length; %>
-      <button type="button" class="admin__btn admin__btn--outline" title="Reconciles every Job CRM field with Tavily + listing page (optional) and AI. Set ANTHROPIC_API_KEY or OPENAI_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')"<%= _crmCount ? '' : ' disabled' %>>Enhance all</button>
+      <button type="button" class="admin__btn admin__btn--outline" title="Reconciles every Job CRM field with Tavily + listing page (optional) and AI. Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server." onclick="enhanceAllCollection('jobs-crm')"<%= _crmCount ? '' : ' disabled' %>>Enhance all</button>
       <button type="button" class="admin__btn admin__btn--outline admin__btn--danger" title="Delete every job in the CRM" onclick="deleteAllJobsCrm()"<%= _crmCount ? '' : ' disabled' %>>Remove all</button>
     </div>
   </div>
 
   <div class="admin__job-hunter" id="job-hunter-panel">
     <h3 class="admin__job-hunter__title">Job Hunter <span class="admin__text-muted">(Claude skill)</span></h3>
-    <p class="admin__job-hunter__lead">Search the web (optional Tavily, URLs deduplicated) + Claude using the bundled <code>skills/job-hunter</code> skill. Your current <strong>Job CRM</strong> rows are sent so the model should not suggest the same role twice. <strong>Each new lead is saved</strong> with full CRM fields (company, role, location, notes, tags, status, priority, listing URL when available, YoE, deadline)<% if (typeof usePostgres !== 'undefined' && usePostgres) { %> to the <strong>PostgreSQL</strong> database<% } else { %> to <code>data/jobs-crm.json</code><% } %>. Deduped by URL and by company+role+location. Set <code>ANTHROPIC_API_KEY</code> on the server.</p>
+    <p class="admin__job-hunter__lead">Search the web (optional Tavily, URLs deduplicated) + AI using the bundled <code>skills/job-hunter</code> skill. Your current <strong>Job CRM</strong> rows are sent so the model should not suggest the same role twice. <strong>Each new lead is saved</strong> with full CRM fields (company, role, location, notes, tags, status, priority, listing URL when available, YoE, deadline)<% if (typeof usePostgres !== 'undefined' && usePostgres) { %> to the <strong>PostgreSQL</strong> database<% } else { %> to <code>data/jobs-crm.json</code><% } %>. Deduped by URL and by company+role+location. Set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> on the server.</p>
     <div class="admin__job-hunter__row">
       <div class="admin__job-hunter__field admin__job-hunter__field--grow">
         <label class="admin__job-hunter__label" for="job-hunter-query">Search</label>
@@ -178,7 +178,7 @@
           <th scope="col">Priority</th>
           <th scope="col">Tags</th>
           <th scope="col">Listing</th>
-          <th scope="col" title="ZIP: cover letter (.docx) and AI-tailored resume (.docx); requires ANTHROPIC_API_KEY and job-search profile data">Cover + resume</th>
+          <th scope="col" title="ZIP: cover letter (.docx) and AI-tailored resume (.docx); requires OPENAI_API_KEY or ANTHROPIC_API_KEY and job-search profile data">Cover + resume</th>
           <th scope="col" class="admin__jobs-th-hult">Hult alumni</th>
           <th scope="col">Actions</th>
         </tr>
@@ -303,7 +303,7 @@
             <% } %>
           </td>
           <td class="admin__jobs-cover-cell">
-            <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Download ZIP: cover letter (.docx) + AI-tailored resume (.docx). Uses Claude (ANTHROPIC_API_KEY)." aria-label="Download application pack: cover letter and tailored resume">
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Download ZIP: cover letter (.docx) + AI-tailored resume (.docx). Uses OPENAI_API_KEY or ANTHROPIC_API_KEY." aria-label="Download application pack: cover letter and tailored resume">
               <svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
           </td>
@@ -342,7 +342,7 @@
         <% } else { %>
         <p>With no database configured, jobs are stored in <code>data/jobs-crm.json</code> in this project. Add that file (or run Job Hunter) so rows load here.</p>
         <% } %>
-        <p class="admin__crm-empty-reason-note">Set <code>ANTHROPIC_API_KEY</code> on the server for Job Hunter; optional <code>TAVILY_API_KEY</code> for web snippets.</p>
+        <p class="admin__crm-empty-reason-note">Set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> for Job Hunter; optional <code>TAVILY_API_KEY</code> for web snippets.</p>
       </div>
     </details>
   </div>

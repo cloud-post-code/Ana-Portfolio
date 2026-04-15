@@ -62,10 +62,10 @@
     <div class="admin__resume-md-editor">
       <h3 class="admin__resume-generated__title">Edit <code>resume.md</code></h3>
       <p class="admin__resume-generated__lead">
-        Edit the file below, or use <strong>Apply with AI</strong> with a short instruction (<code>OPENAI_API_KEY</code> on the server; optional <code>OPENAI_MODEL</code>, default <code>gpt-4o-mini</code>).
+        Edit the file below, or use <strong>Apply with AI</strong> with a short instruction (set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> on the server).
       </p>
-      <% if (!hasOpenAiKey) { %>
-      <p class="admin__text-muted">AI editing is disabled until <code>OPENAI_API_KEY</code> is set. You can still edit and <strong>Save Markdown</strong>.</p>
+      <% if (!hasLlmKey) { %>
+      <p class="admin__text-muted">AI editing is disabled until <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> is set. You can still edit and <strong>Save Markdown</strong>.</p>
       <% } %>
       <div class="admin__form-group admin__form-group--full">
         <label class="admin__label" for="resumeMdBody">Markdown</label>
@@ -82,7 +82,7 @@
           class="admin__btn admin__btn--outline"
           id="resumeMdAiBtn"
           onclick="applyResumeMdAi()"
-          <%= hasOpenAiKey ? '' : 'disabled title="Set OPENAI_API_KEY on the server"' %>
+          <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
         >Apply with AI</button>
       </div>
     </div>
