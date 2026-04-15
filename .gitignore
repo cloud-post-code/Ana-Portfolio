@@ -6,3 +6,5 @@ node_modules/
 public/resume.pdf
 public/resume.docx
 public/resume.md
+public/baseline-resume.docx
+public/generated-resume.docx

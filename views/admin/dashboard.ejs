@@ -178,7 +178,7 @@
           <th scope="col">Priority</th>
           <th scope="col">Tags</th>
           <th scope="col">Listing</th>
-          <th scope="col" title="ZIP: cover letter (.docx) and AI-tailored resume (.docx); requires ANTHROPIC_API_KEY and profile data under Admin → Resume">Cover + resume</th>
+          <th scope="col" title="ZIP: cover letter (.docx) and AI-tailored resume (.docx); requires ANTHROPIC_API_KEY and job-search profile data">Cover + resume</th>
           <th scope="col" class="admin__jobs-th-hult">Hult alumni</th>
           <th scope="col">Actions</th>
         </tr>
@@ -303,7 +303,7 @@
             <% } %>
           </td>
           <td class="admin__jobs-cover-cell">
-            <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Download ZIP: cover letter (.docx) + AI-tailored resume (.docx). Uses Claude (ANTHROPIC_API_KEY). Edit sources under Admin → Resume." aria-label="Download application pack: cover letter and tailored resume">
+            <button type="button" class="admin__btn admin__btn--small admin__btn--outline admin__btn--icon" onclick="downloadJobCoverLetter('<%= job.id %>')" title="Download ZIP: cover letter (.docx) + AI-tailored resume (.docx). Uses Claude (ANTHROPIC_API_KEY)." aria-label="Download application pack: cover letter and tailored resume">
               <svg class="admin__icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
             </button>
           </td>

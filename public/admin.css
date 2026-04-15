@@ -1393,8 +1393,14 @@ body.admin {
   margin-bottom: 0.65rem;
 }
 
-.admin__resume-regenerate {
-  margin-top: 0.75rem;
+.admin__resume-md-editor {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin__resume-md-actions {
+  margin-top: 0.5rem;
 }
 
 .admin__resume-current {

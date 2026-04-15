@@ -3,7 +3,6 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
-const { mergeProfile } = require('../lib/job-search-profile');
 const { CRM_JOB_STATUSES } = require('./crm-constants');
 const {
   regionFromLoc,
@@ -79,39 +78,12 @@ router.get('/resume', async function (req, res, next) {
     const hasDocx = fs.existsSync(path.join(publicDir, 'resume.docx'));
     const hasMd = fs.existsSync(path.join(publicDir, 'resume.md'));
     const resumeFileExists = hasPdf || hasDocx || hasMd;
-    const baselineResumePath = path.join(publicDir, 'baseline-resume.docx');
-    const legacyGenPath = path.join(publicDir, 'generated-resume.docx');
-    const baselineResumeFileExists =
-      fs.existsSync(baselineResumePath) || fs.existsSync(legacyGenPath);
-    const baselineResumePublicHref = fs.existsSync(baselineResumePath)
-      ? '/baseline-resume.docx'
-      : '/generated-resume.docx';
-
-    let profileRaw = await cms.getKv('job_search_profile');
-    if (profileRaw == null) {
-      try {
-        const jf = path.join(__dirname, '..', 'data', 'job-search-profile.json');
-        if (fs.existsSync(jf)) {
-          profileRaw = JSON.parse(fs.readFileSync(jf, 'utf8'));
-        }
-      } catch (e) {
-        profileRaw = null;
-      }
-    }
-    const jobProfile = mergeProfile(profileRaw);
-
-    const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => (a.order || 0) - (b.order || 0));
-    const projects = (await cms.getPortfolio('projects')).sort((a, b) => (a.order || 0) - (b.order || 0));
 
     res.render('admin/resume', {
       adminTitle: 'Resume',
       resume,
       resumeFileExists,
-      baselineResumeFileExists,
-      baselineResumePublicHref,
-      jobProfile,
-      experiences,
-      projects
+      hasAnthropicKey: !!process.env.ANTHROPIC_API_KEY
     });
   } catch (e) {
     next(e);

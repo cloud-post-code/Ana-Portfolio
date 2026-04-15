@@ -61,17 +61,10 @@ async function loadData(filename) {
     const defaults = {
       path: null,
       originalFilename: null,
-      updatedAt: null,
-      baselineResumePath: null,
-      baselineResumeUpdatedAt: null
+      updatedAt: null
     };
     if (v == null) return defaults;
-    const out = { ...defaults, ...v };
-    if (out.generatedResumePath && !out.baselineResumePath) {
-      out.baselineResumePath = out.generatedResumePath;
-      out.baselineResumeUpdatedAt = out.generatedResumeUpdatedAt;
-    }
-    return out;
+    return { ...defaults, ...v };
   }
   if (filename === 'job-search-profile.json') {
     let v = await cms.getKv('job_search_profile');
@@ -277,30 +270,9 @@ crudRoutes('projects', 'projects.json');
 
 const { slugify: coverLetterFileSlug } = require('../lib/cover-letter');
 const { generateCoverLetterSmart } = require('../lib/cover-letter-ai');
-const { generateTailoredResumeForJob, generateStandaloneResumeAsText } = require('../lib/resume-tailor-ai');
+const { generateTailoredResumeForJob } = require('../lib/resume-tailor-ai');
 const { plainTextToDocxBuffer } = require('../lib/cover-letter-docx');
 const { buildApplicationPackZip } = require('../lib/application-pack');
-
-const BASELINE_RESUME_PUBLIC_PATH = '/baseline-resume.docx';
-const BASELINE_RESUME_FS_PATH = path.join(__dirname, '..', 'public', 'baseline-resume.docx');
-const LEGACY_GENERATED_FS_PATH = path.join(__dirname, '..', 'public', 'generated-resume.docx');
-
-/**
- * @param {object} profile merged job-search profile
- * @returns {Promise<string>} ISO timestamp when file was written
- */
-async function writeStandaloneResumeDocxFromProfile(profile) {
-  const experiences = await loadData('experiences.json');
-  const projects = await loadData('projects.json');
-  const text = await generateStandaloneResumeAsText({
-    profile,
-    experiences: Array.isArray(experiences) ? experiences : [],
-    projects: Array.isArray(projects) ? projects : []
-  });
-  const buf = await plainTextToDocxBuffer(text);
-  await fs.promises.writeFile(BASELINE_RESUME_FS_PATH, buf);
-  return new Date().toISOString();
-}
 
 router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
   try {
@@ -465,6 +437,87 @@ router.delete('/jobs-crm/:id', async function (req, res, next) {
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
+const { editResumeMarkdownWithPrompt } = require('../lib/resume-md-ai-edit');
+
+router.get('/resume/md', async function (req, res, next) {
+  try {
+    let markdown = '';
+    if (fs.existsSync(RESUME_MD_FS)) {
+      markdown = await fs.promises.readFile(RESUME_MD_FS, 'utf8');
+    }
+    res.json({ markdown });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put('/resume/md', async function (req, res, next) {
+  try {
+    const body = req.body || {};
+    const md = body.markdown != null ? String(body.markdown) : '';
+    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+    await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
+
+    let meta = await loadData('resume.json');
+    if (!meta || typeof meta !== 'object') {
+      meta = { path: null, originalFilename: null, updatedAt: null };
+    }
+    meta.path = '/resume.md';
+    if (!meta.originalFilename) meta.originalFilename = 'resume.md';
+    meta.updatedAt = new Date().toISOString();
+    await saveData('resume.json', meta);
+
+    res.json({
+      success: true,
+      path: meta.path,
+      originalFilename: meta.originalFilename,
+      updatedAt: meta.updatedAt,
+      markdownBytes: Buffer.byteLength(md, 'utf8')
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post('/resume/md/ai-edit', async function (req, res, next) {
+  try {
+    if (!process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({ error: 'ANTHROPIC_API_KEY is required to edit with AI.' });
+    }
+    const body = req.body || {};
+    const markdown = body.markdown != null ? String(body.markdown) : '';
+    const prompt = body.prompt != null ? String(body.prompt) : '';
+    if (!String(prompt).trim()) {
+      return res.status(400).json({ error: 'prompt is required' });
+    }
+    if (!String(markdown).trim()) {
+      return res.status(400).json({ error: 'markdown is empty — add content in the editor or upload a resume first' });
+    }
+
+    const revised = await editResumeMarkdownWithPrompt(markdown, prompt);
+    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+    await fs.promises.writeFile(RESUME_MD_FS, revised, 'utf8');
+
+    let meta = await loadData('resume.json');
+    if (!meta || typeof meta !== 'object') {
+      meta = { path: null, originalFilename: null, updatedAt: null };
+    }
+    meta.path = '/resume.md';
+    if (!meta.originalFilename) meta.originalFilename = 'resume.md';
+    meta.updatedAt = new Date().toISOString();
+    await saveData('resume.json', meta);
+
+    res.json({
+      markdown: revised,
+      path: meta.path,
+      originalFilename: meta.originalFilename,
+      updatedAt: meta.updatedAt,
+      markdownBytes: Buffer.byteLength(revised, 'utf8')
+    });
+  } catch (e) {
+    next(e);
+  }
+});
 
 router.post('/resume', uploadResume.single('resume'), async function (req, res, next) {
   try {
@@ -480,12 +533,6 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
       });
     }
 
-    let prevMeta = {};
-    try {
-      prevMeta = await loadData('resume.json');
-    } catch (e) {
-      prevMeta = {};
-    }
     const md = buildResumeMarkdown(text, req.file.originalname);
     fs.mkdirSync(PUBLIC_DIR, { recursive: true });
     await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
@@ -501,9 +548,7 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
     const meta = {
       path: '/resume.md',
       originalFilename: req.file.originalname || (ext === '.docx' ? 'resume.docx' : 'resume.pdf'),
-      updatedAt: new Date().toISOString(),
-      baselineResumePath: prevMeta.baselineResumePath || null,
-      baselineResumeUpdatedAt: prevMeta.baselineResumeUpdatedAt || null
+      updatedAt: new Date().toISOString()
     };
     await saveData('resume.json', meta);
 
@@ -516,41 +561,6 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
   }
 });
 
-function baselineDocxHandler(req, res, next) {
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return res.status(503).json({ error: 'ANTHROPIC_API_KEY is required to generate the baseline resume document.' });
-  }
-  loadData('job-search-profile.json')
-    .then(function (profile) {
-      return writeStandaloneResumeDocxFromProfile(profile);
-    })
-    .then(function (baselineResumeUpdatedAt) {
-      return loadData('resume.json').then(function (meta) {
-        if (!meta || typeof meta !== 'object') {
-          meta = { path: null, originalFilename: null, updatedAt: null };
-        }
-        meta.baselineResumePath = BASELINE_RESUME_PUBLIC_PATH;
-        meta.baselineResumeUpdatedAt = baselineResumeUpdatedAt;
-        return saveData('resume.json', meta).then(function () {
-          return baselineResumeUpdatedAt;
-        });
-      });
-    })
-    .then(function (baselineResumeUpdatedAt) {
-      res.json({
-        success: true,
-        baselineResumePath: BASELINE_RESUME_PUBLIC_PATH,
-        baselineResumeUpdatedAt,
-        generatedResumePath: BASELINE_RESUME_PUBLIC_PATH,
-        generatedResumeUpdatedAt: baselineResumeUpdatedAt
-      });
-    })
-    .catch(next);
-}
-
-router.post('/resume/baseline-docx', baselineDocxHandler);
-router.post('/resume/generated-docx', baselineDocxHandler);
-
 router.delete('/resume', async function (req, res, next) {
   try {
     const pub = path.join(__dirname, '..', 'public');
@@ -561,7 +571,7 @@ router.delete('/resume', async function (req, res, next) {
         /* ignore */
       }
     });
-    [BASELINE_RESUME_FS_PATH, LEGACY_GENERATED_FS_PATH].forEach(function (p) {
+    [path.join(pub, 'baseline-resume.docx'), path.join(pub, 'generated-resume.docx')].forEach(function (p) {
       try {
         if (fs.existsSync(p)) fs.unlinkSync(p);
       } catch (e) {
@@ -571,11 +581,7 @@ router.delete('/resume', async function (req, res, next) {
     await saveData('resume.json', {
       path: null,
       originalFilename: null,
-      updatedAt: null,
-      baselineResumePath: null,
-      baselineResumeUpdatedAt: null,
-      generatedResumePath: null,
-      generatedResumeUpdatedAt: null
+      updatedAt: null
     });
     res.json({ success: true });
   } catch (e) {
