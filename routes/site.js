@@ -14,13 +14,16 @@ router.get('/', async function (req, res, next) {
     if (v != null) resume = { ...resume, ...v };
     const pdfPath = path.join(publicDir, 'resume.pdf');
     const docxPath = path.join(publicDir, 'resume.docx');
+    const mdPath = path.join(publicDir, 'resume.md');
     const hasPdf = fs.existsSync(pdfPath);
     const hasDocx = fs.existsSync(docxPath);
+    const hasMd = fs.existsSync(mdPath);
     const rel = resume.path ? String(resume.path).replace(/^\//, '') : '';
     const metaOk = rel && fs.existsSync(path.join(publicDir, rel));
-    let resumeFileExists = metaOk || hasPdf || hasDocx;
+    let resumeFileExists = metaOk || hasPdf || hasDocx || hasMd;
     if (resumeFileExists && !metaOk) {
-      resume.path = hasPdf ? '/resume.pdf' : '/resume.docx';
+      if (hasMd) resume.path = '/resume.md';
+      else resume.path = hasPdf ? '/resume.pdf' : '/resume.docx';
     }
     res.render('index', { experiences, projects, resume, resumeFileExists });
   } catch (e) {

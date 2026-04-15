@@ -5,9 +5,9 @@
     <div>
       <h2>Resume</h2>
       <p class="admin__section-lead">
-        <strong>Public resume file:</strong> upload a <strong>PDF</strong> or <strong>Word (.docx)</strong>. It is saved as <code>public/resume.pdf</code> or <code>public/resume.docx</code> and linked on the site accordingly.
-        When <code>ANTHROPIC_API_KEY</code> is set, the server extracts text, <strong>auto-fills</strong> the profile JSON below, and writes a separate <strong>baseline resume</strong> (<code>baseline-resume.docx</code>) from that profile plus your selected portfolio items—longer than one page is fine; this is not the uploaded file.
-        <strong>Job CRM pack:</strong> each row’s download is a ZIP with a tailored <strong>cover letter</strong> and a <strong>job-specific tailored resume</strong> (both .docx), separate from the baseline document.
+        <strong>Public resume:</strong> upload a <strong>PDF</strong> or <strong>Word (.docx)</strong>. The app reads the document and stores one file, <code>public/resume.md</code>, which is what visitors download (plain Markdown). Edit the profile below manually; it is not filled from the upload.
+        Optional <strong>baseline resume</strong> (<code>baseline-resume.docx</code>): click Regenerate below when <code>ANTHROPIC_API_KEY</code> is set—built from your profile and portfolio, not from the uploaded file.
+        <strong>Job CRM pack:</strong> each row’s download is a ZIP with a tailored <strong>cover letter</strong> and <strong>job-specific tailored resume</strong> (both .docx), separate from the baseline document.
       </p>
     </div>
   </div>
@@ -51,7 +51,7 @@
         <a href="<%= baselineResumePublicHref %>" class="admin__btn admin__btn--outline" download="<%= String(baselineResumePublicHref).replace(/^\//, '') %>">Download</a>
       </div>
       <% } else { %>
-      <p class="admin__text-muted admin__resume-generated__empty">No file yet. Upload a PDF or Word file with autofill (and API key), or click Regenerate below.</p>
+      <p class="admin__text-muted admin__resume-generated__empty">No file yet. Save your profile below and click Regenerate (requires API key), or upload a PDF/Word above first—the public site uses <code>resume.md</code>, not this file.</p>
       <% } %>
       <button type="button" class="admin__btn admin__btn--primary admin__resume-regenerate" id="regenerateMasterResumeBtn" onclick="regenerateMasterResumeDocx()">Regenerate baseline resume</button>
     </div>
@@ -425,32 +425,11 @@
       })
       .then(function (data) {
         if (typeof showToast !== 'function') return;
-        if (data.profileAutofill === 'ok') {
-          var okMsg = 'Resume saved — profile auto-filled from the file.';
-          if (data.baselineResumeError || data.generatedResumeError) {
-            okMsg +=
-              ' Baseline .docx error: ' +
-              (data.baselineResumeError || data.generatedResumeError);
-            showToast(okMsg, 'error');
-          } else if (data.baselineResumeUpdatedAt || data.generatedResumeUpdatedAt) {
-            okMsg += ' Baseline resume (.docx) updated.';
-            showToast(okMsg, 'success');
-          } else {
-            showToast(okMsg, 'success');
-          }
-        } else if (data.profileAutofill === 'skipped_no_api_key') {
-          showToast('Resume saved. ' + (data.profileAutofillDetail || ''), 'success');
-        } else if (
-          data.profileAutofill === 'skipped_extraction_failed' ||
-          data.profileAutofill === 'skipped_parse_failed'
-        ) {
-          showToast(
-            'Resume saved, but auto-fill failed: ' + (data.profileAutofillDetail || 'Unknown error'),
-            'error'
-          );
-        } else {
-          showToast('Resume saved', 'success');
-        }
+        var detail =
+          typeof data.markdownBytes === 'number'
+            ? ' Saved as resume.md (' + data.markdownBytes + ' bytes).'
+            : ' Saved as resume.md.';
+        showToast('Resume saved.' + detail, 'success');
         setTimeout(function () {
           window.location.assign('/admin/resume#job-search-profile');
         }, 500);
@@ -499,7 +478,7 @@ function regenerateMasterResumeDocx() {
 }
 
 function deleteResumeFile() {
-  if (!confirm('Remove the public resume file (PDF or Word) and the baseline .docx from the server?')) return;
+  if (!confirm('Remove resume.md (and any legacy PDF/Word on disk) and the baseline .docx from the server?')) return;
   fetch('/api/resume', { method: 'DELETE' })
     .then(function (res) {
       if (!res.ok) throw new Error();

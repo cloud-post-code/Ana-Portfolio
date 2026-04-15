@@ -28,20 +28,8 @@ const upload = multer({
   }
 });
 
-const resumeStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '..', 'public');
-    fs.mkdirSync(dir, { recursive: true });
-    cb(null, dir);
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname || '').toLowerCase();
-    cb(null, ext === '.docx' ? 'resume.docx' : 'resume.pdf');
-  }
-});
-
 const uploadResume = multer({
-  storage: resumeStorage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname || '').toLowerCase();
@@ -55,8 +43,9 @@ const uploadResume = multer({
 });
 
 const cms = require('../lib/cms-store');
-const { mergeProfile, mergeProfileFromResumeExtract } = require('../lib/job-search-profile');
-const { extractResumeDocumentText, profileFromResumeText } = require('../lib/resume-pdf-to-profile');
+const { mergeProfile } = require('../lib/job-search-profile');
+const { extractResumeDocumentText } = require('../lib/resume-ingest-text');
+const { buildResumeMarkdown } = require('../lib/resume-to-markdown');
 const JOBS_CRM_FILE = 'jobs-crm.json';
 
 function dataPath(filename) {
@@ -474,13 +463,22 @@ router.delete('/jobs-crm/:id', async function (req, res, next) {
   }
 });
 
+const PUBLIC_DIR = path.join(__dirname, '..', 'public');
+const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
+
 router.post('/resume', uploadResume.single('resume'), async function (req, res, next) {
   try {
-    if (!req.file) {
+    if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: 'Upload a PDF or Word (.docx) file.' });
     }
     const ext = path.extname(req.file.originalname || '').toLowerCase();
-    const publicPath = ext === '.docx' ? '/resume.docx' : '/resume.pdf';
+    const buf = req.file.buffer;
+    const { text, error: readErr } = await extractResumeDocumentText(buf, ext);
+    if (readErr || !String(text || '').trim()) {
+      return res.status(400).json({
+        error: readErr || 'Could not read text from this file (empty or image-only PDF).'
+      });
+    }
 
     let prevMeta = {};
     try {
@@ -488,8 +486,20 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
     } catch (e) {
       prevMeta = {};
     }
+    const md = buildResumeMarkdown(text, req.file.originalname);
+    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+    await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
+
+    [path.join(PUBLIC_DIR, 'resume.pdf'), path.join(PUBLIC_DIR, 'resume.docx')].forEach(function (p) {
+      try {
+        if (fs.existsSync(p)) fs.unlinkSync(p);
+      } catch (e) {
+        /* ignore */
+      }
+    });
+
     const meta = {
-      path: publicPath,
+      path: '/resume.md',
       originalFilename: req.file.originalname || (ext === '.docx' ? 'resume.docx' : 'resume.pdf'),
       updatedAt: new Date().toISOString(),
       baselineResumePath: prevMeta.baselineResumePath || null,
@@ -497,61 +507,9 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
     };
     await saveData('resume.json', meta);
 
-    let profileAutofill = 'skipped_no_api_key';
-    let profileAutofillDetail = null;
-    let profile = null;
-    let baselineResumeError = null;
-
-    if (process.env.ANTHROPIC_API_KEY) {
-      try {
-        const buf = await fs.promises.readFile(req.file.path);
-        const { text, error: extractErr } = await extractResumeDocumentText(buf, ext);
-        if (extractErr || !text) {
-          profileAutofill = 'skipped_extraction_failed';
-          profileAutofillDetail = extractErr || 'No text extracted from file.';
-        } else {
-          const current = await loadData('job-search-profile.json');
-          const extracted = await profileFromResumeText(text);
-          let merged = mergeProfileFromResumeExtract(current, extracted);
-          if (!String(merged.resumeNotesForAi || '').trim()) {
-            merged = mergeProfile({
-              ...merged,
-              resumeNotesForAi:
-                'Auto-filled from uploaded resume (PDF or Word) on ' + new Date().toISOString().slice(0, 10) + '.'
-            });
-          }
-          await saveData('job-search-profile.json', merged);
-          profile = merged;
-          profileAutofill = 'ok';
-          try {
-            const baselineResumeUpdatedAt = await writeStandaloneResumeDocxFromProfile(merged);
-            meta.baselineResumePath = BASELINE_RESUME_PUBLIC_PATH;
-            meta.baselineResumeUpdatedAt = baselineResumeUpdatedAt;
-            await saveData('resume.json', meta);
-          } catch (genErr) {
-            console.warn('[baseline-resume]', genErr.message || genErr);
-            baselineResumeError = genErr.message || String(genErr);
-          }
-        }
-      } catch (e) {
-        console.warn('[resume-autofill]', e.message || e);
-        profileAutofill = 'skipped_parse_failed';
-        profileAutofillDetail = e.message || String(e);
-      }
-    } else {
-      profileAutofillDetail =
-        'Set ANTHROPIC_API_KEY to ingest the file into profile JSON and build the baseline resume .docx.';
-    }
-
     res.json({
       ...meta,
-      profile,
-      profileAutofill,
-      profileAutofillDetail,
-      baselineResumeUpdatedAt: meta.baselineResumeUpdatedAt || null,
-      baselineResumeError,
-      generatedResumeUpdatedAt: meta.baselineResumeUpdatedAt || null,
-      generatedResumeError: baselineResumeError
+      markdownBytes: Buffer.byteLength(md, 'utf8')
     });
   } catch (e) {
     next(e);
@@ -596,7 +554,7 @@ router.post('/resume/generated-docx', baselineDocxHandler);
 router.delete('/resume', async function (req, res, next) {
   try {
     const pub = path.join(__dirname, '..', 'public');
-    [path.join(pub, 'resume.pdf'), path.join(pub, 'resume.docx')].forEach(function (p) {
+    [path.join(pub, 'resume.pdf'), path.join(pub, 'resume.docx'), path.join(pub, 'resume.md')].forEach(function (p) {
       try {
         if (fs.existsSync(p)) fs.unlinkSync(p);
       } catch (e) {

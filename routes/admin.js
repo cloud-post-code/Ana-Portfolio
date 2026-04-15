@@ -77,7 +77,8 @@ router.get('/resume', async function (req, res, next) {
     const publicDir = path.join(__dirname, '..', 'public');
     const hasPdf = fs.existsSync(path.join(publicDir, 'resume.pdf'));
     const hasDocx = fs.existsSync(path.join(publicDir, 'resume.docx'));
-    const resumeFileExists = hasPdf || hasDocx;
+    const hasMd = fs.existsSync(path.join(publicDir, 'resume.md'));
+    const resumeFileExists = hasPdf || hasDocx || hasMd;
     const baselineResumePath = path.join(publicDir, 'baseline-resume.docx');
     const legacyGenPath = path.join(publicDir, 'generated-resume.docx');
     const baselineResumeFileExists =
