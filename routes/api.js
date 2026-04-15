@@ -481,8 +481,8 @@ router.put('/resume/md', async function (req, res, next) {
 
 router.post('/resume/md/ai-edit', async function (req, res, next) {
   try {
-    if (!process.env.ANTHROPIC_API_KEY) {
-      return res.status(503).json({ error: 'ANTHROPIC_API_KEY is required to edit with AI.' });
+    if (!process.env.OPENAI_API_KEY) {
+      return res.status(503).json({ error: 'OPENAI_API_KEY is required to edit with AI.' });
     }
     const body = req.body || {};
     const markdown = body.markdown != null ? String(body.markdown) : '';
