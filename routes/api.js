@@ -326,7 +326,9 @@ router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
     if (e && (e.code === 'ENOENT' || String(e.message).includes('JSON'))) {
       return res.status(404).send('Jobs CRM data not found');
     }
-    next(e);
+    console.error('[api jobs-crm cover-letter]', e);
+    const msg = e && e.message ? String(e.message) : String(e);
+    return res.status(500).json({ error: msg });
   }
 });
 

@@ -204,10 +204,13 @@ function downloadJobCoverLetter(id) {
       if (!res.ok) {
         if (ct.indexOf('application/json') >= 0) {
           return res.json().then(function (j) {
-            throw new Error(j.error || 'Could not build application pack');
+            throw new Error((j && j.error) || 'Could not build application pack');
           });
         }
-        throw new Error('Could not build application pack');
+        return res.text().then(function (t) {
+          var s = (t && String(t).trim().slice(0, 240)) || '';
+          throw new Error(s || 'Could not build application pack (HTTP ' + res.status + ')');
+        });
       }
       var disposition = res.headers.get('Content-Disposition') || '';
       var m = /filename="([^"]+)"/.exec(disposition);
