@@ -87,8 +87,10 @@ async function saveData(filename, data) {
   if (filename === 'resume.json') return cms.setKv('resume', data);
   if (filename === 'job-search-profile.json') {
     await cms.setKv('job_search_profile', data);
-    fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
-    fs.writeFileSync(dataPath(filename), JSON.stringify(data, null, 2));
+    if (!cms.isDatabaseEnabled()) {
+      fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
+      fs.writeFileSync(dataPath(filename), JSON.stringify(data, null, 2));
+    }
     return;
   }
   fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
@@ -439,14 +441,31 @@ router.delete('/jobs-crm/:id', async function (req, res, next) {
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
+const RESUME_MD_KV = 'resume_markdown';
 const { editResumeMarkdownWithPrompt } = require('../lib/resume-md-ai-edit');
+
+async function readResumeMarkdownBody() {
+  if (cms.isDatabaseEnabled()) {
+    const row = await cms.getKv(RESUME_MD_KV);
+    if (row && typeof row.content === 'string') return row.content;
+  }
+  if (fs.existsSync(RESUME_MD_FS)) {
+    return await fs.promises.readFile(RESUME_MD_FS, 'utf8');
+  }
+  return '';
+}
+
+async function persistResumeMarkdown(md) {
+  if (cms.isDatabaseEnabled()) {
+    await cms.setKv(RESUME_MD_KV, { content: md });
+  }
+  fs.mkdirSync(PUBLIC_DIR, { recursive: true });
+  await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
+}
 
 router.get('/resume/md', async function (req, res, next) {
   try {
-    let markdown = '';
-    if (fs.existsSync(RESUME_MD_FS)) {
-      markdown = await fs.promises.readFile(RESUME_MD_FS, 'utf8');
-    }
+    const markdown = await readResumeMarkdownBody();
     res.json({ markdown });
   } catch (e) {
     next(e);
@@ -457,8 +476,7 @@ router.put('/resume/md', async function (req, res, next) {
   try {
     const body = req.body || {};
     const md = body.markdown != null ? String(body.markdown) : '';
-    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
-    await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
+    await persistResumeMarkdown(md);
 
     let meta = await loadData('resume.json');
     if (!meta || typeof meta !== 'object') {
@@ -499,8 +517,7 @@ router.post('/resume/md/ai-edit', async function (req, res, next) {
     }
 
     const revised = await editResumeMarkdownWithPrompt(markdown, prompt);
-    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
-    await fs.promises.writeFile(RESUME_MD_FS, revised, 'utf8');
+    await persistResumeMarkdown(revised);
 
     let meta = await loadData('resume.json');
     if (!meta || typeof meta !== 'object') {
@@ -538,8 +555,7 @@ router.post('/resume', uploadResume.single('resume'), async function (req, res, 
     }
 
     const md = buildResumeMarkdown(text, req.file.originalname);
-    fs.mkdirSync(PUBLIC_DIR, { recursive: true });
-    await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
+    await persistResumeMarkdown(md);
 
     [path.join(PUBLIC_DIR, 'resume.pdf'), path.join(PUBLIC_DIR, 'resume.docx')].forEach(function (p) {
       try {
@@ -587,6 +603,9 @@ router.delete('/resume', async function (req, res, next) {
       originalFilename: null,
       updatedAt: null
     });
+    if (cms.isDatabaseEnabled()) {
+      await cms.deleteKv(RESUME_MD_KV);
+    }
     res.json({ success: true });
   } catch (e) {
     next(e);

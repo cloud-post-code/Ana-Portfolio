@@ -17,7 +17,11 @@ router.get('/', async function (req, res, next) {
     const mdPath = path.join(publicDir, 'resume.md');
     const hasPdf = fs.existsSync(pdfPath);
     const hasDocx = fs.existsSync(docxPath);
-    const hasMd = fs.existsSync(mdPath);
+    let hasMd = fs.existsSync(mdPath);
+    if (!hasMd && cms.isDatabaseEnabled()) {
+      const rm = await cms.getKv('resume_markdown');
+      hasMd = !!(rm && typeof rm.content === 'string' && rm.content.length > 0);
+    }
     const rel = resume.path ? String(resume.path).replace(/^\//, '') : '';
     const metaOk = rel && fs.existsSync(path.join(publicDir, rel));
     let resumeFileExists = metaOk || hasPdf || hasDocx || hasMd;

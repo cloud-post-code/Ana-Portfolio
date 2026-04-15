@@ -52,6 +52,13 @@ async function main() {
     console.log('Imported job-search-profile.json');
   }
 
+  const resumeMdPath = path.join(__dirname, '..', 'public', 'resume.md');
+  if (fs.existsSync(resumeMdPath)) {
+    const content = fs.readFileSync(resumeMdPath, 'utf8');
+    await cms.setKv('resume_markdown', { content });
+    console.log('Imported public/resume.md');
+  }
+
   console.log('Done.');
   process.exit(0);
 }

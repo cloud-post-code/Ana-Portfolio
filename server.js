@@ -4,11 +4,28 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
+const cms = require('./lib/cms-store');
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+/** When Postgres holds resume markdown, serve it even if public/resume.md is missing (ephemeral disk). */
+app.get('/resume.md', async function (req, res, next) {
+  try {
+    if (!cms.isDatabaseEnabled()) return next();
+    const row = await cms.getKv('resume_markdown');
+    if (row && typeof row.content === 'string' && row.content.length) {
+      res.type('text/markdown; charset=utf-8');
+      return res.send(row.content);
+    }
+    return next();
+  } catch (e) {
+    next(e);
+  }
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

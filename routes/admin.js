@@ -76,7 +76,11 @@ router.get('/resume', async function (req, res, next) {
     const publicDir = path.join(__dirname, '..', 'public');
     const hasPdf = fs.existsSync(path.join(publicDir, 'resume.pdf'));
     const hasDocx = fs.existsSync(path.join(publicDir, 'resume.docx'));
-    const hasMd = fs.existsSync(path.join(publicDir, 'resume.md'));
+    let hasMd = fs.existsSync(path.join(publicDir, 'resume.md'));
+    if (!hasMd && cms.isDatabaseEnabled()) {
+      const rm = await cms.getKv('resume_markdown');
+      hasMd = !!(rm && typeof rm.content === 'string' && rm.content.length > 0);
+    }
     const resumeFileExists = hasPdf || hasDocx || hasMd;
 
     res.render('admin/resume', {
