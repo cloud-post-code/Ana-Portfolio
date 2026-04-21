@@ -4,7 +4,7 @@
   <div class="admin__section-header">
     <div>
       <h2>Resume</h2>
-      <p class="admin__section-lead">Upload your resume, add the job posting and any notes, then generate a tailored version and download it as a Word document.</p>
+      <p class="admin__section-lead">Upload your resume, add the job posting and any notes, then run <strong>Tailor with AI</strong>. Your tailored Word file downloads automatically — it is not stored on the server.</p>
     </div>
   </div>
 
@@ -81,7 +81,7 @@
       ></textarea>
     </div>
 
-    <h3 class="admin__resume-step-title">Step 3 — Generate &amp; download</h3>
+    <h3 class="admin__resume-step-title">Step 3 — Generate (Word downloads automatically)</h3>
     <div class="admin__resume-actions" style="margin-bottom:1rem;">
       <button
         type="button"
@@ -94,18 +94,19 @@
     </div>
 
     <div id="tailorResultWrap" style="display:none;">
+      <p class="admin__text-muted" style="margin:0 0 0.75rem;font-size:0.85rem;">Preview only — not saved on the server. Use the button below if you edited the text or the automatic download was blocked.</p>
       <div class="admin__form-group admin__form-group--full">
-        <label class="admin__label" for="tailorResultMd">Tailored resume <span class="admin__text-muted">(editable)</span></label>
+        <label class="admin__label" for="tailorResultMd">Tailored resume <span class="admin__text-muted">(editable preview)</span></label>
         <textarea
           id="tailorResultMd"
           class="admin__resume-profile-input"
           rows="22"
-          placeholder="Your tailored resume will appear here…"
+          placeholder="After tailoring, your Word file downloads automatically. The preview appears here for quick edits."
         ></textarea>
       </div>
       <div class="admin__resume-actions">
-        <button type="button" class="admin__btn admin__btn--primary" onclick="downloadTailoredResume()">
-          Download as Word (.docx)
+        <button type="button" class="admin__btn admin__btn--outline" onclick="downloadTailoredResume()">
+          Download Word again (.docx)
         </button>
       </div>
     </div>
@@ -321,11 +322,26 @@ function runResumeTailor() {
     })
     .then(function (o) {
       if (!o.ok) throw new Error((o.j && o.j.error) || 'Tailor failed');
-      if (resultTa) resultTa.value = o.j.tailoredMarkdown || '';
+      var md = o.j.tailoredMarkdown != null ? String(o.j.tailoredMarkdown) : '';
+      if (resultTa) resultTa.value = md;
       if (wrap) wrap.style.display = '';
-      if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
-      if (typeof showToast === 'function') showToast('Resume tailored. Review and download below.', 'success');
       if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (statusEl) statusEl.textContent = 'Preparing Word download\u2026';
+      return downloadTailoredResumeMarkdown(md, { skipSuccessToast: true })
+        .then(function () {
+          if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
+          if (typeof showToast === 'function') {
+            showToast('Word document downloaded to your device. Tailored text is not saved on the server.', 'success');
+          }
+        })
+        .catch(function (dlErr) {
+          if (statusEl) {
+            statusEl.textContent = 'Tailored \u00b7 auto-download failed — use Download Word again';
+          }
+          if (typeof showToast === 'function') {
+            showToast((dlErr && dlErr.message) || 'Download failed', 'error');
+          }
+        });
     })
     .catch(function (e) {
       if (statusEl) statusEl.textContent = '';
@@ -336,18 +352,25 @@ function runResumeTailor() {
     });
 }
 
-function downloadTailoredResume() {
-  var resultTa = document.getElementById('tailorResultMd');
-  var md = resultTa ? resultTa.value.trim() : '';
-  if (!md) {
-    if (typeof showToast === 'function') showToast('No tailored resume to download.', 'error');
-    return;
-  }
+function tailoredDocxBasename() {
   var jobDescEl = document.getElementById('tailorJobDesc');
   var snippet = jobDescEl ? jobDescEl.value.trim().slice(0, 40).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-]/g, '') : '';
-  var filename = 'tailored-resume' + (snippet ? '-' + snippet : '');
+  return 'tailored-resume' + (snippet ? '-' + snippet : '');
+}
 
-  fetch('/api/resume/tailor/download', {
+/**
+ * @param {string} md - markdown body
+ * @param {{ skipSuccessToast?: boolean }} opts
+ * @returns {Promise<void>}
+ */
+function downloadTailoredResumeMarkdown(md, opts) {
+  opts = opts || {};
+  md = String(md || '').trim();
+  if (!md) {
+    return Promise.reject(new Error('No tailored resume to download.'));
+  }
+  var filename = tailoredDocxBasename();
+  return fetch('/api/resume/tailor/download', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ markdown: md, filename: filename })
@@ -371,8 +394,16 @@ function downloadTailoredResume() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(a.href);
-      if (typeof showToast === 'function') showToast('Word document downloaded.', 'success');
-    })
+      if (!opts.skipSuccessToast && typeof showToast === 'function') {
+        showToast('Word document downloaded.', 'success');
+      }
+    });
+}
+
+function downloadTailoredResume() {
+  var resultTa = document.getElementById('tailorResultMd');
+  var md = resultTa ? resultTa.value.trim() : '';
+  downloadTailoredResumeMarkdown(md, {})
     .catch(function (e) {
       if (typeof showToast === 'function') showToast(e.message || 'Download failed', 'error');
     });
