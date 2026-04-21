@@ -4,7 +4,7 @@
   <div class="admin__section-header">
     <div>
       <h2>Resume</h2>
-      <p class="admin__section-lead">Upload your resume, paste the job posting (and optional notes), then run <strong>Tailor with AI</strong>. You get a <strong>refined, improved, role-tailored</strong> resume as Markdown, then a <strong>Word (.docx)</strong> download starts automatically. Nothing is stored on the server except your original uploaded resume.</p>
+      <p class="admin__section-lead">Upload your resume, add optional <strong>persistent profile notes</strong> (saved on the server), paste the job posting, then run <strong>Tailor with AI</strong> and optionally <strong>generate a cover letter</strong>. Tailored resume and cover letter are previews plus <strong>Word (.docx)</strong> downloads — not stored on the server. Your uploaded resume and profile notes persist until you remove them.</p>
     </div>
   </div>
 
@@ -58,6 +58,30 @@
       </div>
     </form>
 
+    <h3 class="admin__resume-step-title">Step 1.5 — Persistent profile notes</h3>
+    <p class="admin__text-muted" style="margin-bottom:1rem;font-size:0.88rem;line-height:1.45;">Themes, positioning, strengths to emphasize, and constraints. These notes load every visit and are included when you tailor your resume or generate a cover letter. They stay on the server if you remove the uploaded file.</p>
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="resumeProfileNotes">Profile notes</label>
+      <textarea
+        id="resumeProfileNotes"
+        class="admin__resume-profile-input"
+        rows="10"
+        placeholder="e.g. Lead with product strategy; emphasize cross-functional leadership; keep tone direct; no relocation."
+      ></textarea>
+      <p class="admin__line-budget" id="resumeNotesLineBudget" aria-live="polite">Lines: <span id="resumeNotesLineCount">0</span> / <%= maxResumePageLines %></p>
+      <p class="admin__text-muted" id="resumeNotesSavedMeta" style="margin:0.25rem 0 0;font-size:0.82rem;"></p>
+      <div class="admin__resume-actions" style="flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
+        <button
+          type="button"
+          class="admin__btn admin__btn--outline"
+          id="resumeNotesEnhanceBtn"
+          onclick="enhanceResumeProfileNotes()"
+          <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
+        >Enhance</button>
+        <button type="button" class="admin__btn admin__btn--primary" id="resumeNotesSaveBtn" onclick="saveResumeProfileNotes()">Save notes</button>
+      </div>
+    </div>
+
     <h3 class="admin__resume-step-title">Step 2 — Job details</h3>
     <% if (!hasLlmKey) { %>
     <p class="admin__text-muted" style="margin-bottom:1rem;">Set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> on the server to enable AI tailoring.</p>
@@ -72,12 +96,12 @@
       ></textarea>
     </div>
     <div class="admin__form-group admin__form-group--full">
-      <label class="admin__label" for="tailorDetails">Additional notes <span class="admin__text-muted">(optional)</span></label>
+      <label class="admin__label" for="tailorDetails">Instructions for this job <span class="admin__text-muted">(optional)</span></label>
       <textarea
         id="tailorDetails"
         class="admin__resume-profile-input"
         rows="4"
-        placeholder="e.g. Emphasise analytics. Keep to one page. Tone: confident but warm."
+        placeholder="e.g. Emphasise analytics for this posting. Tone: confident but warm."
       ></textarea>
     </div>
 
@@ -93,8 +117,8 @@
     </div>
     <% } %>
 
-    <h3 class="admin__resume-step-title">Step 3 — Generate (Word downloads automatically)</h3>
-    <p class="admin__text-muted" style="margin:0 0 0.75rem;font-size:0.88rem;line-height:1.45;">AI rewrites your resume into a stronger, job-specific version (same facts; clearer impact and wording). The result is text you can edit below, then save via Word download.</p>
+    <h3 class="admin__resume-step-title">Step 3 — Tailored resume &amp; cover letter</h3>
+    <p class="admin__text-muted" style="margin:0 0 0.75rem;font-size:0.88rem;line-height:1.45;"><strong>Tailored resume:</strong> AI rewrites bullets and structure to fit the posting (grounded in your resume and profile notes). <strong>Cover letter:</strong> optional short narrative — same job text; not saved on the server.</p>
     <div class="admin__resume-actions" style="margin-bottom:1rem;">
       <button
         type="button"
@@ -116,11 +140,43 @@
           rows="22"
           placeholder="After tailoring, your Word file downloads automatically. The preview appears here for quick edits."
         ></textarea>
+        <p class="admin__line-budget" id="tailorResultLineBudget" aria-live="polite">Lines: <span id="tailorResultLineCount">0</span> / <%= maxResumePageLines %></p>
       </div>
       <div class="admin__resume-actions">
         <button type="button" class="admin__btn admin__btn--outline" onclick="downloadTailoredResume()">
           Download Word again (.docx)
         </button>
+      </div>
+    </div>
+
+    <div class="admin__resume-cover-letter" style="margin-top:1.75rem;padding-top:1.5rem;border-top:1px solid var(--admin-border);">
+      <h4 class="admin__resume-substep-title">Cover letter</h4>
+      <p class="admin__text-muted" style="margin:0 0 0.75rem;font-size:0.88rem;line-height:1.45;">Uses the job description above, your stored resume, profile notes, and optional per-job instructions. Preview only — download as Word if you like; nothing is stored on the server.</p>
+      <div class="admin__resume-actions" style="margin-bottom:0.75rem;">
+        <button
+          type="button"
+          class="admin__btn admin__btn--primary"
+          id="coverLetterRunBtn"
+          onclick="runCoverLetter()"
+          <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
+        >Generate cover letter</button>
+        <span id="coverLetterStatus" class="admin__text-muted" style="margin-left:.75rem;"></span>
+      </div>
+      <div id="coverLetterWrap" style="display:none;">
+        <div class="admin__form-group admin__form-group--full">
+          <label class="admin__label" for="coverLetterMd">Cover letter <span class="admin__text-muted">(Markdown — editable)</span></label>
+          <textarea
+            id="coverLetterMd"
+            class="admin__resume-profile-input"
+            rows="16"
+            placeholder="Generated text appears here. Edit as needed, then download as Word."
+          ></textarea>
+          <p class="admin__line-budget" id="coverLetterLineBudget" aria-live="polite">Lines: <span id="coverLetterLineCount">0</span> / <%= maxCoverLetterLines %></p>
+        </div>
+        <div class="admin__resume-actions">
+          <button type="button" class="admin__btn admin__btn--outline" onclick="downloadCoverLetterDocx()">Download Word (.docx)</button>
+          <button type="button" class="admin__btn admin__btn--outline" onclick="runCoverLetter()" id="coverLetterAgainBtn">Generate again</button>
+        </div>
       </div>
     </div>
   </div>
@@ -129,6 +185,314 @@
 <%- include('layout-bottom') %>
 
 <script>
+var MAX_RESUME_PAGE_LINES = <%= maxResumePageLines %>;
+var MAX_COVER_LETTER_LINES = <%= maxCoverLetterLines %>;
+
+function resumeLineCount(s) {
+  s = String(s || '');
+  if (!s) return 0;
+  return s.split('\n').length;
+}
+
+function setLineBudgetEl(countEl, budgetEl, n, maxN) {
+  if (countEl) countEl.textContent = String(n);
+  if (budgetEl) {
+    budgetEl.classList.toggle('admin__line-budget--over', n > maxN);
+  }
+}
+
+function refreshResumeNotesLineBudget() {
+  var ta = document.getElementById('resumeProfileNotes');
+  var n = resumeLineCount(ta ? ta.value : '');
+  setLineBudgetEl(
+    document.getElementById('resumeNotesLineCount'),
+    document.getElementById('resumeNotesLineBudget'),
+    n,
+    MAX_RESUME_PAGE_LINES
+  );
+  var saveBtn = document.getElementById('resumeNotesSaveBtn');
+  if (saveBtn) saveBtn.disabled = n > MAX_RESUME_PAGE_LINES;
+}
+
+function refreshTailorResultLineBudget() {
+  var ta = document.getElementById('tailorResultMd');
+  var n = resumeLineCount(ta ? ta.value : '');
+  setLineBudgetEl(
+    document.getElementById('tailorResultLineCount'),
+    document.getElementById('tailorResultLineBudget'),
+    n,
+    MAX_RESUME_PAGE_LINES
+  );
+}
+
+function refreshCoverLetterLineBudget() {
+  var ta = document.getElementById('coverLetterMd');
+  var n = resumeLineCount(ta ? ta.value : '');
+  setLineBudgetEl(
+    document.getElementById('coverLetterLineCount'),
+    document.getElementById('coverLetterLineBudget'),
+    n,
+    MAX_COVER_LETTER_LINES
+  );
+}
+
+function getTailorModelPayload() {
+  var out = {};
+  var modelSel = document.getElementById('tailorModelSelect');
+  if (modelSel && modelSel.value) {
+    var pipe = modelSel.value.indexOf('|');
+    if (pipe > 0) {
+      out.provider = modelSel.value.slice(0, pipe);
+      out.model = modelSel.value.slice(pipe + 1);
+    }
+  }
+  return out;
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  fetch('/api/resume/notes')
+    .then(function (res) {
+      return res.json();
+    })
+    .then(function (j) {
+      var ta = document.getElementById('resumeProfileNotes');
+      if (ta && j.content != null) ta.value = String(j.content);
+      refreshResumeNotesLineBudget();
+      var meta = document.getElementById('resumeNotesSavedMeta');
+      if (meta && j.updatedAt) {
+        try {
+          meta.textContent = 'Last saved ' + new Date(j.updatedAt).toLocaleString();
+        } catch (e) {
+          meta.textContent = '';
+        }
+      }
+    })
+    .catch(function () {
+      refreshResumeNotesLineBudget();
+    });
+
+  var notesTa = document.getElementById('resumeProfileNotes');
+  if (notesTa) {
+    notesTa.addEventListener('input', refreshResumeNotesLineBudget);
+  }
+  var tailorTa = document.getElementById('tailorResultMd');
+  if (tailorTa) {
+    tailorTa.addEventListener('input', refreshTailorResultLineBudget);
+  }
+  var clTa = document.getElementById('coverLetterMd');
+  if (clTa) {
+    clTa.addEventListener('input', refreshCoverLetterLineBudget);
+  }
+});
+
+function enhanceResumeProfileNotes() {
+  var ta = document.getElementById('resumeProfileNotes');
+  var text = ta ? String(ta.value || '') : '';
+  if (!text.trim()) {
+    if (typeof showToast === 'function') showToast('Add some notes to enhance.', 'error');
+    return;
+  }
+  if (resumeLineCount(text) > MAX_RESUME_PAGE_LINES) {
+    if (typeof showToast === 'function') showToast('Notes exceed the line limit — shorten first.', 'error');
+    return;
+  }
+  var btn = document.getElementById('resumeNotesEnhanceBtn');
+  if (enhanceResumeProfileNotes._busy) return;
+  enhanceResumeProfileNotes._busy = true;
+  if (btn) btn.disabled = true;
+  var payload = Object.assign({ content: text }, getTailorModelPayload());
+  fetch('/api/resume/notes/enhance', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(function (res) {
+      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (ct.indexOf('application/json') >= 0) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      }
+      return res.text().then(function (t) {
+        return { ok: res.ok, j: { error: (t && t.slice(0, 200)) || 'Enhance failed' } };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Enhance failed');
+      var c = o.j.content != null ? String(o.j.content) : '';
+      if (ta) ta.value = c;
+      refreshResumeNotesLineBudget();
+      if (typeof showToast === 'function') showToast('Notes enhanced — review and Save if you want to keep them.', 'success');
+    })
+    .catch(function (e) {
+      if (typeof showToast === 'function') showToast(e.message || 'Enhance failed', 'error');
+    })
+    .finally(function () {
+      enhanceResumeProfileNotes._busy = false;
+      if (btn) btn.disabled = false;
+    });
+}
+
+function saveResumeProfileNotes() {
+  var ta = document.getElementById('resumeProfileNotes');
+  var content = ta ? String(ta.value || '') : '';
+  if (resumeLineCount(content) > MAX_RESUME_PAGE_LINES) {
+    if (typeof showToast === 'function') showToast('Notes must be at most ' + MAX_RESUME_PAGE_LINES + ' lines.', 'error');
+    return;
+  }
+  var btn = document.getElementById('resumeNotesSaveBtn');
+  if (btn) btn.disabled = true;
+  fetch('/api/resume/notes', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ content: content })
+  })
+    .then(function (res) {
+      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (ct.indexOf('application/json') >= 0) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      }
+      return res.text().then(function (t) {
+        return { ok: res.ok, j: { error: (t && t.slice(0, 160)) || 'Save failed' } };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Save failed');
+      var meta = document.getElementById('resumeNotesSavedMeta');
+      if (meta && o.j.updatedAt) {
+        try {
+          meta.textContent = 'Last saved ' + new Date(o.j.updatedAt).toLocaleString();
+        } catch (e) {
+          meta.textContent = '';
+        }
+      }
+      if (typeof showToast === 'function') showToast('Profile notes saved.', 'success');
+    })
+    .catch(function (e) {
+      if (typeof showToast === 'function') showToast(e.message || 'Save failed', 'error');
+    })
+    .finally(function () {
+      refreshResumeNotesLineBudget();
+    });
+}
+
+function coverLetterDocxBasename() {
+  var jobDescEl = document.getElementById('tailorJobDesc');
+  var snippet = jobDescEl ? jobDescEl.value.trim().slice(0, 40).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-]/g, '') : '';
+  return 'cover-letter' + (snippet ? '-' + snippet : '');
+}
+
+function runCoverLetter() {
+  var jobDesc = (document.getElementById('tailorJobDesc') || {}).value || '';
+  var details = (document.getElementById('tailorDetails') || {}).value || '';
+  var btn = document.getElementById('coverLetterRunBtn');
+  var again = document.getElementById('coverLetterAgainBtn');
+  var statusEl = document.getElementById('coverLetterStatus');
+  var wrap = document.getElementById('coverLetterWrap');
+  var resultTa = document.getElementById('coverLetterMd');
+
+  if (!jobDesc.trim()) {
+    if (typeof showToast === 'function') showToast('Paste a job description first.', 'error');
+    return;
+  }
+
+  if (runCoverLetter._busy) return;
+  runCoverLetter._busy = true;
+
+  if (btn) btn.disabled = true;
+  if (again) again.disabled = true;
+  if (statusEl) statusEl.textContent = 'Writing cover letter\u2026';
+
+  var payload = Object.assign(
+    { jobDescription: jobDesc, additionalDetails: details },
+    getTailorModelPayload()
+  );
+
+  fetch('/api/resume/cover-letter', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(function (res) {
+      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (ct.indexOf('application/json') >= 0) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      }
+      return res.text().then(function (t) {
+        return { ok: res.ok, j: { error: (t && t.slice(0, 200)) || 'Cover letter failed (' + res.status + ')' } };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Cover letter failed');
+      var md = o.j.coverLetterMarkdown != null ? String(o.j.coverLetterMarkdown) : '';
+      if (!String(md).trim()) {
+        throw new Error('No cover letter text returned — try again.');
+      }
+      if (resultTa) resultTa.value = md;
+      if (wrap) wrap.style.display = '';
+      if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      refreshCoverLetterLineBudget();
+      if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
+      if (typeof showToast === 'function') {
+        showToast('Cover letter ready — not saved on the server.', 'success');
+      }
+    })
+    .catch(function (e) {
+      if (statusEl) statusEl.textContent = '';
+      if (typeof showToast === 'function') showToast(e.message || 'Cover letter failed', 'error');
+    })
+    .finally(function () {
+      runCoverLetter._busy = false;
+      if (btn) btn.disabled = false;
+      if (again) again.disabled = false;
+    });
+}
+
+function downloadCoverLetterDocx() {
+  var resultTa = document.getElementById('coverLetterMd');
+  var md = resultTa ? resultTa.value.trim() : '';
+  if (!md) {
+    if (typeof showToast === 'function') showToast('Generate a cover letter first.', 'error');
+    return;
+  }
+  var filename = coverLetterDocxBasename();
+  fetch('/api/resume/cover-letter/download', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ markdown: md, filename: filename })
+  })
+    .then(function (res) {
+      if (!res.ok) {
+        return res.json().then(function (j) {
+          throw new Error(j.error || 'Download failed');
+        });
+      }
+      return res.blob().then(function (blob) {
+        var disposition = res.headers.get('Content-Disposition') || '';
+        var m = /filename="([^"]+)"/.exec(disposition);
+        return { blob: blob, fname: m ? m[1] : filename + '.docx' };
+      });
+    })
+    .then(function (o) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(o.blob);
+      a.download = o.fname;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      if (typeof showToast === 'function') showToast('Word document downloaded.', 'success');
+    })
+    .catch(function (e) {
+      if (typeof showToast === 'function') showToast(e.message || 'Download failed', 'error');
+    });
+}
+
 (function () {
   var sel = document.getElementById('tailorModelSelect');
   if (sel) {
@@ -353,15 +717,7 @@ function runResumeTailor() {
   if (statusEl) statusEl.textContent = 'Tailoring with AI\u2026 this takes 15\u201330 seconds.';
   if (wrap) wrap.style.display = 'none';
 
-  var tailorPayload = { jobDescription: jobDesc, additionalDetails: details };
-  var modelSel = document.getElementById('tailorModelSelect');
-  if (modelSel && modelSel.value) {
-    var pipe = modelSel.value.indexOf('|');
-    if (pipe > 0) {
-      tailorPayload.provider = modelSel.value.slice(0, pipe);
-      tailorPayload.model = modelSel.value.slice(pipe + 1);
-    }
-  }
+  var tailorPayload = Object.assign({ jobDescription: jobDesc, additionalDetails: details }, getTailorModelPayload());
 
   fetch('/api/resume/tailor', {
     method: 'POST',
@@ -386,6 +742,7 @@ function runResumeTailor() {
         throw new Error('No tailored text returned — try again.');
       }
       if (resultTa) resultTa.value = md;
+      refreshTailorResultLineBudget();
       if (wrap) wrap.style.display = '';
       if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
       if (statusEl) statusEl.textContent = 'Preparing Word download\u2026';

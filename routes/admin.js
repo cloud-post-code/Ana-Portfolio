@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
 const { getResumeTailorModelOptions, getResumeTailorDefaultSelection } = require('../lib/resume-tailor-models');
+const { getMaxResumePageLines, getMaxCoverLetterLines } = require('../lib/resume-line-budget');
 
 router.get('/', async function (req, res, next) {
   try {
@@ -54,7 +55,9 @@ router.get('/resume', async function (req, res, next) {
       resumeFileExists,
       hasLlmKey: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY),
       resumeTailorModels,
-      resumeTailorDefault
+      resumeTailorDefault,
+      maxResumePageLines: getMaxResumePageLines(),
+      maxCoverLetterLines: getMaxCoverLetterLines()
     });
   } catch (e) {
     next(e);

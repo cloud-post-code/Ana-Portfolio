@@ -1376,6 +1376,24 @@ body.admin {
   color: var(--admin-text);
 }
 
+.admin__resume-substep-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: var(--admin-text);
+}
+
+.admin__line-budget {
+  font-size: 0.82rem;
+  margin: 0.35rem 0 0;
+  color: var(--admin-text-muted);
+}
+
+.admin__line-budget--over {
+  color: var(--admin-danger);
+  font-weight: 600;
+}
+
 .admin__resume-current + .admin__resume-step-title,
 .admin__resume-empty + .admin__resume-step-title {
   margin-top: 0;

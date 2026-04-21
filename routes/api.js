@@ -45,6 +45,17 @@ const uploadResume = multer({
 const cms = require('../lib/cms-store');
 const { extractResumeDocumentText } = require('../lib/resume-ingest-text');
 const { buildResumeMarkdown } = require('../lib/resume-to-markdown');
+const { resolveResumeTailorRequest } = require('../lib/resume-tailor-models');
+const { enhanceResumeNotes } = require('../lib/resume-notes-enhance');
+const { generateCoverLetter } = require('../lib/resume-cover-letter');
+const {
+  getMaxResumePageLines,
+  getMaxCoverLetterLines,
+  exceedsLineBudget,
+  countLines
+} = require('../lib/resume-line-budget');
+const { tailorResumeForJob } = require('../lib/resume-tailor');
+const { markdownToDocxBuffer } = require('../lib/markdown-to-docx');
 
 async function loadData(filename) {
   if (filename === 'experiences.json') return cms.getPortfolio('experiences');
@@ -241,6 +252,8 @@ crudRoutes('projects', 'projects.json');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
 const RESUME_MD_KV = 'resume_markdown';
+const RESUME_NOTES_KV = 'resume_notes';
+const RESUME_NOTES_MAX_CHARS = 65536;
 const { editResumeMarkdownWithPrompt } = require('../lib/resume-md-ai-edit');
 
 async function readResumeMarkdownBody() {
@@ -269,6 +282,101 @@ async function persistResumeMarkdown(md) {
   fs.mkdirSync(PUBLIC_DIR, { recursive: true });
   await fs.promises.writeFile(RESUME_MD_FS, md, 'utf8');
 }
+
+async function readResumeNotesBody() {
+  try {
+    const row = await cms.getKv(RESUME_NOTES_KV);
+    if (row && typeof row.content === 'string') {
+      return row.content;
+    }
+  } catch (e) {
+    /* ignore */
+  }
+  return '';
+}
+
+async function persistResumeNotes(content) {
+  const payload = {
+    content: String(content ?? ''),
+    updatedAt: new Date().toISOString()
+  };
+  await cms.setKv(RESUME_NOTES_KV, payload);
+}
+
+router.get('/resume/notes', async function (req, res, next) {
+  try {
+    const row = await cms.getKv(RESUME_NOTES_KV);
+    const content = row && typeof row.content === 'string' ? row.content : '';
+    const updatedAt = row && row.updatedAt != null ? String(row.updatedAt) : '';
+    res.json({
+      content,
+      updatedAt,
+      maxResumePageLines: getMaxResumePageLines(),
+      maxCoverLetterLines: getMaxCoverLetterLines()
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.put('/resume/notes', async function (req, res, next) {
+  try {
+    const body = req.body || {};
+    const content = body.content != null ? String(body.content) : '';
+    if (Buffer.byteLength(content, 'utf8') > RESUME_NOTES_MAX_CHARS) {
+      return res.status(400).json({ error: 'Notes are too long (max ' + RESUME_NOTES_MAX_CHARS + ' characters).' });
+    }
+    const maxL = getMaxResumePageLines();
+    if (exceedsLineBudget(content, maxL)) {
+      return res.status(400).json({ error: 'Notes must be at most ' + maxL + ' lines.' });
+    }
+    await persistResumeNotes(content);
+    const row = await cms.getKv(RESUME_NOTES_KV);
+    res.json({
+      success: true,
+      content: row && typeof row.content === 'string' ? row.content : '',
+      updatedAt: row && row.updatedAt != null ? row.updatedAt : null,
+      maxResumePageLines: maxL
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post('/resume/notes/enhance', async function (req, res, next) {
+  try {
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({
+        error: 'OPENAI_API_KEY or ANTHROPIC_API_KEY is required.'
+      });
+    }
+    const body = req.body || {};
+    const text = body.content != null ? String(body.content) : '';
+    let resolved;
+    try {
+      resolved = resolveResumeTailorRequest(body);
+    } catch (e) {
+      const msg = e.message || String(e);
+      if (msg.includes('No LLM API key') || msg.includes('is not configured')) {
+        return res.status(503).json({ error: msg });
+      }
+      return res.status(400).json({ error: msg });
+    }
+    const improved = await enhanceResumeNotes({
+      text,
+      provider: resolved.provider,
+      model: resolved.model
+    });
+    res.json({ content: improved });
+  } catch (e) {
+    const msg = e.message || String(e);
+    const msgLc = msg.toLowerCase();
+    if (msgLc.includes('empty') || msgLc.includes('required') || msgLc.includes('exceed')) {
+      return res.status(400).json({ error: msg });
+    }
+    next(e);
+  }
+});
 
 router.get('/resume/md', async function (req, res, next) {
   try {
@@ -469,10 +577,6 @@ router.post('/enhance', (req, res) => {
     });
 });
 
-const { tailorResumeForJob } = require('../lib/resume-tailor');
-const { resolveResumeTailorRequest } = require('../lib/resume-tailor-models');
-const { markdownToDocxBuffer } = require('../lib/markdown-to-docx');
-
 router.post('/resume/tailor', async function (req, res, next) {
   try {
     if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
@@ -492,6 +596,9 @@ router.post('/resume/tailor', async function (req, res, next) {
       });
     }
 
+    const resumeNotes = await readResumeNotesBody();
+    const maxOutputLines = getMaxResumePageLines();
+
     let resolved;
     try {
       resolved = resolveResumeTailorRequest(req.body);
@@ -505,16 +612,20 @@ router.post('/resume/tailor', async function (req, res, next) {
 
     const result = await tailorResumeForJob({
       resumeMarkdown,
+      resumeNotes,
       jobDescription,
       additionalDetails,
       provider: resolved.provider,
-      model: resolved.model
+      model: resolved.model,
+      maxOutputLines
     });
 
     res.json({
       tailoredMarkdown: result.tailoredMarkdown,
       model: result.model,
-      provider: result.provider
+      provider: result.provider,
+      lineCount: countLines(result.tailoredMarkdown),
+      maxResumePageLines: maxOutputLines
     });
   } catch (e) {
     const msg = e.message || String(e);
@@ -522,9 +633,94 @@ router.post('/resume/tailor', async function (req, res, next) {
       return res.status(503).json({ error: msg });
     }
     const msgLc = msg.toLowerCase();
-    if (msgLc.includes('empty') || msgLc.includes('required')) {
+    if (msgLc.includes('empty') || msgLc.includes('required') || msgLc.includes('exceed') || msgLc.includes('line limit')) {
       return res.status(400).json({ error: msg });
     }
+    next(e);
+  }
+});
+
+router.post('/resume/cover-letter', async function (req, res, next) {
+  try {
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({
+        error: 'OPENAI_API_KEY or ANTHROPIC_API_KEY is required.'
+      });
+    }
+    const body = req.body || {};
+    const jobDescription = String(body.jobDescription || '').trim();
+    const additionalDetails = String(body.additionalDetails || '').trim();
+
+    const resumeMarkdown = await readResumeMarkdownBody();
+    if (!String(resumeMarkdown || '').trim()) {
+      return res.status(400).json({
+        error:
+          'No resume text found. Upload your resume in Step 1 first.'
+      });
+    }
+
+    const resumeNotes = await readResumeNotesBody();
+    const maxLines = getMaxCoverLetterLines();
+
+    let resolved;
+    try {
+      resolved = resolveResumeTailorRequest(req.body);
+    } catch (e) {
+      const msg = e.message || String(e);
+      if (msg.includes('No LLM API key') || msg.includes('is not configured')) {
+        return res.status(503).json({ error: msg });
+      }
+      return res.status(400).json({ error: msg });
+    }
+
+    const result = await generateCoverLetter({
+      resumeMarkdown,
+      resumeNotes,
+      jobDescription,
+      additionalDetails,
+      provider: resolved.provider,
+      model: resolved.model,
+      maxLines
+    });
+
+    res.json({
+      coverLetterMarkdown: result.coverLetterMarkdown,
+      model: result.model,
+      provider: result.provider,
+      lineCount: countLines(result.coverLetterMarkdown),
+      maxCoverLetterLines: maxLines
+    });
+  } catch (e) {
+    const msg = e.message || String(e);
+    if (msg.includes('OPENAI_API_KEY') || msg.includes('ANTHROPIC_API_KEY')) {
+      return res.status(503).json({ error: msg });
+    }
+    const msgLc = msg.toLowerCase();
+    if (
+      msgLc.includes('empty') ||
+      msgLc.includes('required') ||
+      msgLc.includes('exceed') ||
+      msgLc.includes('line limit')
+    ) {
+      return res.status(400).json({ error: msg });
+    }
+    next(e);
+  }
+});
+
+router.post('/resume/cover-letter/download', async function (req, res, next) {
+  try {
+    const body = req.body || {};
+    const markdown = String(body.markdown || '').trim();
+    if (!markdown) {
+      return res.status(400).json({ error: 'markdown is required' });
+    }
+    const filename = String(body.filename || 'cover-letter').replace(/[^a-zA-Z0-9_\-]/g, '-');
+    const buf = await markdownToDocxBuffer(markdown);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.docx"`);
+    res.send(buf);
+  } catch (e) {
     next(e);
   }
 });
