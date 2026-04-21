@@ -308,6 +308,9 @@ function runResumeTailor() {
     return;
   }
 
+  if (runResumeTailor._busy) return;
+  runResumeTailor._busy = true;
+
   if (btn) btn.disabled = true;
   if (statusEl) statusEl.textContent = 'Tailoring with AI\u2026 this takes 15\u201330 seconds.';
   if (wrap) wrap.style.display = 'none';
@@ -318,11 +321,22 @@ function runResumeTailor() {
     body: JSON.stringify({ jobDescription: jobDesc, additionalDetails: details })
   })
     .then(function (res) {
-      return res.json().then(function (j) { return { ok: res.ok, j: j }; });
+      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (ct.indexOf('application/json') >= 0) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      }
+      return res.text().then(function (t) {
+        return { ok: res.ok, j: { error: (t && t.slice(0, 200)) || 'Tailor failed (' + res.status + ')' } };
+      });
     })
     .then(function (o) {
       if (!o.ok) throw new Error((o.j && o.j.error) || 'Tailor failed');
       var md = o.j.tailoredMarkdown != null ? String(o.j.tailoredMarkdown) : '';
+      if (!String(md).trim()) {
+        throw new Error('No tailored text returned — try again.');
+      }
       if (resultTa) resultTa.value = md;
       if (wrap) wrap.style.display = '';
       if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -348,6 +362,7 @@ function runResumeTailor() {
       if (typeof showToast === 'function') showToast(e.message || 'Tailor failed', 'error');
     })
     .finally(function () {
+      runResumeTailor._busy = false;
       if (btn) btn.disabled = false;
     });
 }

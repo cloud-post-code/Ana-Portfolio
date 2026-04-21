@@ -244,12 +244,20 @@ const RESUME_MD_KV = 'resume_markdown';
 const { editResumeMarkdownWithPrompt } = require('../lib/resume-md-ai-edit');
 
 async function readResumeMarkdownBody() {
+  // Prefer non-empty KV; if the row exists but is empty (desync / partial write), fall back to resume.md on disk.
   if (cms.isDatabaseEnabled()) {
-    const row = await cms.getKv(RESUME_MD_KV);
-    if (row && typeof row.content === 'string') return row.content;
+    try {
+      const row = await cms.getKv(RESUME_MD_KV);
+      if (row && typeof row.content === 'string' && String(row.content).trim()) {
+        return row.content;
+      }
+    } catch (e) {
+      /* fall through to file */
+    }
   }
   if (fs.existsSync(RESUME_MD_FS)) {
-    return await fs.promises.readFile(RESUME_MD_FS, 'utf8');
+    const fromFile = await fs.promises.readFile(RESUME_MD_FS, 'utf8');
+    if (String(fromFile || '').trim()) return fromFile;
   }
   return '';
 }
@@ -489,7 +497,8 @@ router.post('/resume/tailor', async function (req, res, next) {
     if (msg.includes('OPENAI_API_KEY') || msg.includes('ANTHROPIC_API_KEY')) {
       return res.status(503).json({ error: msg });
     }
-    if (msg.includes('empty') || msg.includes('required')) {
+    const msgLc = msg.toLowerCase();
+    if (msgLc.includes('empty') || msgLc.includes('required')) {
       return res.status(400).json({ error: msg });
     }
     next(e);
