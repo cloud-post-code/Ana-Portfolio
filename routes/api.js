@@ -484,6 +484,12 @@ router.post('/resume/tailor', async function (req, res, next) {
     const additionalDetails = String(body.additionalDetails || '').trim();
 
     const resumeMarkdown = await readResumeMarkdownBody();
+    if (!String(resumeMarkdown || '').trim()) {
+      return res.status(400).json({
+        error:
+          'No resume text found. Upload your resume again in Step 1 (PDF or Word), wait for the success message, then run Tailor with AI.'
+      });
+    }
 
     const result = await tailorResumeForJob({ resumeMarkdown, jobDescription, additionalDetails });
 
