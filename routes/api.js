@@ -43,58 +43,26 @@ const uploadResume = multer({
 });
 
 const cms = require('../lib/cms-store');
-const { mergeProfile } = require('../lib/job-search-profile');
 const { extractResumeDocumentText } = require('../lib/resume-ingest-text');
 const { buildResumeMarkdown } = require('../lib/resume-to-markdown');
-const JOBS_CRM_FILE = 'jobs-crm.json';
-
-function dataPath(filename) {
-  return path.join(__dirname, '..', 'data', filename);
-}
 
 async function loadData(filename) {
-  if (filename === JOBS_CRM_FILE) return cms.getJobsCrm();
   if (filename === 'experiences.json') return cms.getPortfolio('experiences');
   if (filename === 'projects.json') return cms.getPortfolio('projects');
   if (filename === 'resume.json') {
     const v = await cms.getKv('resume');
-    const defaults = {
-      path: null,
-      originalFilename: null,
-      updatedAt: null
-    };
+    const defaults = { path: null, originalFilename: null, updatedAt: null };
     if (v == null) return defaults;
     return { ...defaults, ...v };
   }
-  if (filename === 'job-search-profile.json') {
-    let v = await cms.getKv('job_search_profile');
-    if (v == null) {
-      try {
-        v = JSON.parse(fs.readFileSync(dataPath('job-search-profile.json'), 'utf8'));
-      } catch (e) {
-        v = {};
-      }
-    }
-    return mergeProfile(v);
-  }
-  return JSON.parse(fs.readFileSync(dataPath(filename), 'utf8'));
+  throw new Error('loadData: unknown file ' + filename);
 }
 
 async function saveData(filename, data) {
-  if (filename === JOBS_CRM_FILE) return cms.saveJobsCrm(data);
   if (filename === 'experiences.json') return cms.savePortfolio('experiences', data);
   if (filename === 'projects.json') return cms.savePortfolio('projects', data);
   if (filename === 'resume.json') return cms.setKv('resume', data);
-  if (filename === 'job-search-profile.json') {
-    await cms.setKv('job_search_profile', data);
-    if (!cms.isDatabaseEnabled()) {
-      fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
-      fs.writeFileSync(dataPath(filename), JSON.stringify(data, null, 2));
-    }
-    return;
-  }
-  fs.mkdirSync(path.dirname(dataPath(filename)), { recursive: true });
-  fs.writeFileSync(dataPath(filename), JSON.stringify(data, null, 2));
+  throw new Error('saveData: unknown file ' + filename);
 }
 
 function slugify(text) {
@@ -269,175 +237,6 @@ function crudRoutes(entityName, filename) {
 
 crudRoutes('experiences', 'experiences.json');
 crudRoutes('projects', 'projects.json');
-
-const { slugify: coverLetterFileSlug } = require('../lib/cover-letter');
-const { generateCoverLetterSmart } = require('../lib/cover-letter-ai');
-const { generateTailoredResumeForJob } = require('../lib/resume-tailor-ai');
-const { plainTextToDocxBuffer } = require('../lib/cover-letter-docx');
-const { buildApplicationPackZip } = require('../lib/application-pack');
-
-router.get('/jobs-crm/:id/cover-letter', async function (req, res, next) {
-  try {
-    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
-      return res.status(503).json({
-        error:
-          'Application pack requires OPENAI_API_KEY or ANTHROPIC_API_KEY (generates the tailored resume and cover letter).'
-      });
-    }
-
-    const jobs = await loadData(JOBS_CRM_FILE);
-    const job = jobs.find(j => j.id === req.params.id);
-    if (!job) return res.status(404).send('Job not found');
-
-    let experiences = [];
-    try {
-      const ex = await loadData('experiences.json');
-      experiences = ex.sort((a, b) => (a.order || 0) - (b.order || 0));
-    } catch (e) {
-      /* optional */
-    }
-
-    let projects = [];
-    try {
-      const pr = await loadData('projects.json');
-      projects = pr.sort((a, b) => (a.order || 0) - (b.order || 0));
-    } catch (e) {
-      /* optional */
-    }
-
-    let profile = await loadData('job-search-profile.json');
-
-    const coverText = await generateCoverLetterSmart({ job, experiences, profile });
-    const resumeText = await generateTailoredResumeForJob({ job, profile, experiences, projects });
-    const slug = coverLetterFileSlug(job.co);
-    const coverBuf = await plainTextToDocxBuffer(coverText);
-    const tailoredResumeBuf = await plainTextToDocxBuffer(resumeText);
-
-    const zipBuf = await buildApplicationPackZip({
-      coverDocxBuffer: coverBuf,
-      tailoredResumeDocxBuffer: tailoredResumeBuf,
-      slug
-    });
-
-    const zipName = `Application-${slug}.zip`;
-    res.setHeader('Content-Type', 'application/zip');
-    res.setHeader('Content-Disposition', `attachment; filename="${zipName.replace(/"/g, '')}"`);
-    res.setHeader('X-Application-Pack-Includes-Tailored-Resume', 'yes');
-    res.send(zipBuf);
-  } catch (e) {
-    if (e && (e.code === 'ENOENT' || String(e.message).includes('JSON'))) {
-      return res.status(404).send('Jobs CRM data not found');
-    }
-    console.error('[api jobs-crm cover-letter]', e);
-    const msg = e && e.message ? String(e.message) : String(e);
-    return res.status(500).json({ error: msg });
-  }
-});
-
-router.get('/job-search-profile', async function (req, res, next) {
-  try {
-    const profile = await loadData('job-search-profile.json');
-    res.json(profile);
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.get('/job-search-profile/download', async function (req, res, next) {
-  try {
-    const profile = await loadData('job-search-profile.json');
-    const body = JSON.stringify(profile, null, 2);
-    res.setHeader('Content-Type', 'application/json; charset=utf-8');
-    res.setHeader('Content-Disposition', 'attachment; filename="job-search-profile.json"');
-    res.send(body);
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.put('/job-search-profile', async function (req, res, next) {
-  try {
-    const merged = mergeProfile(req.body || {});
-    await saveData('job-search-profile.json', merged);
-    res.json(merged);
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.patch('/jobs-crm/:id', async function (req, res, next) {
-  try {
-    const data = await loadData(JOBS_CRM_FILE);
-    const idx = data.findIndex(j => j.id === req.params.id);
-    if (idx === -1) return res.status(404).json({ error: 'Job not found' });
-    let changed = false;
-    if (typeof req.body.starred === 'boolean') {
-      data[idx].starred = req.body.starred;
-      changed = true;
-    }
-    if (req.body.st !== undefined) {
-      const st = String(req.body.st).trim().slice(0, 120);
-      if (!st) return res.status(400).json({ error: 'st cannot be empty' });
-      data[idx].st = st;
-      changed = true;
-    }
-    if (req.body.pri !== undefined) {
-      const pri = String(req.body.pri).trim().slice(0, 40);
-      if (!pri) return res.status(400).json({ error: 'pri cannot be empty' });
-      data[idx].pri = pri;
-      changed = true;
-    }
-    if (req.body.deadline !== undefined) {
-      const dl = String(req.body.deadline).trim().slice(0, 120);
-      if (!dl) delete data[idx].deadline;
-      else data[idx].deadline = dl;
-      changed = true;
-    }
-    if (req.body.notes !== undefined) {
-      const n = String(req.body.notes).trim().slice(0, 8000);
-      if (!n) delete data[idx].notes;
-      else data[idx].notes = n;
-      changed = true;
-    }
-    if (req.body.yoe !== undefined) {
-      const y = String(req.body.yoe).trim().slice(0, 60);
-      if (!y) delete data[idx].yoe;
-      else data[idx].yoe = y;
-      changed = true;
-    }
-    if (!changed) {
-      return res.status(400).json({ error: 'Provide starred, st, pri, deadline, notes, and/or yoe' });
-    }
-    await saveData(JOBS_CRM_FILE, data);
-    res.json(data[idx]);
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.delete('/jobs-crm', async function (req, res, next) {
-  try {
-    const data = await loadData(JOBS_CRM_FILE);
-    const removed = Array.isArray(data) ? data.length : 0;
-    await saveData(JOBS_CRM_FILE, []);
-    res.json({ success: true, removed });
-  } catch (e) {
-    next(e);
-  }
-});
-
-router.delete('/jobs-crm/:id', async function (req, res, next) {
-  try {
-    const data = await loadData(JOBS_CRM_FILE);
-    const idx = data.findIndex(j => j.id === req.params.id);
-    if (idx === -1) return res.status(404).json({ error: 'Job not found' });
-    data.splice(idx, 1);
-    await saveData(JOBS_CRM_FILE, data);
-    res.json({ success: true });
-  } catch (e) {
-    next(e);
-  }
-});
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
@@ -626,7 +425,7 @@ router.post('/enhance', (req, res) => {
   const body = req.body || {};
   const collection = body.collection;
   if (!collection || !ENHANCE_DATA_FILES[collection]) {
-    return res.status(400).json({ error: 'collection must be experiences, projects, or jobs-crm' });
+    return res.status(400).json({ error: 'collection must be experiences or projects' });
   }
 
   try {
@@ -660,94 +459,6 @@ router.post('/enhance', (req, res) => {
       }
       res.status(500).json({ error: e.message || String(e) });
     });
-});
-
-const { runJobHunterSkill, normalizeTargetJobCount } = require('../lib/job-hunter-claude');
-const { parseOpenRolesTable } = require('../lib/job-hunter-open-roles');
-const { verifyOpenRoleRows } = require('../lib/job-leads-verify');
-const { applyOpenRoleDefaults } = require('../lib/job-leads-defaults');
-const { resolveUrlsOnRows } = require('../lib/resolve-employer-url');
-const { enrichOpenRolesRows } = require('../lib/job-hunter-enrich');
-const { mergeJobHunterOpenRolesIntoCrm } = require('../lib/job-hunter-persist');
-
-router.post('/job-hunter/find-jobs', async function (req, res, next) {
-  const body = req.body || {};
-  const searchQuery = body.searchQuery != null ? String(body.searchQuery) : '';
-  const criteria = body.criteria != null ? String(body.criteria) : '';
-  if (!searchQuery.trim() && !criteria.trim()) {
-    return res.status(400).json({ error: 'Enter a search query and/or additional criteria.' });
-  }
-
-  const targetJobCount = normalizeTargetJobCount(body.targetJobCount);
-
-  let existingJobs = [];
-  try {
-    const crm = await loadData(JOBS_CRM_FILE);
-    if (Array.isArray(crm)) {
-      existingJobs = crm.map(function (j) {
-        return {
-          id: j.id,
-          co: j.co,
-          role: j.role,
-          loc: j.loc || '',
-          url: j.url || ''
-        };
-      });
-    }
-  } catch (e) {
-    /* optional */
-  }
-
-  try {
-    const out = await runJobHunterSkill({ searchQuery, criteria, existingJobs, targetJobCount });
-    const parsed = parseOpenRolesTable(out.text);
-    let rows = parsed.rows;
-    const listingFetchCache = new Map();
-    rows = await resolveUrlsOnRows(rows, 4, listingFetchCache);
-    rows = await enrichOpenRolesRows(rows, {
-      maxRows: targetJobCount,
-      listingFetchCache: listingFetchCache,
-      fetchConcurrency: 4
-    });
-    const openRoles = applyOpenRoleDefaults(
-      verifyOpenRoleRows(rows, {
-        existingJobs,
-        webSnippets: out.webSnippets || ''
-      })
-    );
-
-    let crmSave = { added: 0, skipped: 0, newIds: [] };
-    try {
-      crmSave = await mergeJobHunterOpenRolesIntoCrm(openRoles);
-    } catch (saveErr) {
-      console.error('[job-hunter] CRM save failed:', saveErr);
-      crmSave = {
-        added: 0,
-        skipped: 0,
-        newIds: [],
-        error: saveErr.message || String(saveErr)
-      };
-    }
-
-    res.json({
-      ok: true,
-      text: out.text,
-      model: out.model,
-      targetJobCount: out.targetJobCount != null ? out.targetJobCount : targetJobCount,
-      openRoles,
-      crmSave: crmSave
-    });
-  } catch (e) {
-    const msg = e.message || String(e);
-    if (
-      msg.includes('OPENAI_API_KEY') ||
-      msg.includes('ANTHROPIC_API_KEY') ||
-      msg.includes('Job Hunter skill not found')
-    ) {
-      return res.status(503).json({ error: msg });
-    }
-    next(e);
-  }
 });
 
 module.exports = router;

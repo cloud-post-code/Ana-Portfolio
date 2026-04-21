@@ -3,51 +3,12 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
-const { CRM_JOB_STATUSES } = require('./crm-constants');
-const {
-  regionFromLoc,
-  tracksForJob,
-  TRACK_DEFS
-} = require('./job-crm-helpers');
 
 router.get('/', async function (req, res, next) {
   try {
     const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => a.order - b.order);
     const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
-    let jobsCrm = [];
-    let starredJobCount = 0;
-    try {
-      const raw = await cms.getJobsCrm();
-      const starred = [];
-      const rest = [];
-      raw.forEach(function (j) {
-        if (j.starred) starred.push(j);
-        else rest.push(j);
-      });
-      starredJobCount = starred.length;
-      jobsCrm = starred.concat(rest);
-    } catch (e) {
-      /* optional */
-    }
-
-    const crmJobRows = jobsCrm.map(function (job) {
-      return {
-        job,
-        region: regionFromLoc(job.loc),
-        tracks: tracksForJob(job)
-      };
-    });
-
-    res.render('admin/dashboard', {
-      experiences,
-      projects,
-      jobsCrm,
-      crmJobRows,
-      starredJobCount,
-      crmStatusOptions: CRM_JOB_STATUSES,
-      crmTrackOptions: TRACK_DEFS,
-      usePostgres: cms.isDatabaseEnabled()
-    });
+    res.render('admin/dashboard', { experiences, projects });
   } catch (e) {
     next(e);
   }

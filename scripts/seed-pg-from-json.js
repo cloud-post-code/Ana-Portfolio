@@ -22,12 +22,6 @@ async function main() {
     return JSON.parse(fs.readFileSync(p, 'utf8'));
   }
 
-  const jobs = read('jobs-crm.json');
-  if (Array.isArray(jobs) && jobs.length) {
-    await cms.saveJobsCrm(jobs);
-    console.log('Imported jobs-crm:', jobs.length);
-  }
-
   const ex = read('experiences.json');
   if (Array.isArray(ex) && ex.length) {
     await cms.savePortfolio('experiences', ex);
@@ -44,12 +38,6 @@ async function main() {
   if (resume && typeof resume === 'object') {
     await cms.setKv('resume', resume);
     console.log('Imported resume.json');
-  }
-
-  const profile = read('job-search-profile.json');
-  if (profile && typeof profile === 'object') {
-    await cms.setKv('job_search_profile', profile);
-    console.log('Imported job-search-profile.json');
   }
 
   const resumeMdPath = path.join(__dirname, '..', 'public', 'resume.md');
