@@ -1612,6 +1612,12 @@ textarea.admin__resume-profile-input {
   line-height: 1.45;
 }
 
+select.admin__resume-profile-input,
+select.admin__resume-model-select {
+  cursor: pointer;
+  max-width: 100%;
+}
+
 .admin__education-row {
   position: relative;
   margin-bottom: 0.5rem;

@@ -81,6 +81,18 @@
       ></textarea>
     </div>
 
+    <% if (hasLlmKey && resumeTailorModels && resumeTailorModels.length) { %>
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="tailorModelSelect">AI model</label>
+      <select id="tailorModelSelect" class="admin__resume-profile-input admin__resume-model-select" aria-describedby="tailorModelHelp">
+        <% resumeTailorModels.forEach(function (opt) { %>
+        <option value="<%= opt.value %>"<%= resumeTailorDefault && opt.value === resumeTailorDefault.value ? ' selected' : '' %>><%= opt.label %></option>
+        <% }); %>
+      </select>
+      <p id="tailorModelHelp" class="admin__text-muted" style="margin:0.35rem 0 0;font-size:0.82rem;">Choose OpenAI or Anthropic (if both are configured). Selection is remembered for this browser session.</p>
+    </div>
+    <% } %>
+
     <h3 class="admin__resume-step-title">Step 3 — Generate (Word downloads automatically)</h3>
     <p class="admin__text-muted" style="margin:0 0 0.75rem;font-size:0.88rem;line-height:1.45;">AI rewrites your resume into a stronger, job-specific version (same facts; clearer impact and wording). The result is text you can edit below, then save via Word download.</p>
     <div class="admin__resume-actions" style="margin-bottom:1rem;">
@@ -117,6 +129,31 @@
 <%- include('layout-bottom') %>
 
 <script>
+(function () {
+  var sel = document.getElementById('tailorModelSelect');
+  if (sel) {
+    try {
+      var saved = sessionStorage.getItem('resumeTailorModel');
+      if (saved) {
+        for (var i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === saved) {
+            sel.selectedIndex = i;
+            break;
+          }
+        }
+      }
+      sel.addEventListener('change', function () {
+        try {
+          sessionStorage.setItem('resumeTailorModel', sel.value);
+        } catch (e) {
+          /* ignore */
+        }
+      });
+    } catch (e) {
+      /* ignore */
+    }
+  }
+})();
 (function () {
   var form = document.getElementById('resumeUploadForm');
   if (!form) return;
@@ -316,10 +353,20 @@ function runResumeTailor() {
   if (statusEl) statusEl.textContent = 'Tailoring with AI\u2026 this takes 15\u201330 seconds.';
   if (wrap) wrap.style.display = 'none';
 
+  var tailorPayload = { jobDescription: jobDesc, additionalDetails: details };
+  var modelSel = document.getElementById('tailorModelSelect');
+  if (modelSel && modelSel.value) {
+    var pipe = modelSel.value.indexOf('|');
+    if (pipe > 0) {
+      tailorPayload.provider = modelSel.value.slice(0, pipe);
+      tailorPayload.model = modelSel.value.slice(pipe + 1);
+    }
+  }
+
   fetch('/api/resume/tailor', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ jobDescription: jobDesc, additionalDetails: details })
+    body: JSON.stringify(tailorPayload)
   })
     .then(function (res) {
       var ct = (res.headers.get('Content-Type') || '').toLowerCase();

@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
+const { getResumeTailorModelOptions, getResumeTailorDefaultSelection } = require('../lib/resume-tailor-models');
 
 router.get('/', async function (req, res, next) {
   try {
@@ -44,11 +45,16 @@ router.get('/resume', async function (req, res, next) {
     }
     const resumeFileExists = hasPdf || hasDocx || hasMd;
 
+    const resumeTailorModels = getResumeTailorModelOptions();
+    const resumeTailorDefault = getResumeTailorDefaultSelection();
+
     res.render('admin/resume', {
       adminTitle: 'Resume',
       resume,
       resumeFileExists,
-      hasLlmKey: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY)
+      hasLlmKey: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY),
+      resumeTailorModels,
+      resumeTailorDefault
     });
   } catch (e) {
     next(e);

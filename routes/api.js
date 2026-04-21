@@ -470,6 +470,7 @@ router.post('/enhance', (req, res) => {
 });
 
 const { tailorResumeForJob } = require('../lib/resume-tailor');
+const { resolveResumeTailorRequest } = require('../lib/resume-tailor-models');
 const { markdownToDocxBuffer } = require('../lib/markdown-to-docx');
 
 router.post('/resume/tailor', async function (req, res, next) {
@@ -491,7 +492,24 @@ router.post('/resume/tailor', async function (req, res, next) {
       });
     }
 
-    const result = await tailorResumeForJob({ resumeMarkdown, jobDescription, additionalDetails });
+    let resolved;
+    try {
+      resolved = resolveResumeTailorRequest(req.body);
+    } catch (e) {
+      const msg = e.message || String(e);
+      if (msg.includes('No LLM API key') || msg.includes('is not configured')) {
+        return res.status(503).json({ error: msg });
+      }
+      return res.status(400).json({ error: msg });
+    }
+
+    const result = await tailorResumeForJob({
+      resumeMarkdown,
+      jobDescription,
+      additionalDetails,
+      provider: resolved.provider,
+      model: resolved.model
+    });
 
     res.json({
       tailoredMarkdown: result.tailoredMarkdown,
