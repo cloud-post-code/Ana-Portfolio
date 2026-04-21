@@ -89,6 +89,72 @@
   </div>
 </section>
 
+<section class="admin__section" id="resume-tailor">
+  <div class="admin__section-header">
+    <div>
+      <h2>Tailor Resume for a Job</h2>
+      <p class="admin__section-lead">Paste a job description and let AI adjust your stored resume to match. Then download as a Word document.</p>
+    </div>
+  </div>
+
+  <div class="admin__card">
+    <% if (!hasLlmKey) { %>
+    <p class="admin__text-muted" style="margin-bottom:1rem;">Set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> on the server to enable AI tailoring.</p>
+    <% } %>
+
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="tailorJobDesc">Job description <span class="admin__text-muted">(required)</span></label>
+      <textarea
+        id="tailorJobDesc"
+        class="admin__resume-profile-input"
+        rows="10"
+        placeholder="Paste the full job posting here — role, requirements, responsibilities, company context…"
+      ></textarea>
+    </div>
+
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="tailorDetails">Additional details <span class="admin__text-muted">(optional)</span></label>
+      <textarea
+        id="tailorDetails"
+        class="admin__resume-profile-input"
+        rows="4"
+        placeholder="e.g. Keep it to one page. Emphasise campaign analytics. Use a strong action verb for every bullet."
+      ></textarea>
+    </div>
+
+    <div class="admin__resume-actions" style="margin-bottom:1.5rem;">
+      <button
+        type="button"
+        class="admin__btn admin__btn--primary"
+        id="tailorRunBtn"
+        onclick="runResumeTailor()"
+        <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
+      >Tailor with AI</button>
+      <span id="tailorStatus" class="admin__text-muted" style="margin-left:.75rem;"></span>
+    </div>
+
+    <div id="tailorResultWrap" style="display:none;">
+      <div class="admin__form-group admin__form-group--full">
+        <label class="admin__label" for="tailorResultMd">Tailored resume <span class="admin__text-muted">(editable)</span></label>
+        <textarea
+          id="tailorResultMd"
+          class="admin__resume-profile-input"
+          rows="22"
+          placeholder="Tailored resume will appear here…"
+        ></textarea>
+      </div>
+      <div class="admin__resume-actions">
+        <button type="button" class="admin__btn admin__btn--primary" onclick="downloadTailoredResume()">
+          Download as Word (.docx)
+        </button>
+        <button type="button" class="admin__btn admin__btn--outline" onclick="saveTailoredAsMain()">
+          Save as my main resume.md
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
 <%- include('layout-bottom') %>
 
 <script>
@@ -371,6 +437,116 @@ function deleteResumeFile() {
     })
     .catch(function () {
       if (typeof showToast === 'function') showToast('Could not remove resume', 'error');
+    });
+}
+
+/* ─── Resume Tailor ─────────────────────────────────────────────────── */
+function runResumeTailor() {
+  var jobDesc = (document.getElementById('tailorJobDesc') || {}).value || '';
+  var details = (document.getElementById('tailorDetails') || {}).value || '';
+  var btn = document.getElementById('tailorRunBtn');
+  var statusEl = document.getElementById('tailorStatus');
+  var wrap = document.getElementById('tailorResultWrap');
+  var resultTa = document.getElementById('tailorResultMd');
+
+  if (!jobDesc.trim()) {
+    if (typeof showToast === 'function') showToast('Paste a job description first.', 'error');
+    return;
+  }
+
+  if (btn) btn.disabled = true;
+  if (statusEl) statusEl.textContent = 'Tailoring with AI\u2026 this takes 15\u201330 seconds.';
+  if (wrap) wrap.style.display = 'none';
+
+  fetch('/api/resume/tailor', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ jobDescription: jobDesc, additionalDetails: details })
+  })
+    .then(function (res) {
+      return res.json().then(function (j) { return { ok: res.ok, j: j }; });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Tailor failed');
+      if (resultTa) resultTa.value = o.j.tailoredMarkdown || '';
+      if (wrap) wrap.style.display = '';
+      if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
+      if (typeof showToast === 'function') showToast('Resume tailored! Review and download below.', 'success');
+      if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    })
+    .catch(function (e) {
+      if (statusEl) statusEl.textContent = '';
+      if (typeof showToast === 'function') showToast(e.message || 'Tailor failed', 'error');
+    })
+    .finally(function () {
+      if (btn) btn.disabled = false;
+    });
+}
+
+function downloadTailoredResume() {
+  var resultTa = document.getElementById('tailorResultMd');
+  var md = resultTa ? resultTa.value.trim() : '';
+  if (!md) {
+    if (typeof showToast === 'function') showToast('No tailored resume to download.', 'error');
+    return;
+  }
+  var jobDescEl = document.getElementById('tailorJobDesc');
+  var snippet = jobDescEl ? jobDescEl.value.trim().slice(0, 40).replace(/\s+/g, '-').replace(/[^a-zA-Z0-9\-]/g, '') : '';
+  var filename = 'tailored-resume' + (snippet ? '-' + snippet : '');
+
+  fetch('/api/resume/tailor/download', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ markdown: md, filename: filename })
+  })
+    .then(function (res) {
+      if (!res.ok) {
+        return res.json().then(function (j) { throw new Error(j.error || 'Download failed'); });
+      }
+      return res.blob().then(function (blob) {
+        var disposition = res.headers.get('Content-Disposition') || '';
+        var m = /filename="([^"]+)"/.exec(disposition);
+        return { blob: blob, fname: m ? m[1] : filename + '.docx' };
+      });
+    })
+    .then(function (o) {
+      var a = document.createElement('a');
+      a.href = URL.createObjectURL(o.blob);
+      a.download = o.fname;
+      a.rel = 'noopener';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+      if (typeof showToast === 'function') showToast('Word document downloaded.', 'success');
+    })
+    .catch(function (e) {
+      if (typeof showToast === 'function') showToast(e.message || 'Download failed', 'error');
+    });
+}
+
+function saveTailoredAsMain() {
+  var resultTa = document.getElementById('tailorResultMd');
+  var md = resultTa ? resultTa.value.trim() : '';
+  if (!md) {
+    if (typeof showToast === 'function') showToast('No tailored resume to save.', 'error');
+    return;
+  }
+  if (!confirm('Replace your stored resume.md with the tailored version?')) return;
+  fetch('/api/resume/md', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ markdown: md })
+  })
+    .then(function (res) {
+      if (!res.ok) return res.json().then(function (j) { throw new Error(j.error || 'Save failed'); });
+      return res.json();
+    })
+    .then(function () {
+      if (typeof showToast === 'function') showToast('Tailored resume saved as resume.md', 'success');
+    })
+    .catch(function (e) {
+      if (typeof showToast === 'function') showToast(e.message || 'Save failed', 'error');
     });
 }
 </script>

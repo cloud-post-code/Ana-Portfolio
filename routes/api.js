@@ -461,4 +461,56 @@ router.post('/enhance', (req, res) => {
     });
 });
 
+const { tailorResumeForJob } = require('../lib/resume-tailor');
+const { markdownToDocxBuffer } = require('../lib/markdown-to-docx');
+
+router.post('/resume/tailor', async function (req, res, next) {
+  try {
+    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+      return res.status(503).json({
+        error: 'OPENAI_API_KEY or ANTHROPIC_API_KEY is required to tailor the resume.'
+      });
+    }
+    const body = req.body || {};
+    const jobDescription = String(body.jobDescription || '').trim();
+    const additionalDetails = String(body.additionalDetails || '').trim();
+
+    const resumeMarkdown = await readResumeMarkdownBody();
+
+    const result = await tailorResumeForJob({ resumeMarkdown, jobDescription, additionalDetails });
+
+    res.json({
+      tailoredMarkdown: result.tailoredMarkdown,
+      model: result.model,
+      provider: result.provider
+    });
+  } catch (e) {
+    const msg = e.message || String(e);
+    if (msg.includes('OPENAI_API_KEY') || msg.includes('ANTHROPIC_API_KEY')) {
+      return res.status(503).json({ error: msg });
+    }
+    if (msg.includes('empty') || msg.includes('required')) {
+      return res.status(400).json({ error: msg });
+    }
+    next(e);
+  }
+});
+
+router.post('/resume/tailor/download', async function (req, res, next) {
+  try {
+    const body = req.body || {};
+    const markdown = String(body.markdown || '').trim();
+    if (!markdown) {
+      return res.status(400).json({ error: 'markdown is required' });
+    }
+    const filename = String(body.filename || 'tailored-resume').replace(/[^a-zA-Z0-9_\-]/g, '-');
+    const buf = await markdownToDocxBuffer(markdown);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}.docx"`);
+    res.send(buf);
+  } catch (e) {
+    next(e);
+  }
+});
+
 module.exports = router;
