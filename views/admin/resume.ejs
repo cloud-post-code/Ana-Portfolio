@@ -4,6 +4,7 @@
   <div class="admin__section-header">
     <div>
       <h2>Resume</h2>
+      <p class="admin__section-lead">Upload your resume, add the job posting and any notes, then generate a tailored version and download it as a Word document.</p>
     </div>
   </div>
 
@@ -12,23 +13,21 @@
     <% var uploadBasename = (resume.path || '').replace(/^\//, ''); %>
     <div class="admin__resume-current">
       <p class="admin__resume-meta">
-        <strong>Current file:</strong> <%= resume.originalFilename || uploadBasename || 'resume' %>
+        <strong>Current resume:</strong> <%= resume.originalFilename || uploadBasename || 'resume' %>
         <% if (resume.updatedAt) { %>
-        <span class="admin__text-muted"> · Updated <%= new Date(resume.updatedAt).toLocaleString() %></span>
+        <span class="admin__text-muted"> · Uploaded <%= new Date(resume.updatedAt).toLocaleString() %></span>
         <% } %>
       </p>
       <div class="admin__resume-actions">
-        <a href="<%= resume.path %>" class="admin__btn admin__btn--outline" target="_blank" rel="noopener noreferrer">View file</a>
-        <a href="<%= resume.path %>" class="admin__btn admin__btn--outline" download="<%= uploadBasename %>">Download</a>
         <button type="button" class="admin__btn admin__btn--danger" onclick="deleteResumeFile()">Remove resume</button>
       </div>
     </div>
     <% } else { %>
-    <p class="admin__resume-empty">No public resume yet — visitors won’t see a download link until you add one.</p>
+    <p class="admin__resume-empty">Upload a PDF or Word resume below to get started. You need a stored resume before you can tailor it for a role.</p>
     <% } %>
 
+    <h3 class="admin__resume-step-title">Step 1 — Upload your resume</h3>
     <form class="admin__resume-form" id="resumeUploadForm" novalidate>
-      <p class="admin__resume-upload-label"><%= resumeFileExists ? 'Replace file' : 'Add resume file' %></p>
       <p class="admin__resume-upload-meta">PDF or Word (.docx) · max 8 MB</p>
       <div class="admin__resume-upload-field">
       <input
@@ -59,70 +58,31 @@
       </div>
     </form>
 
-    <div class="admin__resume-md-editor">
-      <h3 class="admin__resume-generated__title">Edit <code>resume.md</code></h3>
-      <p class="admin__resume-generated__lead">
-        Edit the file below, or use <strong>Apply with AI</strong> with a short instruction (set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> on the server).
-      </p>
-      <% if (!hasLlmKey) { %>
-      <p class="admin__text-muted">AI editing is disabled until <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> is set. You can still edit and <strong>Save Markdown</strong>.</p>
-      <% } %>
-      <div class="admin__form-group admin__form-group--full">
-        <label class="admin__label" for="resumeMdBody">Markdown</label>
-        <textarea id="resumeMdBody" class="admin__resume-profile-input" rows="18" placeholder="Loading…"></textarea>
-      </div>
-      <div class="admin__form-group admin__form-group--full">
-        <label class="admin__label" for="resumeMdPrompt">Instruction for AI</label>
-        <textarea id="resumeMdPrompt" class="admin__resume-profile-input" rows="3" placeholder="e.g. Tighten bullets under Experience; keep facts the same."></textarea>
-      </div>
-      <div class="admin__resume-actions admin__resume-md-actions">
-        <button type="button" class="admin__btn admin__btn--primary" id="resumeMdSaveBtn" onclick="saveResumeMarkdown()">Save Markdown</button>
-        <button
-          type="button"
-          class="admin__btn admin__btn--outline"
-          id="resumeMdAiBtn"
-          onclick="applyResumeMdAi()"
-          <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
-        >Apply with AI</button>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="admin__section" id="resume-tailor">
-  <div class="admin__section-header">
-    <div>
-      <h2>Tailor Resume for a Job</h2>
-      <p class="admin__section-lead">Paste a job description and let AI adjust your stored resume to match. Then download as a Word document.</p>
-    </div>
-  </div>
-
-  <div class="admin__card">
+    <h3 class="admin__resume-step-title">Step 2 — Job details</h3>
     <% if (!hasLlmKey) { %>
     <p class="admin__text-muted" style="margin-bottom:1rem;">Set <code>OPENAI_API_KEY</code> or <code>ANTHROPIC_API_KEY</code> on the server to enable AI tailoring.</p>
     <% } %>
-
     <div class="admin__form-group admin__form-group--full">
       <label class="admin__label" for="tailorJobDesc">Job description <span class="admin__text-muted">(required)</span></label>
       <textarea
         id="tailorJobDesc"
         class="admin__resume-profile-input"
         rows="10"
-        placeholder="Paste the full job posting here — role, requirements, responsibilities, company context…"
+        placeholder="Paste the full job posting — role, requirements, responsibilities, company…"
       ></textarea>
     </div>
-
     <div class="admin__form-group admin__form-group--full">
-      <label class="admin__label" for="tailorDetails">Additional details <span class="admin__text-muted">(optional)</span></label>
+      <label class="admin__label" for="tailorDetails">Additional notes <span class="admin__text-muted">(optional)</span></label>
       <textarea
         id="tailorDetails"
         class="admin__resume-profile-input"
         rows="4"
-        placeholder="e.g. Keep it to one page. Emphasise campaign analytics. Use a strong action verb for every bullet."
+        placeholder="e.g. Emphasise analytics. Keep to one page. Tone: confident but warm."
       ></textarea>
     </div>
 
-    <div class="admin__resume-actions" style="margin-bottom:1.5rem;">
+    <h3 class="admin__resume-step-title">Step 3 — Generate &amp; download</h3>
+    <div class="admin__resume-actions" style="margin-bottom:1rem;">
       <button
         type="button"
         class="admin__btn admin__btn--primary"
@@ -140,15 +100,12 @@
           id="tailorResultMd"
           class="admin__resume-profile-input"
           rows="22"
-          placeholder="Tailored resume will appear here…"
+          placeholder="Your tailored resume will appear here…"
         ></textarea>
       </div>
       <div class="admin__resume-actions">
         <button type="button" class="admin__btn admin__btn--primary" onclick="downloadTailoredResume()">
           Download as Word (.docx)
-        </button>
-        <button type="button" class="admin__btn admin__btn--outline" onclick="saveTailoredAsMain()">
-          Save as my main resume.md
         </button>
       </div>
     </div>
@@ -158,29 +115,6 @@
 <%- include('layout-bottom') %>
 
 <script>
-(function () {
-  function loadResumeMdEditor() {
-    var ta = document.getElementById('resumeMdBody');
-    if (!ta) return;
-    fetch('/api/resume/md')
-      .then(function (res) {
-        if (!res.ok) throw new Error('Could not load resume.md');
-        return res.json();
-      })
-      .then(function (data) {
-        ta.value = data.markdown != null ? String(data.markdown) : '';
-        ta.placeholder = '';
-      })
-      .catch(function () {
-        ta.placeholder = 'Could not load resume.md';
-      });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadResumeMdEditor);
-  } else {
-    loadResumeMdEditor();
-  }
-})();
 (function () {
   var form = document.getElementById('resumeUploadForm');
   if (!form) return;
@@ -328,13 +262,8 @@
         }
         return res.json();
       })
-      .then(function (data) {
-        if (typeof showToast !== 'function') return;
-        var detail =
-          typeof data.markdownBytes === 'number'
-            ? ' Saved as resume.md (' + data.markdownBytes + ' bytes).'
-            : ' Saved as resume.md.';
-        showToast('Resume saved.' + detail, 'success');
+      .then(function () {
+        if (typeof showToast === 'function') showToast('Resume saved. You can tailor it below.', 'success');
         setTimeout(function () {
           window.location.assign('/admin/resume');
         }, 500);
@@ -349,83 +278,8 @@
   });
 })();
 
-function saveResumeMarkdown() {
-  var ta = document.getElementById('resumeMdBody');
-  var btn = document.getElementById('resumeMdSaveBtn');
-  if (!ta) return;
-  if (btn) btn.disabled = true;
-  fetch('/api/resume/md', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ markdown: ta.value })
-  })
-    .then(function (res) {
-      if (!res.ok) {
-        return res.json().then(function (j) {
-          throw new Error(j.error || 'Save failed');
-        });
-      }
-      return res.json();
-    })
-    .then(function () {
-      if (typeof showToast === 'function') showToast('resume.md saved', 'success');
-      setTimeout(function () {
-        window.location.assign('/admin/resume');
-      }, 400);
-    })
-    .catch(function (err) {
-      if (typeof showToast === 'function') showToast(err.message || 'Save failed', 'error');
-    })
-    .finally(function () {
-      if (btn) btn.disabled = false;
-    });
-}
-
-function applyResumeMdAi() {
-  var ta = document.getElementById('resumeMdBody');
-  var pr = document.getElementById('resumeMdPrompt');
-  var btn = document.getElementById('resumeMdAiBtn');
-  if (!ta || !pr) return;
-  var instruction = String(pr.value || '').trim();
-  if (!instruction) {
-    if (typeof showToast === 'function') showToast('Add an instruction for the AI.', 'error');
-    return;
-  }
-  if (!String(ta.value || '').trim()) {
-    if (typeof showToast === 'function') showToast('Nothing to edit — paste or upload resume content first.', 'error');
-    return;
-  }
-  if (btn) btn.disabled = true;
-  fetch('/api/resume/md/ai-edit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ markdown: ta.value, prompt: instruction })
-  })
-    .then(function (res) {
-      if (!res.ok) {
-        return res.json().then(function (j) {
-          throw new Error(j.error || 'AI edit failed');
-        });
-      }
-      return res.json();
-    })
-    .then(function (data) {
-      if (data.markdown != null) ta.value = String(data.markdown);
-      if (typeof showToast === 'function') showToast('resume.md updated with AI', 'success');
-      setTimeout(function () {
-        window.location.assign('/admin/resume');
-      }, 400);
-    })
-    .catch(function (err) {
-      if (typeof showToast === 'function') showToast(err.message || 'AI edit failed', 'error');
-    })
-    .finally(function () {
-      if (btn) btn.disabled = false;
-    });
-}
-
 function deleteResumeFile() {
-  if (!confirm('Remove resume.md and any legacy PDF/Word from the server?')) return;
+  if (!confirm('Remove your stored resume from the server?')) return;
   fetch('/api/resume', { method: 'DELETE' })
     .then(function (res) {
       if (!res.ok) throw new Error();
@@ -440,7 +294,6 @@ function deleteResumeFile() {
     });
 }
 
-/* ─── Resume Tailor ─────────────────────────────────────────────────── */
 function runResumeTailor() {
   var jobDesc = (document.getElementById('tailorJobDesc') || {}).value || '';
   var details = (document.getElementById('tailorDetails') || {}).value || '';
@@ -471,7 +324,7 @@ function runResumeTailor() {
       if (resultTa) resultTa.value = o.j.tailoredMarkdown || '';
       if (wrap) wrap.style.display = '';
       if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
-      if (typeof showToast === 'function') showToast('Resume tailored! Review and download below.', 'success');
+      if (typeof showToast === 'function') showToast('Resume tailored. Review and download below.', 'success');
       if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'start' });
     })
     .catch(function (e) {
@@ -522,31 +375,6 @@ function downloadTailoredResume() {
     })
     .catch(function (e) {
       if (typeof showToast === 'function') showToast(e.message || 'Download failed', 'error');
-    });
-}
-
-function saveTailoredAsMain() {
-  var resultTa = document.getElementById('tailorResultMd');
-  var md = resultTa ? resultTa.value.trim() : '';
-  if (!md) {
-    if (typeof showToast === 'function') showToast('No tailored resume to save.', 'error');
-    return;
-  }
-  if (!confirm('Replace your stored resume.md with the tailored version?')) return;
-  fetch('/api/resume/md', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ markdown: md })
-  })
-    .then(function (res) {
-      if (!res.ok) return res.json().then(function (j) { throw new Error(j.error || 'Save failed'); });
-      return res.json();
-    })
-    .then(function () {
-      if (typeof showToast === 'function') showToast('Tailored resume saved as resume.md', 'success');
-    })
-    .catch(function (e) {
-      if (typeof showToast === 'function') showToast(e.message || 'Save failed', 'error');
     });
 }
 </script>
