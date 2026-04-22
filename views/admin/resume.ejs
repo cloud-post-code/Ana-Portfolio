@@ -77,10 +77,10 @@
         id="resumeNotesEnhancePrompt"
         class="admin__resume-profile-input"
         rows="3"
-        placeholder="e.g. Make bullets tighter; lead with leadership; keep a warm but executive tone."
+        placeholder="e.g. Pull out high-level themes for a VP-level search; stress P&amp;L and team scale; keep bullets strategic not tactical."
         aria-describedby="resumeNotesEnhancePromptHelp"
       ></textarea>
-      <p id="resumeNotesEnhancePromptHelp" class="admin__text-muted" style="margin:0.35rem 0 0;font-size:0.82rem;">Sent to the model with your notes when you click Enhance — not saved with profile notes unless you copy it in.</p>
+      <p id="resumeNotesEnhancePromptHelp" class="admin__text-muted" style="margin:0.35rem 0 0;font-size:0.82rem;">Enhance runs on <strong>OpenAI (GPT)</strong> and sharpens notes into <strong>high-level resume positioning</strong> (themes, strengths, constraints). Sent only with this request — not saved unless you copy it into profile notes. <% if (!hasOpenAiForEnhance && hasLlmKey) { %><span class="admin__text-muted"> — Add <code>OPENAI_API_KEY</code> to enable Enhance.</span><% } %></p>
     </div>
     <div class="admin__resume-actions" style="flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
       <button
@@ -88,7 +88,7 @@
         class="admin__btn admin__btn--outline"
         id="resumeNotesEnhanceBtn"
         onclick="enhanceResumeProfileNotes()"
-        <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
+        <%= hasOpenAiForEnhance ? '' : 'disabled title="Enhance uses OpenAI (GPT): set OPENAI_API_KEY on the server"' %>
       >Enhance</button>
       <button type="button" class="admin__btn admin__btn--primary" id="resumeNotesSaveBtn" onclick="saveResumeProfileNotes()">Save notes</button>
     </div>

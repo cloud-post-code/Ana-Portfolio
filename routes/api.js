@@ -45,7 +45,7 @@ const uploadResume = multer({
 const cms = require('../lib/cms-store');
 const { extractResumeDocumentText } = require('../lib/resume-ingest-text');
 const { buildResumeMarkdown } = require('../lib/resume-to-markdown');
-const { resolveResumeTailorRequest } = require('../lib/resume-tailor-models');
+const { resolveResumeTailorRequest, resolveResumeNotesEnhanceRequest } = require('../lib/resume-tailor-models');
 const { enhanceResumeNotes } = require('../lib/resume-notes-enhance');
 const { generateCoverLetter } = require('../lib/resume-cover-letter');
 const {
@@ -347,9 +347,9 @@ router.put('/resume/notes', async function (req, res, next) {
 
 router.post('/resume/notes/enhance', async function (req, res, next) {
   try {
-    if (!process.env.OPENAI_API_KEY && !process.env.ANTHROPIC_API_KEY) {
+    if (!process.env.OPENAI_API_KEY) {
       return res.status(503).json({
-        error: 'OPENAI_API_KEY or ANTHROPIC_API_KEY is required.'
+        error: 'Enhance uses OpenAI (GPT). Set OPENAI_API_KEY on the server.'
       });
     }
     const body = req.body || {};
@@ -363,10 +363,10 @@ router.post('/resume/notes/enhance', async function (req, res, next) {
     }
     let resolved;
     try {
-      resolved = resolveResumeTailorRequest(body);
+      resolved = resolveResumeNotesEnhanceRequest(body);
     } catch (e) {
       const msg = e.message || String(e);
-      if (msg.includes('No LLM API key') || msg.includes('is not configured')) {
+      if (msg.includes('OPENAI_API_KEY') || msg.includes('No LLM API key') || msg.includes('is not configured')) {
         return res.status(503).json({ error: msg });
       }
       return res.status(400).json({ error: msg });
@@ -377,7 +377,7 @@ router.post('/resume/notes/enhance', async function (req, res, next) {
       provider: resolved.provider,
       model: resolved.model
     });
-    res.json({ content: improved });
+    res.json({ content: improved, provider: resolved.provider, model: resolved.model });
   } catch (e) {
     const msg = e.message || String(e);
     const msgLc = msg.toLowerCase();

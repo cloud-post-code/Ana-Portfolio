@@ -54,6 +54,7 @@ router.get('/resume', async function (req, res, next) {
       resume,
       resumeFileExists,
       hasLlmKey: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY),
+      hasOpenAiForEnhance: !!process.env.OPENAI_API_KEY,
       resumeTailorModels,
       resumeTailorDefault,
       maxResumePageLines: getMaxResumePageLines(),
