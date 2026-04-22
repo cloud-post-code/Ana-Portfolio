@@ -254,6 +254,8 @@ const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
 const RESUME_MD_KV = 'resume_markdown';
 const RESUME_NOTES_KV = 'resume_notes';
 const RESUME_NOTES_MAX_CHARS = 65536;
+/** Max chars for optional Enhance instructions field (separate from note body). */
+const RESUME_NOTES_ENHANCE_INSTRUCTIONS_MAX = 4096;
 const { editResumeMarkdownWithPrompt } = require('../lib/resume-md-ai-edit');
 
 async function readResumeMarkdownBody() {
@@ -352,6 +354,13 @@ router.post('/resume/notes/enhance', async function (req, res, next) {
     }
     const body = req.body || {};
     const text = body.content != null ? String(body.content) : '';
+    const instructions = body.instructions != null ? String(body.instructions) : '';
+    if (Buffer.byteLength(instructions, 'utf8') > RESUME_NOTES_ENHANCE_INSTRUCTIONS_MAX) {
+      return res.status(400).json({
+        error:
+          'Enhance instructions are too long (max ' + RESUME_NOTES_ENHANCE_INSTRUCTIONS_MAX + ' characters).'
+      });
+    }
     let resolved;
     try {
       resolved = resolveResumeTailorRequest(body);
@@ -364,6 +373,7 @@ router.post('/resume/notes/enhance', async function (req, res, next) {
     }
     const improved = await enhanceResumeNotes({
       text,
+      instructions,
       provider: resolved.provider,
       model: resolved.model
     });

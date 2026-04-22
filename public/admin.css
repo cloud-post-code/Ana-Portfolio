@@ -1452,6 +1452,10 @@ body.admin {
   align-items: center;
 }
 
+.admin__resume-actions--tailor-pair {
+  align-items: flex-start;
+}
+
 .admin__resume-form {
   margin-top: 0.25rem;
 }

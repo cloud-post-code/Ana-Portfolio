@@ -70,16 +70,27 @@
       ></textarea>
       <p class="admin__line-budget" id="resumeNotesLineBudget" aria-live="polite">Lines: <span id="resumeNotesLineCount">0</span> / <%= maxResumePageLines %></p>
       <p class="admin__text-muted" id="resumeNotesSavedMeta" style="margin:0.25rem 0 0;font-size:0.82rem;"></p>
-      <div class="admin__resume-actions" style="flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
-        <button
-          type="button"
-          class="admin__btn admin__btn--outline"
-          id="resumeNotesEnhanceBtn"
-          onclick="enhanceResumeProfileNotes()"
-          <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
-        >Enhance</button>
-        <button type="button" class="admin__btn admin__btn--primary" id="resumeNotesSaveBtn" onclick="saveResumeProfileNotes()">Save notes</button>
-      </div>
+    </div>
+    <div class="admin__form-group admin__form-group--full" style="margin-top:0.75rem;">
+      <label class="admin__label" for="resumeNotesEnhancePrompt">Instructions for Enhance <span class="admin__text-muted">(optional)</span></label>
+      <textarea
+        id="resumeNotesEnhancePrompt"
+        class="admin__resume-profile-input"
+        rows="3"
+        placeholder="e.g. Make bullets tighter; lead with leadership; keep a warm but executive tone."
+        aria-describedby="resumeNotesEnhancePromptHelp"
+      ></textarea>
+      <p id="resumeNotesEnhancePromptHelp" class="admin__text-muted" style="margin:0.35rem 0 0;font-size:0.82rem;">Sent to the model with your notes when you click Enhance — not saved with profile notes unless you copy it in.</p>
+    </div>
+    <div class="admin__resume-actions" style="flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
+      <button
+        type="button"
+        class="admin__btn admin__btn--outline"
+        id="resumeNotesEnhanceBtn"
+        onclick="enhanceResumeProfileNotes()"
+        <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
+      >Enhance</button>
+      <button type="button" class="admin__btn admin__btn--primary" id="resumeNotesSaveBtn" onclick="saveResumeProfileNotes()">Save notes</button>
     </div>
 
     <h3 class="admin__resume-step-title">Step 2 — Job details</h3>
@@ -119,15 +130,22 @@
 
     <h3 class="admin__resume-step-title">Step 3 — Tailored resume &amp; cover letter</h3>
     <p class="admin__text-muted" style="margin:0 0 0.75rem;font-size:0.88rem;line-height:1.45;"><strong>Tailored resume:</strong> AI rewrites bullets and structure to fit the posting (grounded in your resume and profile notes). <strong>Cover letter:</strong> optional short narrative — same job text; not saved on the server.</p>
-    <div class="admin__resume-actions" style="margin-bottom:1rem;">
+    <div class="admin__resume-actions admin__resume-actions--tailor-pair" style="margin-bottom:1rem;">
       <button
         type="button"
         class="admin__btn admin__btn--primary"
         id="tailorRunBtn"
-        onclick="runResumeTailor()"
+        onclick="runResumeTailor(false)"
         <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
       >Tailor with AI</button>
-      <span id="tailorStatus" class="admin__text-muted" style="margin-left:.75rem;"></span>
+      <button
+        type="button"
+        class="admin__btn admin__btn--primary"
+        id="tailorWithCoverBtn"
+        onclick="runResumeTailor(true)"
+        <%= hasLlmKey ? '' : 'disabled title="Set OPENAI_API_KEY or ANTHROPIC_API_KEY on the server"' %>
+      >Tailor with AI + Cover letter</button>
+      <span id="tailorStatus" class="admin__text-muted" style="margin-left:.75rem;flex:1;min-width:8rem;"></span>
     </div>
 
     <div id="tailorResultWrap" style="display:none;">
@@ -300,7 +318,13 @@ function enhanceResumeProfileNotes() {
   if (enhanceResumeProfileNotes._busy) return;
   enhanceResumeProfileNotes._busy = true;
   if (btn) btn.disabled = true;
-  var payload = Object.assign({ content: text }, getTailorModelPayload());
+  var promptEl = document.getElementById('resumeNotesEnhancePrompt');
+  var instructions = promptEl ? String(promptEl.value || '') : '';
+  if (typeof TextEncoder !== 'undefined' && new TextEncoder().encode(instructions).length > 4096) {
+    if (typeof showToast === 'function') showToast('Enhance instructions must be 4096 bytes or less.', 'error');
+    return;
+  }
+  var payload = Object.assign({ content: text, instructions: instructions }, getTailorModelPayload());
   fetch('/api/resume/notes/enhance', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -384,7 +408,14 @@ function coverLetterDocxBasename() {
   return 'cover-letter' + (snippet ? '-' + snippet : '');
 }
 
-function runCoverLetter() {
+/**
+ * @param {{ fromTailorChain?: boolean }} opts - when true, skip standalone busy/locks (tailor flow owns buttons)
+ * @returns {Promise<void>}
+ */
+function runCoverLetter(opts) {
+  opts = opts || {};
+  var fromChain = !!opts.fromTailorChain;
+
   var jobDesc = (document.getElementById('tailorJobDesc') || {}).value || '';
   var details = (document.getElementById('tailorDetails') || {}).value || '';
   var btn = document.getElementById('coverLetterRunBtn');
@@ -394,15 +425,16 @@ function runCoverLetter() {
   var resultTa = document.getElementById('coverLetterMd');
 
   if (!jobDesc.trim()) {
-    if (typeof showToast === 'function') showToast('Paste a job description first.', 'error');
-    return;
+    if (!fromChain && typeof showToast === 'function') showToast('Paste a job description first.', 'error');
+    return Promise.resolve();
   }
 
-  if (runCoverLetter._busy) return;
-  runCoverLetter._busy = true;
-
-  if (btn) btn.disabled = true;
-  if (again) again.disabled = true;
+  if (!fromChain) {
+    if (runCoverLetter._busy) return Promise.resolve();
+    runCoverLetter._busy = true;
+    if (btn) btn.disabled = true;
+    if (again) again.disabled = true;
+  }
   if (statusEl) statusEl.textContent = 'Writing cover letter\u2026';
 
   var payload = Object.assign(
@@ -410,7 +442,7 @@ function runCoverLetter() {
     getTailorModelPayload()
   );
 
-  fetch('/api/resume/cover-letter', {
+  return fetch('/api/resume/cover-letter', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload)
@@ -434,21 +466,31 @@ function runCoverLetter() {
       }
       if (resultTa) resultTa.value = md;
       if (wrap) wrap.style.display = '';
-      if (wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      if (!fromChain && wrap) wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       refreshCoverLetterLineBudget();
       if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
       if (typeof showToast === 'function') {
-        showToast('Cover letter ready — not saved on the server.', 'success');
+        showToast(
+          fromChain
+            ? 'Resume and cover letter are ready — previews below; not saved on the server.'
+            : 'Cover letter ready — not saved on the server.',
+          'success'
+        );
       }
     })
     .catch(function (e) {
-      if (statusEl) statusEl.textContent = '';
-      if (typeof showToast === 'function') showToast(e.message || 'Cover letter failed', 'error');
+      if (statusEl && !fromChain) statusEl.textContent = '';
+      if (typeof showToast === 'function') {
+        showToast(e.message || 'Cover letter failed', 'error');
+      }
+      throw e;
     })
     .finally(function () {
-      runCoverLetter._busy = false;
-      if (btn) btn.disabled = false;
-      if (again) again.disabled = false;
+      if (!fromChain) {
+        runCoverLetter._busy = false;
+        if (btn) btn.disabled = false;
+        if (again) again.disabled = false;
+      }
     });
 }
 
@@ -697,10 +739,14 @@ function deleteResumeFile() {
     });
 }
 
-function runResumeTailor() {
+/**
+ * @param {boolean} alsoCoverLetter - if true, generate cover letter after tailored resume + Word download
+ */
+function runResumeTailor(alsoCoverLetter) {
   var jobDesc = (document.getElementById('tailorJobDesc') || {}).value || '';
   var details = (document.getElementById('tailorDetails') || {}).value || '';
   var btn = document.getElementById('tailorRunBtn');
+  var btnCover = document.getElementById('tailorWithCoverBtn');
   var statusEl = document.getElementById('tailorStatus');
   var wrap = document.getElementById('tailorResultWrap');
   var resultTa = document.getElementById('tailorResultMd');
@@ -714,6 +760,7 @@ function runResumeTailor() {
   runResumeTailor._busy = true;
 
   if (btn) btn.disabled = true;
+  if (btnCover) btnCover.disabled = true;
   if (statusEl) statusEl.textContent = 'Tailoring with AI\u2026 this takes 15\u201330 seconds.';
   if (wrap) wrap.style.display = 'none';
 
@@ -748,10 +795,25 @@ function runResumeTailor() {
       if (statusEl) statusEl.textContent = 'Preparing Word download\u2026';
       return downloadTailoredResumeMarkdown(md, { skipSuccessToast: true })
         .then(function () {
-          if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
-          if (typeof showToast === 'function') {
-            showToast('Word document downloaded to your device. Tailored text is not saved on the server.', 'success');
+          if (!alsoCoverLetter) {
+            if (statusEl) statusEl.textContent = 'Done \u00b7 ' + (o.j.model || '');
+            if (typeof showToast === 'function') {
+              showToast('Word document downloaded to your device. Tailored text is not saved on the server.', 'success');
+            }
+            return;
           }
+          if (statusEl) statusEl.textContent = 'Resume saved \u00b7 writing cover letter\u2026';
+          return runCoverLetter({ fromTailorChain: true })
+            .then(function () {
+              if (statusEl) statusEl.textContent = 'Done \u00b7 resume + cover letter';
+              var clWrap = document.getElementById('coverLetterWrap');
+              if (clWrap) clWrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            })
+            .catch(function () {
+              if (statusEl) {
+                statusEl.textContent = 'Resume done \u00b7 cover letter failed — use Generate cover letter';
+              }
+            });
         })
         .catch(function (dlErr) {
           if (statusEl) {
@@ -769,6 +831,7 @@ function runResumeTailor() {
     .finally(function () {
       runResumeTailor._busy = false;
       if (btn) btn.disabled = false;
+      if (btnCover) btnCover.disabled = false;
     });
 }
 
