@@ -5,6 +5,7 @@ const fs = require('fs');
 const cms = require('../lib/cms-store');
 const { getResumeTailorModelOptions, getResumeTailorDefaultSelection } = require('../lib/resume-tailor-models');
 const { getMaxResumePageLines, getMaxCoverLetterLines } = require('../lib/resume-line-budget');
+const { getProfileNotesCount } = require('../lib/resume-profile-notes');
 
 router.get('/', async function (req, res, next) {
   try {
@@ -31,6 +32,24 @@ router.get('/experiences/:id/edit', async function (req, res, next) {
   }
 });
 
+router.get('/resume/profile-notes', async function (req, res, next) {
+  try {
+    const resumeTailorModels = getResumeTailorModelOptions();
+    const resumeTailorDefault = getResumeTailorDefaultSelection();
+    res.render('admin/profile-notes', {
+      adminTitle: 'Profile notes',
+      hasLlmKey: !!(process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY),
+      hasOpenAiForEnhance: !!process.env.OPENAI_API_KEY,
+      resumeTailorModels,
+      resumeTailorDefault,
+      maxResumePageLines: getMaxResumePageLines(),
+      maxCoverLetterLines: getMaxCoverLetterLines()
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get('/resume', async function (req, res, next) {
   try {
     let resume = { path: null, originalFilename: null, updatedAt: null };
@@ -48,6 +67,7 @@ router.get('/resume', async function (req, res, next) {
 
     const resumeTailorModels = getResumeTailorModelOptions();
     const resumeTailorDefault = getResumeTailorDefaultSelection();
+    const profileNotesCount = await getProfileNotesCount(cms);
 
     res.render('admin/resume', {
       adminTitle: 'Resume',
@@ -58,7 +78,8 @@ router.get('/resume', async function (req, res, next) {
       resumeTailorModels,
       resumeTailorDefault,
       maxResumePageLines: getMaxResumePageLines(),
-      maxCoverLetterLines: getMaxCoverLetterLines()
+      maxCoverLetterLines: getMaxCoverLetterLines(),
+      profileNotesCount
     });
   } catch (e) {
     next(e);

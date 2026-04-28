@@ -4,7 +4,7 @@
   <div class="admin__section-header">
     <div>
       <h2>Resume</h2>
-      <p class="admin__section-lead">Upload your resume, add optional <strong>persistent profile notes</strong> (saved on the server), paste the job posting, then run <strong>Tailor with AI</strong> and optionally <strong>generate a cover letter</strong>. Tailored resume and cover letter are previews plus <strong>Word (.docx)</strong> downloads — not stored on the server. Your uploaded resume and profile notes persist until you remove them.</p>
+      <p class="admin__section-lead">Upload your resume, manage optional <strong>profile notes</strong> on a separate page (each note stored separately), paste the job posting, then run <strong>Tailor with AI</strong> and optionally <strong>generate a cover letter</strong>. Tailored resume and cover letter are previews plus <strong>Word (.docx)</strong> downloads — not stored on the server. Your resume file and profile notes persist until you remove them.</p>
     </div>
   </div>
 
@@ -58,39 +58,11 @@
       </div>
     </form>
 
-    <h3 class="admin__resume-step-title">Step 1.5 — Persistent profile notes</h3>
-    <p class="admin__text-muted" style="margin-bottom:1rem;font-size:0.88rem;line-height:1.45;">Themes, positioning, strengths to emphasize, and constraints. These notes load every visit and are included when you tailor your resume or generate a cover letter. They stay on the server if you remove the uploaded file.</p>
-    <div class="admin__form-group admin__form-group--full">
-      <label class="admin__label" for="resumeProfileNotes">Profile notes</label>
-      <textarea
-        id="resumeProfileNotes"
-        class="admin__resume-profile-input"
-        rows="10"
-        placeholder="e.g. Lead with product strategy; emphasize cross-functional leadership; keep tone direct; no relocation."
-      ></textarea>
-      <p class="admin__line-budget" id="resumeNotesLineBudget" aria-live="polite">Lines: <span id="resumeNotesLineCount">0</span> / <%= maxResumePageLines %></p>
-      <p class="admin__text-muted" id="resumeNotesSavedMeta" style="margin:0.25rem 0 0;font-size:0.82rem;"></p>
-    </div>
-    <div class="admin__form-group admin__form-group--full" style="margin-top:0.75rem;">
-      <label class="admin__label" for="resumeNotesEnhancePrompt">Instructions for Enhance <span class="admin__text-muted">(optional)</span></label>
-      <textarea
-        id="resumeNotesEnhancePrompt"
-        class="admin__resume-profile-input"
-        rows="3"
-        placeholder="e.g. Pull out high-level themes for a VP-level search; stress P&amp;L and team scale; keep bullets strategic not tactical."
-        aria-describedby="resumeNotesEnhancePromptHelp"
-      ></textarea>
-      <p id="resumeNotesEnhancePromptHelp" class="admin__text-muted" style="margin:0.35rem 0 0;font-size:0.82rem;">Enhance runs on <strong>OpenAI (GPT)</strong> and sharpens notes into <strong>high-level resume positioning</strong> (themes, strengths, constraints). Sent only with this request — not saved unless you copy it into profile notes. <% if (!hasOpenAiForEnhance && hasLlmKey) { %><span class="admin__text-muted"> — Add <code>OPENAI_API_KEY</code> to enable Enhance.</span><% } %></p>
-    </div>
-    <div class="admin__resume-actions" style="flex-wrap:wrap;gap:0.5rem;margin-top:0.5rem;">
-      <button
-        type="button"
-        class="admin__btn admin__btn--outline"
-        id="resumeNotesEnhanceBtn"
-        onclick="enhanceResumeProfileNotes()"
-        <%= hasOpenAiForEnhance ? '' : 'disabled title="Enhance uses OpenAI (GPT): set OPENAI_API_KEY on the server"' %>
-      >Enhance</button>
-      <button type="button" class="admin__btn admin__btn--primary" id="resumeNotesSaveBtn" onclick="saveResumeProfileNotes()">Save notes</button>
+    <h3 class="admin__resume-step-title">Step 1.5 — Profile notes</h3>
+    <p class="admin__text-muted" style="margin-bottom:0.75rem;font-size:0.88rem;line-height:1.45;">Store multiple notes separately (add, Enhance with GPT, delete on the Profile notes page). All saved notes are combined when you tailor your resume or generate a cover letter. They are <strong>not</strong> deleted when you remove the uploaded resume file.</p>
+    <div class="admin__resume-actions" style="flex-wrap:wrap;gap:0.75rem;align-items:center;margin-bottom:1rem;">
+      <a href="/admin/resume/profile-notes" class="admin__btn admin__btn--outline">Open Profile notes</a>
+      <span class="admin__text-muted" style="font-size:0.88rem;"><strong><%= typeof profileNotesCount !== 'undefined' ? profileNotesCount : 0 %></strong> saved note<%= (typeof profileNotesCount !== 'undefined' && profileNotesCount === 1) ? '' : 's' %></span>
     </div>
 
     <h3 class="admin__resume-step-title">Step 2 — Job details</h3>
@@ -219,19 +191,6 @@ function setLineBudgetEl(countEl, budgetEl, n, maxN) {
   }
 }
 
-function refreshResumeNotesLineBudget() {
-  var ta = document.getElementById('resumeProfileNotes');
-  var n = resumeLineCount(ta ? ta.value : '');
-  setLineBudgetEl(
-    document.getElementById('resumeNotesLineCount'),
-    document.getElementById('resumeNotesLineBudget'),
-    n,
-    MAX_RESUME_PAGE_LINES
-  );
-  var saveBtn = document.getElementById('resumeNotesSaveBtn');
-  if (saveBtn) saveBtn.disabled = n > MAX_RESUME_PAGE_LINES;
-}
-
 function refreshTailorResultLineBudget() {
   var ta = document.getElementById('tailorResultMd');
   var n = resumeLineCount(ta ? ta.value : '');
@@ -268,31 +227,6 @@ function getTailorModelPayload() {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  fetch('/api/resume/notes')
-    .then(function (res) {
-      return res.json();
-    })
-    .then(function (j) {
-      var ta = document.getElementById('resumeProfileNotes');
-      if (ta && j.content != null) ta.value = String(j.content);
-      refreshResumeNotesLineBudget();
-      var meta = document.getElementById('resumeNotesSavedMeta');
-      if (meta && j.updatedAt) {
-        try {
-          meta.textContent = 'Last saved ' + new Date(j.updatedAt).toLocaleString();
-        } catch (e) {
-          meta.textContent = '';
-        }
-      }
-    })
-    .catch(function () {
-      refreshResumeNotesLineBudget();
-    });
-
-  var notesTa = document.getElementById('resumeProfileNotes');
-  if (notesTa) {
-    notesTa.addEventListener('input', refreshResumeNotesLineBudget);
-  }
   var tailorTa = document.getElementById('tailorResultMd');
   if (tailorTa) {
     tailorTa.addEventListener('input', refreshTailorResultLineBudget);
@@ -302,105 +236,6 @@ document.addEventListener('DOMContentLoaded', function () {
     clTa.addEventListener('input', refreshCoverLetterLineBudget);
   }
 });
-
-function enhanceResumeProfileNotes() {
-  var ta = document.getElementById('resumeProfileNotes');
-  var text = ta ? String(ta.value || '') : '';
-  if (!text.trim()) {
-    if (typeof showToast === 'function') showToast('Add some notes to enhance.', 'error');
-    return;
-  }
-  if (resumeLineCount(text) > MAX_RESUME_PAGE_LINES) {
-    if (typeof showToast === 'function') showToast('Notes exceed the line limit — shorten first.', 'error');
-    return;
-  }
-  var btn = document.getElementById('resumeNotesEnhanceBtn');
-  if (enhanceResumeProfileNotes._busy) return;
-  enhanceResumeProfileNotes._busy = true;
-  if (btn) btn.disabled = true;
-  var promptEl = document.getElementById('resumeNotesEnhancePrompt');
-  var instructions = promptEl ? String(promptEl.value || '') : '';
-  if (typeof TextEncoder !== 'undefined' && new TextEncoder().encode(instructions).length > 4096) {
-    if (typeof showToast === 'function') showToast('Enhance instructions must be 4096 bytes or less.', 'error');
-    return;
-  }
-  var payload = Object.assign({ content: text, instructions: instructions }, getTailorModelPayload());
-  fetch('/api/resume/notes/enhance', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
-  })
-    .then(function (res) {
-      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
-      if (ct.indexOf('application/json') >= 0) {
-        return res.json().then(function (j) {
-          return { ok: res.ok, j: j };
-        });
-      }
-      return res.text().then(function (t) {
-        return { ok: res.ok, j: { error: (t && t.slice(0, 200)) || 'Enhance failed' } };
-      });
-    })
-    .then(function (o) {
-      if (!o.ok) throw new Error((o.j && o.j.error) || 'Enhance failed');
-      var c = o.j.content != null ? String(o.j.content) : '';
-      if (ta) ta.value = c;
-      refreshResumeNotesLineBudget();
-      if (typeof showToast === 'function') showToast('Notes enhanced — review and Save if you want to keep them.', 'success');
-    })
-    .catch(function (e) {
-      if (typeof showToast === 'function') showToast(e.message || 'Enhance failed', 'error');
-    })
-    .finally(function () {
-      enhanceResumeProfileNotes._busy = false;
-      if (btn) btn.disabled = false;
-    });
-}
-
-function saveResumeProfileNotes() {
-  var ta = document.getElementById('resumeProfileNotes');
-  var content = ta ? String(ta.value || '') : '';
-  if (resumeLineCount(content) > MAX_RESUME_PAGE_LINES) {
-    if (typeof showToast === 'function') showToast('Notes must be at most ' + MAX_RESUME_PAGE_LINES + ' lines.', 'error');
-    return;
-  }
-  var btn = document.getElementById('resumeNotesSaveBtn');
-  if (btn) btn.disabled = true;
-  fetch('/api/resume/notes', {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ content: content })
-  })
-    .then(function (res) {
-      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
-      if (ct.indexOf('application/json') >= 0) {
-        return res.json().then(function (j) {
-          return { ok: res.ok, j: j };
-        });
-      }
-      return res.text().then(function (t) {
-        return { ok: res.ok, j: { error: (t && t.slice(0, 160)) || 'Save failed' } };
-      });
-    })
-    .then(function (o) {
-      if (!o.ok) throw new Error((o.j && o.j.error) || 'Save failed');
-      var meta = document.getElementById('resumeNotesSavedMeta');
-      if (meta && o.j.updatedAt) {
-        try {
-          meta.textContent = 'Last saved ' + new Date(o.j.updatedAt).toLocaleString();
-        } catch (e) {
-          meta.textContent = '';
-        }
-      }
-      if (typeof showToast === 'function') showToast('Profile notes saved.', 'success');
-    })
-    .catch(function (e) {
-      if (typeof showToast === 'function') showToast(e.message || 'Save failed', 'error');
-    })
-    .finally(function () {
-      refreshResumeNotesLineBudget();
-    });
-}
 
 function coverLetterDocxBasename() {
   var jobDescEl = document.getElementById('tailorJobDesc');

@@ -1,71 +1,220 @@
 <%- include('layout-top', { adminTitle: 'Dashboard' }) %>
 
-<section class="admin__section">
-  <div class="admin__section-header">
-    <h2>Work Experience</h2>
-    <div class="admin__section-header__actions">
-      <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search: fill empty experience fields" onclick="enhanceAllCollection('experiences')">Enhance all</button>
-      <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">+ Add Experience</a>
-    </div>
-  </div>
-  <div class="admin__card-grid">
-    <% experiences.forEach(function(exp) { %>
-    <div class="admin__card">
-      <div class="admin__card-header">
-        <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
-        <div>
-          <h3 class="admin__card-title"><%= exp.title %></h3>
-          <p class="admin__card-sub"><%= exp.role || exp.type || 'Experience' %></p>
-        </div>
-      </div>
-      <p class="admin__card-desc"><%= exp.description.slice(0, 120) %><%= exp.description.length > 120 ? '...' : '' %></p>
-      <div class="admin__card-meta">
-        <span><%= (exp.deliverables || []).length %> sub-group(s)</span>
-        <span><%= (exp.skills || []).length %> skill(s)</span>
-      </div>
-      <div class="admin__card-actions">
-        <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text/skills" onclick="enhanceOne('experiences','<%= exp.id %>')">Enhance</button>
-        <a href="/admin/experiences/<%= exp.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
-        <a href="/experience/<%= exp.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
-        <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('experiences', '<%= exp.id %>')">Delete</button>
-      </div>
-    </div>
-    <% }); %>
-  </div>
-</section>
+<% var spotExp = experiences.slice(0, 3); %>
+<% var spotProj = projects.slice(0, 3); %>
+<% var nExp = experiences.length; %>
+<% var nProj = projects.length; %>
 
-<section class="admin__section">
-  <div class="admin__section-header">
-    <h2>Projects</h2>
-    <div class="admin__section-header__actions">
-      <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search: fill empty project fields" onclick="enhanceAllCollection('projects')">Enhance all</button>
-      <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add Project</a>
+<div class="admin-dash">
+  <header class="admin-dash__hero" aria-labelledby="dash-hero-title">
+    <div class="admin-dash__hero-bg" aria-hidden="true"></div>
+    <div class="admin-dash__hero-inner">
+      <h2 id="dash-hero-title" class="admin-dash__hero-title">Shape the story visitors feel</h2>
     </div>
-  </div>
-  <div class="admin__card-grid">
-    <% projects.forEach(function(proj) { %>
-    <div class="admin__card<%= proj.hidden ? ' admin__card--hidden' : '' %>">
-      <div class="admin__card-header">
-        <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
-        <div>
-          <h3 class="admin__card-title"><%= proj.title %></h3>
-          <p class="admin__card-sub"><%= proj.sectionLabel %><%= proj.hidden ? ' (Hidden)' : '' %></p>
+    <div class="admin-dash__hero-art" aria-hidden="true">
+      <span class="admin-dash__blob admin-dash__blob--a"></span>
+      <span class="admin-dash__blob admin-dash__blob--b"></span>
+      <span class="admin-dash__blob admin-dash__blob--c"></span>
+    </div>
+  </header>
+
+  <div class="admin-dash__below">
+    <p class="admin-dash__eyebrow">Portfolio command center</p>
+    <p class="admin-dash__hero-lead">Curated highlights — open the drawers when you need the full library. Numbers in the pulse strip are illustrative mood checks, not analytics.</p>
+    <div class="admin-dash__hero-cta">
+      <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">New experience</a>
+      <a href="/admin/projects/new" class="admin__btn admin__btn--outline">New project</a>
+      <a href="/" class="admin__btn admin__btn--outline" target="_blank" rel="noopener">Live site</a>
+    </div>
+
+    <section class="admin-dash__pulse" aria-label="Illustrative studio pulse">
+      <div class="admin-dash__pulse-card">
+        <span class="admin-dash__pulse-icon admin-dash__pulse-icon--exp" aria-hidden="true"></span>
+        <span class="admin-dash__pulse-value"><%= nExp %></span>
+        <span class="admin-dash__pulse-label">Experiences live</span>
+      </div>
+      <div class="admin-dash__pulse-card">
+        <span class="admin-dash__pulse-icon admin-dash__pulse-icon--proj" aria-hidden="true"></span>
+        <span class="admin-dash__pulse-value"><%= nProj %></span>
+        <span class="admin-dash__pulse-label">Project capsules</span>
+      </div>
+      <div class="admin-dash__pulse-card admin-dash__pulse-card--fake">
+        <span class="admin-dash__pulse-value">94%</span>
+        <span class="admin-dash__pulse-label">Narrative resonance <span class="admin-dash__fake-tag">demo</span></span>
+      </div>
+      <div class="admin-dash__pulse-card admin-dash__pulse-card--fake">
+        <span class="admin-dash__pulse-value">A−</span>
+        <span class="admin-dash__pulse-label">Visual rhythm grade <span class="admin-dash__fake-tag">demo</span></span>
+      </div>
+      <div class="admin-dash__pulse-card admin-dash__pulse-card--fake">
+        <span class="admin-dash__pulse-value">2h</span>
+        <span class="admin-dash__pulse-label">Since last “sync” <span class="admin-dash__fake-tag">demo</span></span>
+      </div>
+    </section>
+
+    <section class="admin-dash__chart-block" aria-label="Illustrative content mix">
+      <div class="admin-dash__chart-visual">
+        <h3 class="admin-dash__chart-title">Content mix <span class="admin-dash__fake-tag">visual only</span></h3>
+        <div class="admin-dash__chart" role="presentation">
+          <div class="admin-dash__bar" style="--h: 42%"></div>
+          <div class="admin-dash__bar" style="--h: 78%"></div>
+          <div class="admin-dash__bar" style="--h: 55%"></div>
+          <div class="admin-dash__bar" style="--h: 91%"></div>
+          <div class="admin-dash__bar" style="--h: 63%"></div>
+          <div class="admin-dash__bar" style="--h: 48%"></div>
+          <div class="admin-dash__bar" style="--h: 72%"></div>
         </div>
       </div>
-      <p class="admin__card-desc"><%= proj.description.slice(0, 120) %><%= proj.description.length > 120 ? '...' : '' %></p>
-      <div class="admin__card-meta">
-        <span><%= (proj.deliverables || []).length %> sub-group(s)</span>
-        <span><%= (proj.skills || []).length %> skill(s)</span>
+      <div class="admin-dash__chart-below">
+        <p class="admin-dash__chart-sub">Invented bars — vibes for the room, not your database.</p>
+        <div class="admin-dash__chart-legend">
+          <span><i class="admin-dash__swatch admin-dash__swatch--rose"></i> Story</span>
+          <span><i class="admin-dash__swatch admin-dash__swatch--ink"></i> Proof</span>
+          <span><i class="admin-dash__swatch admin-dash__swatch--sand"></i> Texture</span>
+        </div>
       </div>
-      <div class="admin__card-actions">
-        <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text/skills" onclick="enhanceOne('projects','<%= proj.id %>')">Enhance</button>
-        <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
-        <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
-        <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>
+    </section>
+
+    <section class="admin-dash__spotlight admin-dash__spotlight--anchor" id="admin-work-experience">
+      <h3 class="admin-dash__spotlight-title">Work Experience</h3>
+      <div class="admin-dash__spotlight-below-title">
+        <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Everything else stays in the full library drawer below.</p>
+        <div class="admin-dash__spotlight-actions">
+          <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search" onclick="enhanceAllCollection('experiences')">Enhance all</button>
+        </div>
       </div>
-    </div>
-    <% }); %>
+      <% if (!spotExp.length) { %>
+      <p class="admin__empty-hint">No experiences yet — add your first capsule.</p>
+      <% } else { %>
+      <div class="admin-dash__spotlight-grid">
+        <% spotExp.forEach(function(exp) { %>
+        <article class="admin-dash__spot-card">
+          <div class="admin-dash__spot-card__shine" aria-hidden="true"></div>
+          <div class="admin-dash__spot-card__top">
+            <% if (exp.logo) { %>
+            <img src="/<%= exp.logo %>" alt="" class="admin-dash__spot-logo" onerror="this.style.display='none'" />
+            <% } %>
+            <h4 class="admin-dash__spot-name"><%= exp.title %></h4>
+          </div>
+          <div class="admin-dash__spot-card__below">
+            <p class="admin-dash__spot-role"><%= exp.role || exp.type || 'Experience' %></p>
+            <p class="admin-dash__spot-blurb"><%= (exp.description || '').slice(0, 100) %><%= (exp.description || '').length > 100 ? '…' : '' %></p>
+            <div class="admin-dash__spot-footer">
+              <a href="/admin/experiences/<%= exp.id %>/edit" class="admin__btn admin__btn--small admin__btn--primary">Edit</a>
+              <a href="/experience/<%= exp.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank" rel="noopener">View</a>
+            </div>
+          </div>
+        </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <section class="admin-dash__spotlight admin-dash__spotlight--projects admin-dash__spotlight--anchor" id="admin-projects">
+      <h3 class="admin-dash__spotlight-title">Projects</h3>
+      <div class="admin-dash__spotlight-below-title">
+        <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Open the full project library drawer below for the rest.</p>
+        <div class="admin-dash__spotlight-actions">
+          <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search" onclick="enhanceAllCollection('projects')">Enhance all</button>
+        </div>
+      </div>
+      <% if (!spotProj.length) { %>
+      <p class="admin__empty-hint">No projects yet — mint a new case study.</p>
+      <% } else { %>
+      <div class="admin-dash__spotlight-grid">
+        <% spotProj.forEach(function(proj) { %>
+        <article class="admin-dash__spot-card<%= proj.hidden ? ' admin-dash__spot-card--muted' : '' %>">
+          <div class="admin-dash__spot-card__shine admin-dash__spot-card__shine--cool" aria-hidden="true"></div>
+          <div class="admin-dash__spot-card__top">
+            <% if (proj.logo) { %>
+            <img src="/<%= proj.logo %>" alt="" class="admin-dash__spot-logo" onerror="this.style.display='none'" />
+            <% } %>
+            <h4 class="admin-dash__spot-name"><%= proj.title %></h4>
+          </div>
+          <div class="admin-dash__spot-card__below">
+            <p class="admin-dash__spot-role"><%= proj.sectionLabel %><%= proj.hidden ? ' · hidden' : '' %></p>
+            <p class="admin-dash__spot-blurb"><%= (proj.description || '').slice(0, 100) %><%= (proj.description || '').length > 100 ? '…' : '' %></p>
+            <div class="admin-dash__spot-footer">
+              <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small admin__btn--primary">Edit</a>
+              <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank" rel="noopener">View</a>
+            </div>
+          </div>
+        </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <details class="admin-dash__drawer">
+      <summary class="admin-dash__drawer-summary">Full experience library <span class="admin-dash__drawer-count">(<%= nExp %>)</span></summary>
+      <div class="admin-dash__drawer-body">
+        <div class="admin__section-header" style="margin-bottom: 1rem;">
+          <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">+ Add Experience</a>
+        </div>
+        <div class="admin__card-grid">
+          <% experiences.forEach(function(exp) { %>
+          <div class="admin__card">
+            <div class="admin__card-header">
+              <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
+              <div>
+                <h3 class="admin__card-title"><%= exp.title %></h3>
+              </div>
+            </div>
+            <div class="admin-dash__library-card-below">
+              <p class="admin__card-sub"><%= exp.role || exp.type || 'Experience' %></p>
+              <p class="admin__card-desc"><%= (exp.description || '').slice(0, 120) %><%= (exp.description || '').length > 120 ? '...' : '' %></p>
+              <div class="admin__card-meta">
+                <span><%= (exp.deliverables || []).length %> sub-group(s)</span>
+                <span><%= (exp.skills || []).length %> skill(s)</span>
+              </div>
+              <div class="admin__card-actions">
+                <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text/skills" onclick="enhanceOne('experiences','<%= exp.id %>')">Enhance</button>
+                <a href="/admin/experiences/<%= exp.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
+                <a href="/experience/<%= exp.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
+                <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('experiences', '<%= exp.id %>')">Delete</button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+    </details>
+
+    <details class="admin-dash__drawer">
+      <summary class="admin-dash__drawer-summary">Full project library <span class="admin-dash__drawer-count">(<%= nProj %>)</span></summary>
+      <div class="admin-dash__drawer-body">
+        <div class="admin__section-header" style="margin-bottom: 1rem;">
+          <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add Project</a>
+        </div>
+        <div class="admin__card-grid">
+          <% projects.forEach(function(proj) { %>
+          <div class="admin__card<%= proj.hidden ? ' admin__card--hidden' : '' %>">
+            <div class="admin__card-header">
+              <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
+              <div>
+                <h3 class="admin__card-title"><%= proj.title %></h3>
+              </div>
+            </div>
+            <div class="admin-dash__library-card-below">
+              <p class="admin__card-sub"><%= proj.sectionLabel %><%= proj.hidden ? ' (Hidden)' : '' %></p>
+              <p class="admin__card-desc"><%= (proj.description || '').slice(0, 120) %><%= (proj.description || '').length > 120 ? '...' : '' %></p>
+              <div class="admin__card-meta">
+                <span><%= (proj.deliverables || []).length %> sub-group(s)</span>
+                <span><%= (proj.skills || []).length %> skill(s)</span>
+              </div>
+              <div class="admin__card-actions">
+                <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text/skills" onclick="enhanceOne('projects','<%= proj.id %>')">Enhance</button>
+                <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
+                <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
+                <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+    </details>
   </div>
-</section>
+</div>
 
 <%- include('layout-bottom') %>

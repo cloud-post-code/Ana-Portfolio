@@ -2105,3 +2105,49 @@ a.work__card:focus-visible {
     padding-left: 0.25rem;
   }
 }
+
+/* CMS empty states (homepage when collections are empty) */
+.portfolio-empty {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(45, 45, 45, 0.72);
+}
+
+/* Ensure portfolio sections stay readable without JS or with reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale,
+  .reveal-rotate,
+  .reveal-blur,
+  .reveal-flip {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .reveal-clip {
+    clip-path: inset(0 0 0 0) !important;
+  }
+}
+
+@media (scripting: none) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale,
+  .reveal-rotate,
+  .reveal-blur,
+  .reveal-flip {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .reveal-clip {
+    clip-path: inset(0 0 0 0) !important;
+  }
+}

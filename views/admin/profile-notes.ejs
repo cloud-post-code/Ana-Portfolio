@@ -1,0 +1,264 @@
+<%- include('layout-top', { adminTitle: 'Profile notes' }) %>
+
+<section class="admin__section">
+  <div class="admin__section-header">
+    <div>
+      <h2>Profile notes</h2>
+      <p class="admin__section-lead">Save <strong>separate</strong> positioning notes (themes, strengths, constraints). Tailor and cover letter combine all of them with your resume. Delete a note anytime. Removing your resume file does <strong>not</strong> delete these notes.</p>
+    </div>
+  </div>
+
+  <div class="admin__card admin__resume-card" style="max-width: 44rem;">
+    <div class="admin__resume-actions" style="margin-bottom: 1rem;">
+      <a href="/admin/resume" class="admin__btn admin__btn--outline">Back to Resume</a>
+    </div>
+
+    <h3 class="admin__resume-step-title" style="margin-top: 0;">Your notes</h3>
+    <div id="profileNotesList" class="admin__profile-notes-list" aria-live="polite">
+      <p class="admin__text-muted">Loading…</p>
+    </div>
+
+    <h3 class="admin__resume-step-title">Add a new note</h3>
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="composerContent">Note text</label>
+      <textarea
+        id="composerContent"
+        class="admin__resume-profile-input"
+        rows="8"
+        placeholder="e.g. Lead with brand transformation; emphasize bilingual stakeholder work."
+      ></textarea>
+      <p class="admin__line-budget" id="composerLineBudget" aria-live="polite">Lines: <span id="composerLineCount">0</span> / <%= maxResumePageLines %></p>
+    </div>
+    <div class="admin__form-group admin__form-group--full">
+      <label class="admin__label" for="composerEnhancePrompt">Instructions for Enhance <span class="admin__text-muted">(optional)</span></label>
+      <textarea
+        id="composerEnhancePrompt"
+        class="admin__resume-profile-input"
+        rows="2"
+        placeholder="Optional: how GPT should tighten this draft before you save."
+        aria-describedby="composerEnhanceHelp"
+      ></textarea>
+      <p id="composerEnhanceHelp" class="admin__text-muted" style="margin:0.35rem 0 0;font-size:0.82rem;">Enhance uses <strong>OpenAI (GPT)</strong> only. <% if (!hasOpenAiForEnhance) { %>Set <code>OPENAI_API_KEY</code> to enable.<% } %></p>
+    </div>
+    <div class="admin__resume-actions" style="flex-wrap: wrap; gap: 0.5rem;">
+      <button
+        type="button"
+        class="admin__btn admin__btn--outline"
+        id="composerEnhanceBtn"
+        onclick="enhanceComposerDraft()"
+        <%= hasOpenAiForEnhance ? '' : 'disabled title="Set OPENAI_API_KEY on the server"' %>
+      >Enhance draft</button>
+      <button type="button" class="admin__btn admin__btn--primary" id="composerAddBtn" onclick="addComposerNote()">Add note</button>
+    </div>
+    <p class="admin__text-muted" style="margin-top: 0.75rem; font-size: 0.82rem;">Max <span id="maxProfileNotesHint">100</span> notes · each note ≤ <%= maxResumePageLines %> lines.</p>
+  </div>
+</section>
+
+<%- include('layout-bottom') %>
+
+<script>
+(function () {
+  var MAX_LINES = <%= maxResumePageLines %>;
+  var MAX_PROFILE_NOTES = 100;
+
+  function lineCount(s) {
+    s = String(s || '');
+    if (!s) return 0;
+    return s.split('\n').length;
+  }
+
+  function refreshComposerBudget() {
+    var ta = document.getElementById('composerContent');
+    var n = lineCount(ta ? ta.value : '');
+    var countEl = document.getElementById('composerLineCount');
+    var budgetEl = document.getElementById('composerLineBudget');
+    if (countEl) countEl.textContent = String(n);
+    if (budgetEl) budgetEl.classList.toggle('admin__line-budget--over', n > MAX_LINES);
+    var addBtn = document.getElementById('composerAddBtn');
+    if (addBtn) addBtn.disabled = n > MAX_LINES || n === 0;
+  }
+
+  function renderNotes(notes) {
+    var root = document.getElementById('profileNotesList');
+    if (!root) return;
+    root.innerHTML = '';
+    if (!notes || !notes.length) {
+      var empty = document.createElement('p');
+      empty.className = 'admin__text-muted';
+      empty.textContent = 'No profile notes yet. Add one below.';
+      root.appendChild(empty);
+      return;
+    }
+    notes.forEach(function (note) {
+      var article = document.createElement('article');
+      article.className = 'admin__profile-note-row';
+      var meta = document.createElement('p');
+      meta.className = 'admin__profile-note-meta';
+      var when = '';
+      try {
+        when = note.createdAt ? new Date(note.createdAt).toLocaleString() : '';
+      } catch (e) {
+        when = '';
+      }
+      meta.textContent = when ? 'Saved ' + when : 'Saved note';
+      var body = document.createElement('div');
+      body.className = 'admin__profile-note-body';
+      body.textContent = note.content != null ? String(note.content) : '';
+      var actions = document.createElement('div');
+      actions.className = 'admin__resume-actions';
+      actions.style.marginTop = '0.65rem';
+      var del = document.createElement('button');
+      del.type = 'button';
+      del.className = 'admin__btn admin__btn--danger';
+      del.textContent = 'Delete';
+      del.setAttribute('data-id', note.id);
+      del.addEventListener('click', function () {
+        deleteNote(note.id);
+      });
+      actions.appendChild(del);
+      article.appendChild(meta);
+      article.appendChild(body);
+      article.appendChild(actions);
+      root.appendChild(article);
+    });
+  }
+
+  function loadNotes() {
+    return fetch('/api/resume/profile-notes')
+      .then(function (res) {
+        return res.json();
+      })
+      .then(function (j) {
+        if (j.maxProfileNotes != null) {
+          var hint = document.getElementById('maxProfileNotesHint');
+          if (hint) hint.textContent = String(j.maxProfileNotes);
+        }
+        renderNotes(j.notes || []);
+      })
+      .catch(function () {
+        var root = document.getElementById('profileNotesList');
+        if (root) {
+          root.innerHTML = '<p class="admin__text-muted">Could not load notes.</p>';
+        }
+      });
+  }
+
+  window.addComposerNote = function () {
+    var ta = document.getElementById('composerContent');
+    var text = ta ? String(ta.value || '').trim() : '';
+    if (!text) {
+      if (typeof showToast === 'function') showToast('Write something in the note field first.', 'error');
+      return;
+    }
+    if (lineCount(text) > MAX_LINES) {
+      if (typeof showToast === 'function') showToast('Note exceeds the line limit.', 'error');
+      return;
+    }
+    var btn = document.getElementById('composerAddBtn');
+    if (btn) btn.disabled = true;
+    fetch('/api/resume/profile-notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: text })
+    })
+      .then(function (res) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      })
+      .then(function (o) {
+        if (!o.ok) throw new Error((o.j && o.j.error) || 'Could not save note');
+        if (ta) ta.value = '';
+        refreshComposerBudget();
+        if (typeof showToast === 'function') showToast('Note saved.', 'success');
+        return loadNotes();
+      })
+      .catch(function (e) {
+        if (typeof showToast === 'function') showToast(e.message || 'Save failed', 'error');
+      })
+      .finally(function () {
+        refreshComposerBudget();
+      });
+  };
+
+  window.deleteNote = function (id) {
+    if (!confirm('Delete this profile note permanently?')) return;
+    fetch('/api/resume/profile-notes/' + encodeURIComponent(id), { method: 'DELETE' })
+      .then(function (res) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      })
+      .then(function (o) {
+        if (!o.ok) throw new Error((o.j && o.j.error) || 'Delete failed');
+        if (typeof showToast === 'function') showToast('Note deleted.', 'success');
+        return loadNotes();
+      })
+      .catch(function (e) {
+        if (typeof showToast === 'function') showToast(e.message || 'Delete failed', 'error');
+      });
+  };
+
+  window.enhanceComposerDraft = function () {
+    var ta = document.getElementById('composerContent');
+    var text = ta ? String(ta.value || '') : '';
+    if (!String(text).trim()) {
+      if (typeof showToast === 'function') showToast('Add note text to enhance.', 'error');
+      return;
+    }
+    if (lineCount(text) > MAX_LINES) {
+      if (typeof showToast === 'function') showToast('Note exceeds the line limit — shorten first.', 'error');
+      return;
+    }
+    var instTa = document.getElementById('composerEnhancePrompt');
+    var instructions = instTa ? String(instTa.value || '') : '';
+    if (typeof TextEncoder !== 'undefined' && new TextEncoder().encode(instructions).length > 4096) {
+      if (typeof showToast === 'function') showToast('Enhance instructions must be 4096 bytes or less.', 'error');
+      return;
+    }
+    var btn = document.getElementById('composerEnhanceBtn');
+    if (enhanceComposerDraft._busy) return;
+    enhanceComposerDraft._busy = true;
+    if (btn) btn.disabled = true;
+    fetch('/api/resume/notes/enhance', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ content: text, instructions: instructions })
+    })
+      .then(function (res) {
+        var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+        if (ct.indexOf('application/json') >= 0) {
+          return res.json().then(function (j) {
+            return { ok: res.ok, j: j };
+          });
+        }
+        return res.text().then(function (t) {
+          return { ok: res.ok, j: { error: (t && t.slice(0, 200)) || 'Enhance failed' } };
+        });
+      })
+      .then(function (o) {
+        if (!o.ok) throw new Error((o.j && o.j.error) || 'Enhance failed');
+        var c = o.j.content != null ? String(o.j.content) : '';
+        if (ta) ta.value = c;
+        refreshComposerBudget();
+        if (typeof showToast === 'function') {
+          showToast('Draft enhanced — review, then Add note to save.', 'success');
+        }
+      })
+      .catch(function (e) {
+        if (typeof showToast === 'function') showToast(e.message || 'Enhance failed', 'error');
+      })
+      .finally(function () {
+        enhanceComposerDraft._busy = false;
+        if (btn) btn.disabled = false;
+      });
+  };
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var ta = document.getElementById('composerContent');
+    if (ta) ta.addEventListener('input', refreshComposerBudget);
+    refreshComposerBudget();
+    loadNotes();
+  });
+})();
+</script>

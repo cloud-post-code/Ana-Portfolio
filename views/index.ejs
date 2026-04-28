@@ -4,6 +4,7 @@
   <%- include('partials/head') %>
 </head>
 <body>
+  <% var visibleProjects = projects.filter(function (p) { return !p.hidden; }); %>
   <%- include('partials/nav') %>
 
   <!-- Hero -->
@@ -17,7 +18,7 @@
       <p class="hero__tagline reveal-blur">If you're hiring for marketing or brand roles,<br />here's how I combine strategy, creativity, and storytelling to drive <em>measurable</em> results—so you can decide if I'm the right fit.</p>
       <div class="hero__actions reveal-scale">
         <a href="#contact" class="btn btn--primary">Contact me about a role</a>
-        <a href="#experience" class="btn btn--outline">Review experience &amp; work</a>
+        <a href="#brands" class="btn btn--outline">Review experience &amp; work</a>
       </div>
     </div>
   </section>
@@ -55,11 +56,14 @@
   </section>
 
   <!-- Brands strip: work experience -->
-  <section class="brands section" id="brands">
+  <section class="brands section" id="brands" aria-label="Work experience — company logos">
     <div class="container">
       <div class="brands__groups">
         <div class="brands__group reveal-scale">
           <h3 class="brands__group-title">WORK EXPERIENCE</h3>
+          <% if (!experiences.length) { %>
+          <p class="portfolio-empty">No work experience entries yet — add them from the admin dashboard and they appear here automatically.</p>
+          <% } else { %>
           <div class="brands__grid">
             <% experiences.forEach(function(exp) { %>
             <a href="/experience/<%= exp.slug %>" class="brand-tile" data-site-search="<%= encodeURIComponent([exp.title, exp.role, exp.type, exp.company, exp.description].filter(Boolean).join(' ')) %>">
@@ -69,19 +73,23 @@
             </a>
             <% }); %>
           </div>
+          <% } %>
         </div>
       </div>
     </div>
   </section>
 
   <!-- Projects -->
-  <section class="brands section" id="projects">
+  <section class="brands section" id="projects" aria-label="Projects">
     <div class="container">
       <div class="brands__groups">
         <div class="brands__group reveal-scale">
           <h3 class="brands__group-title">PROJECTS</h3>
+          <% if (!visibleProjects.length) { %>
+          <p class="portfolio-empty">No projects to show yet (or all are marked hidden). Add or unhide projects in the admin dashboard.</p>
+          <% } else { %>
           <div class="brands__grid">
-            <% projects.filter(function(p) { return !p.hidden; }).forEach(function(proj) { %>
+            <% visibleProjects.forEach(function(proj) { %>
             <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>" data-site-search="<%= encodeURIComponent([proj.title, proj.sectionLabel, proj.role, proj.description, (proj.skills || []).join(' ')].filter(Boolean).join(' ')) %>">
               <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
               <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
@@ -89,6 +97,7 @@
             </a>
             <% }); %>
           </div>
+          <% } %>
         </div>
       </div>
     </div>
@@ -145,10 +154,13 @@
   </section>
 
   <!-- Work Experience -->
-  <section class="experience section" id="experience">
+  <section class="experience section" id="experience" aria-label="Work experience — timeline">
     <div class="container">
       <p class="section__label reveal-blur">Work Experience</p>
       <h2 class="section__title reveal-clip">Where I've <span class="highlight">grown.</span></h2>
+      <% if (!experiences.length) { %>
+      <p class="portfolio-empty">Add roles in the admin dashboard to build this timeline.</p>
+      <% } else { %>
       <div class="experience__timeline">
         <% experiences.forEach(function(exp) { %>
         <a href="/experience/<%= exp.slug %>" class="experience__item reveal-right" data-site-search="<%= encodeURIComponent([exp.title, exp.role, exp.type, exp.company, exp.description, (exp.skills || []).join(' ')].filter(Boolean).join(' ')) %>">
@@ -164,6 +176,7 @@
         </a>
         <% }); %>
       </div>
+      <% } %>
     </div>
   </section>
 

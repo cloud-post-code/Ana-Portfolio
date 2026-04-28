@@ -54,6 +54,14 @@ const {
   exceedsLineBudget,
   countLines
 } = require('../lib/resume-line-budget');
+const {
+  getProfileNotesItems,
+  getCombinedProfileNotesText,
+  getProfileNotesCount,
+  addProfileNote,
+  deleteProfileNoteById,
+  MAX_PROFILE_NOTES
+} = require('../lib/resume-profile-notes');
 const { tailorResumeForJob } = require('../lib/resume-tailor');
 const { markdownToDocxBuffer } = require('../lib/markdown-to-docx');
 
@@ -252,7 +260,7 @@ crudRoutes('projects', 'projects.json');
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');
 const RESUME_MD_KV = 'resume_markdown';
-const RESUME_NOTES_KV = 'resume_notes';
+/** Per profile note max size (single note body). */
 const RESUME_NOTES_MAX_CHARS = 65536;
 /** Max chars for optional Enhance instructions field (separate from note body). */
 const RESUME_NOTES_ENHANCE_INSTRUCTIONS_MAX = 4096;
@@ -287,60 +295,69 @@ async function persistResumeMarkdown(md) {
 
 async function readResumeNotesBody() {
   try {
-    const row = await cms.getKv(RESUME_NOTES_KV);
-    if (row && typeof row.content === 'string') {
-      return row.content;
-    }
+    return await getCombinedProfileNotesText(cms);
   } catch (e) {
-    /* ignore */
+    return '';
   }
-  return '';
 }
 
-async function persistResumeNotes(content) {
-  const payload = {
-    content: String(content ?? ''),
-    updatedAt: new Date().toISOString()
-  };
-  await cms.setKv(RESUME_NOTES_KV, payload);
-}
-
-router.get('/resume/notes', async function (req, res, next) {
+router.get('/resume/profile-notes', async function (req, res, next) {
   try {
-    const row = await cms.getKv(RESUME_NOTES_KV);
-    const content = row && typeof row.content === 'string' ? row.content : '';
-    const updatedAt = row && row.updatedAt != null ? String(row.updatedAt) : '';
+    const notes = await getProfileNotesItems(cms);
     res.json({
-      content,
-      updatedAt,
+      notes: notes.map(function (n) {
+        return {
+          id: n.id,
+          content: n.content,
+          createdAt: n.createdAt,
+          updatedAt: n.updatedAt
+        };
+      }),
       maxResumePageLines: getMaxResumePageLines(),
-      maxCoverLetterLines: getMaxCoverLetterLines()
+      maxCoverLetterLines: getMaxCoverLetterLines(),
+      maxProfileNotes: MAX_PROFILE_NOTES,
+      perNoteMaxChars: RESUME_NOTES_MAX_CHARS
     });
   } catch (e) {
     next(e);
   }
 });
 
-router.put('/resume/notes', async function (req, res, next) {
+router.post('/resume/profile-notes', async function (req, res, next) {
   try {
     const body = req.body || {};
     const content = body.content != null ? String(body.content) : '';
-    if (Buffer.byteLength(content, 'utf8') > RESUME_NOTES_MAX_CHARS) {
-      return res.status(400).json({ error: 'Notes are too long (max ' + RESUME_NOTES_MAX_CHARS + ' characters).' });
-    }
     const maxL = getMaxResumePageLines();
-    if (exceedsLineBudget(content, maxL)) {
-      return res.status(400).json({ error: 'Notes must be at most ' + maxL + ' lines.' });
-    }
-    await persistResumeNotes(content);
-    const row = await cms.getKv(RESUME_NOTES_KV);
-    res.json({
-      success: true,
-      content: row && typeof row.content === 'string' ? row.content : '',
-      updatedAt: row && row.updatedAt != null ? row.updatedAt : null,
-      maxResumePageLines: maxL
-    });
+    const note = await addProfileNote(
+      cms,
+      content,
+      { exceedsLineBudget, maxLines: maxL },
+      RESUME_NOTES_MAX_CHARS
+    );
+    const count = await getProfileNotesCount(cms);
+    res.json({ success: true, note, count });
   } catch (e) {
+    const msg = e.message || String(e);
+    const msgLc = msg.toLowerCase();
+    if (msgLc.includes('required') || msgLc.includes('too long') || msgLc.includes('lines') || msgLc.includes('maximum')) {
+      return res.status(400).json({ error: msg });
+    }
+    next(e);
+  }
+});
+
+router.delete('/resume/profile-notes/:id', async function (req, res, next) {
+  try {
+    const ok = await deleteProfileNoteById(cms, req.params.id);
+    if (!ok) {
+      return res.status(404).json({ error: 'Note not found.' });
+    }
+    res.json({ success: true });
+  } catch (e) {
+    const msg = e.message || String(e);
+    if (msg.includes('Invalid')) {
+      return res.status(400).json({ error: msg });
+    }
     next(e);
   }
 });
