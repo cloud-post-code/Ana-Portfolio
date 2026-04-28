@@ -6,6 +6,9 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
+# Sync data/experiences.json, data/projects.json, and other data/*.json into Postgres before the new release goes live.
+# Requires DATABASE_URL (Railway Postgres). Skips harmlessly if unset. Binary assets ship in the image; JSON only stores paths.
+preDeployCommand = ["npm", "run", "db:seed"]
 startCommand = "npm start"
 healthcheckPath = "/"
 healthcheckTimeout = 60
