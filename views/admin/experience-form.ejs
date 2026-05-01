@@ -160,6 +160,9 @@
       <%= isNew ? 'Create Experience' : 'Save Changes' %>
     </button>
     <a href="/admin" class="admin__btn admin__btn--outline admin__btn--large">Cancel</a>
+    <% if (!isNew) { %>
+    <button type="button" class="admin__btn admin__btn--danger admin__btn--outline admin__btn--large" onclick="deleteItem('experiences', '<%= item.id %>')">Delete experience</button>
+    <% } %>
   </div>
 </form>
 

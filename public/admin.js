@@ -78,14 +78,29 @@ function enhanceAllCollection(collection) {
 
 /* ─── Delete item from dashboard ──────────────────────────────────────── */
 function deleteItem(entity, id) {
-  if (!confirm('Are you sure you want to delete this item?')) return;
-  fetch('/api/' + entity + '/' + id, { method: 'DELETE' })
-    .then(function (res) { return res.json(); })
-    .then(function () {
-      showToast('Deleted successfully', 'success');
-      setTimeout(function () { location.reload(); }, 500);
+  if (!confirm('Are you sure you want to delete this item? This cannot be undone.')) return;
+  fetch('/api/' + encodeURIComponent(entity) + '/' + encodeURIComponent(id), { method: 'DELETE' })
+    .then(function (res) {
+      var ct = (res.headers.get('Content-Type') || '').toLowerCase();
+      if (ct.indexOf('application/json') >= 0) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      }
+      return res.text().then(function (t) {
+        return { ok: res.ok, j: { error: (t && t.slice(0, 200)) || 'Delete failed (' + res.status + ')' } };
+      });
     })
-    .catch(function () { showToast('Delete failed', 'error'); });
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Delete failed');
+      showToast('Deleted successfully', 'success');
+      setTimeout(function () {
+        window.location.href = '/admin';
+      }, 400);
+    })
+    .catch(function (e) {
+      showToast(e.message || 'Delete failed', 'error');
+    });
 }
 
 /* ─── Upload single file (logo) ──────────────────────────────────────── */

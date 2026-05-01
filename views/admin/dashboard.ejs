@@ -102,6 +102,7 @@
             <div class="admin-dash__spot-footer">
               <a href="/admin/experiences/<%= exp.id %>/edit" class="admin__btn admin__btn--small admin__btn--primary">Edit</a>
               <a href="/experience/<%= exp.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank" rel="noopener">View</a>
+              <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('experiences', '<%= exp.id %>')">Delete</button>
             </div>
           </div>
         </article>
@@ -137,6 +138,7 @@
             <div class="admin-dash__spot-footer">
               <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small admin__btn--primary">Edit</a>
               <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank" rel="noopener">View</a>
+              <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>
             </div>
           </div>
         </article>
