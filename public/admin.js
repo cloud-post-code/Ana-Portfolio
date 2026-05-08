@@ -375,6 +375,32 @@ function initDragAndDrop() {
   });
 }
 
+function initAdminPortfolioFocusToggle() {
+  var el = document.getElementById('adminPortfolioFocusToggle');
+  if (!el) return;
+  var KEY = 'portfolioHeroMarqueeFocus';
+  try {
+    el.checked = localStorage.getItem(KEY) === '1';
+  } catch (e) {
+    /* ignore */
+  }
+  el.addEventListener('change', function () {
+    try {
+      if (el.checked) localStorage.setItem(KEY, '1');
+      else localStorage.removeItem(KEY);
+      showToast(
+        el.checked
+          ? 'Saved. Refresh the homepage to see presentation view.'
+          : 'Saved. Refresh the homepage to restore the full layout.',
+        'success'
+      );
+    } catch (err) {
+      showToast('Storage unavailable in this browser.', 'error');
+    }
+  });
+}
+
 document.addEventListener('DOMContentLoaded', function () {
   initDragAndDrop();
+  initAdminPortfolioFocusToggle();
 });

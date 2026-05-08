@@ -2307,3 +2307,48 @@ select.admin__resume-model-select {
     flex-direction: column;
   }
 }
+
+/* Dashboard: homepage presentation view toggle */
+.admin-dash__presentation-card {
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.35rem;
+}
+
+.admin-dash__presentation-title {
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: var(--admin-text);
+}
+
+.admin-dash__presentation-lead {
+  font-size: 0.88rem;
+  line-height: 1.45;
+  margin: 0 0 1rem;
+}
+
+.admin-dash__presentation-check {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--admin-text);
+}
+
+.admin-dash__presentation-check input {
+  margin-top: 0.15rem;
+  accent-color: var(--admin-accent);
+  flex-shrink: 0;
+}
+
+.admin-dash__presentation-foot {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+}
+
+.admin-dash__presentation-foot a {
+  color: var(--admin-accent);
+  font-weight: 600;
+}

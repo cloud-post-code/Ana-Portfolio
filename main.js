@@ -52,6 +52,7 @@
   const heroSection = document.querySelector('.hero');
 
   const handleHeroParallax = () => {
+    if (document.body.classList.contains('portfolio-hero-marquee-focus')) return;
     const scrollY = window.scrollY;
     const heroH = heroSection ? heroSection.offsetHeight : window.innerHeight;
 
@@ -362,4 +363,64 @@
 
     wrap.setAttribute('tabindex', '0');
   });
+
+  // ---- Homepage presentation mode (hero + skills strip only) ----
+  const PORTFOLIO_FOCUS_KEY = 'portfolioHeroMarqueeFocus';
+  const PORTFOLIO_FOCUS_CLASS = 'portfolio-hero-marquee-focus';
+
+  const isHomePresentationPage = () =>
+    Boolean(
+      document.getElementById('hero') &&
+        document.querySelector('.marquee-strip') &&
+        document.getElementById('brands')
+    );
+
+  const resetHeroPresentationStyles = () => {
+    if (heroContent) {
+      heroContent.style.opacity = '';
+      heroContent.style.transform = '';
+    }
+    if (heroBgText) {
+      heroBgText.style.transform = '';
+      heroBgText.style.opacity = '';
+    }
+  };
+
+  const setPortfolioPresentationFocus = (on) => {
+    if (!isHomePresentationPage()) return;
+    document.body.classList.toggle(PORTFOLIO_FOCUS_CLASS, on);
+    try {
+      if (on) localStorage.setItem(PORTFOLIO_FOCUS_KEY, '1');
+      else localStorage.removeItem(PORTFOLIO_FOCUS_KEY);
+    } catch {
+      /* private / blocked storage */
+    }
+    if (on) {
+      resetHeroPresentationStyles();
+      document.body.style.overflow = '';
+      window.scrollTo({ top: 0, behavior: 'auto' });
+      updateScrollProgress();
+    } else {
+      resetHeroPresentationStyles();
+      handleHeroParallax();
+      updateScrollProgress();
+    }
+  };
+
+  const focusToggle = document.getElementById('workExperienceFocusToggle');
+  let initialFocus = false;
+  try {
+    initialFocus = localStorage.getItem(PORTFOLIO_FOCUS_KEY) === '1';
+  } catch {
+    /* ignore */
+  }
+  if (focusToggle) {
+    focusToggle.checked = initialFocus;
+    focusToggle.addEventListener('change', () => {
+      setPortfolioPresentationFocus(focusToggle.checked);
+    });
+  }
+  if (initialFocus && isHomePresentationPage()) {
+    setPortfolioPresentationFocus(true);
+  }
 })();
