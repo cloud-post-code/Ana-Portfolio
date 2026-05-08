@@ -76,13 +76,31 @@
     </section>
 
     <section class="admin-dash__spotlight admin-dash__spotlight--anchor" id="admin-work-experience">
-      <h3 class="admin-dash__spotlight-title">Work Experience</h3>
+      <div class="admin-dash__spotlight-head">
+        <h3 class="admin-dash__spotlight-title">Work Experience</h3>
+        <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">New Work Experience</a>
+      </div>
       <div class="admin-dash__spotlight-below-title">
         <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Everything else stays in the full library drawer below.</p>
         <div class="admin-dash__spotlight-actions">
           <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search" onclick="enhanceAllCollection('experiences')">Enhance all</button>
         </div>
       </div>
+
+      <div class="admin-dash__presentation-card admin__card">
+        <h4 class="admin-dash__presentation-title">Homepage presentation view</h4>
+        <p class="admin-dash__presentation-lead admin__text-muted">
+          On the live homepage, show only the large name block and pink skills strip (hides navigation, footer, and all other sections). The same switch appears at the top of <strong>Work Experience</strong> for you or visitors. Stored in this browser only—refresh the homepage after toggling.
+        </p>
+        <label class="admin-dash__presentation-check">
+          <input type="checkbox" id="adminPortfolioFocusToggle" />
+          <span>Enable on this device</span>
+        </label>
+        <p class="admin-dash__presentation-foot admin__text-muted">
+          <a href="/#brands" target="_blank" rel="noopener">Open homepage — Work Experience</a>
+        </p>
+      </div>
+
       <% if (!spotExp.length) { %>
       <p class="admin__empty-hint">No experiences yet — add your first capsule.</p>
       <% } else { %>
@@ -112,7 +130,10 @@
     </section>
 
     <section class="admin-dash__spotlight admin-dash__spotlight--projects admin-dash__spotlight--anchor" id="admin-projects">
-      <h3 class="admin-dash__spotlight-title">Projects</h3>
+      <div class="admin-dash__spotlight-head">
+        <h3 class="admin-dash__spotlight-title">Projects</h3>
+        <a href="/admin/projects/new" class="admin__btn admin__btn--primary">New Projects</a>
+      </div>
       <div class="admin-dash__spotlight-below-title">
         <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Open the full project library drawer below for the rest.</p>
         <div class="admin-dash__spotlight-actions">

@@ -2062,6 +2062,15 @@ select.admin__resume-model-select {
   scroll-margin-top: 1.25rem;
 }
 
+.admin-dash__spotlight-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
 .admin-dash__spotlight-title {
   font-size: 1.15rem;
   font-weight: 700;
