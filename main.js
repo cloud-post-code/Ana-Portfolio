@@ -407,18 +407,11 @@
     }
   };
 
-  const focusToggle = document.getElementById('workExperienceFocusToggle');
   let initialFocus = false;
   try {
     initialFocus = localStorage.getItem(PORTFOLIO_FOCUS_KEY) === '1';
   } catch {
     /* ignore */
-  }
-  if (focusToggle) {
-    focusToggle.checked = initialFocus;
-    focusToggle.addEventListener('change', () => {
-      setPortfolioPresentationFocus(focusToggle.checked);
-    });
   }
   if (initialFocus && isHomePresentationPage()) {
     setPortfolioPresentationFocus(true);

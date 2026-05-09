@@ -1192,47 +1192,7 @@ a.work__card:focus-visible {
   }
 }
 
-/* Homepage presentation: hero + skills strip only (toggle under Work Experience) */
-.work-focus-toolbar {
-  margin-bottom: 1.25rem;
-}
-
-.work-focus-toggle {
-  padding: 1rem 1.15rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  background: rgba(255, 255, 255, 0.65);
-}
-
-.work-focus-toggle__label {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  cursor: pointer;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--color-text);
-}
-
-.work-focus-toggle__input {
-  width: 1.15rem;
-  height: 1.15rem;
-  accent-color: var(--color-accent);
-  flex-shrink: 0;
-}
-
-.work-focus-toggle__text {
-  line-height: 1.35;
-}
-
-.work-focus-toggle__hint {
-  margin: 0.55rem 0 0 1.8rem;
-  font-size: 0.82rem;
-  line-height: 1.5;
-  color: var(--color-text-muted);
-  max-width: 40rem;
-}
-
+/* Homepage presentation: hero + skills strip only (admin + localStorage on this device) */
 body.portfolio-hero-marquee-focus .nav,
 body.portfolio-hero-marquee-focus #scrollProgress,
 body.portfolio-hero-marquee-focus .nav__backdrop,
@@ -1249,14 +1209,6 @@ body.portfolio-hero-marquee-focus .footer {
 
 body.portfolio-hero-marquee-focus #brands.section {
   padding: clamp(0.65rem, 2vw, 1rem) 0;
-}
-
-body.portfolio-hero-marquee-focus .work-focus-toolbar {
-  margin-bottom: 0;
-}
-
-body.portfolio-hero-marquee-focus .work-focus-toggle {
-  border-style: dashed;
 }
 
 /* Tighter top padding on About when it follows the marquee */
