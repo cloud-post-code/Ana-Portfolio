@@ -182,6 +182,9 @@ function addMediaItem(grid, type, src, alt) {
 /* ─── Add deliverable sub-group ──────────────────────────────────────── */
 function addDeliverable() {
   var list = document.getElementById('deliverablesList');
+  if (!list) return;
+  var wrap = list.closest('details.admin__advanced--deliverables');
+  if (wrap) wrap.open = true;
   var count = list.querySelectorAll('.admin__deliverable').length + 1;
 
   var html =

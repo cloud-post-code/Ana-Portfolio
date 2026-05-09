@@ -18,7 +18,7 @@ router.get('/', async function (req, res, next) {
 });
 
 router.get('/experiences/new', (req, res) => {
-  res.render('admin/experience-form', { item: null, isNew: true });
+  res.render('admin/entity-form', { item: null, isNew: true, entity: 'experiences' });
 });
 
 router.get('/experiences/:id/edit', async function (req, res, next) {
@@ -26,7 +26,7 @@ router.get('/experiences/:id/edit', async function (req, res, next) {
     const experiences = await cms.getPortfolio('experiences');
     const item = experiences.find(e => e.id === req.params.id);
     if (!item) return res.status(404).send('Not found');
-    res.render('admin/experience-form', { item, isNew: false });
+    res.render('admin/entity-form', { item, isNew: false, entity: 'experiences' });
   } catch (e) {
     next(e);
   }
@@ -87,7 +87,7 @@ router.get('/resume', async function (req, res, next) {
 });
 
 router.get('/projects/new', (req, res) => {
-  res.render('admin/project-form', { item: null, isNew: true });
+  res.render('admin/entity-form', { item: null, isNew: true, entity: 'projects' });
 });
 
 router.get('/projects/:id/edit', async function (req, res, next) {
@@ -95,7 +95,7 @@ router.get('/projects/:id/edit', async function (req, res, next) {
     const projects = await cms.getPortfolio('projects');
     const item = projects.find(p => p.id === req.params.id);
     if (!item) return res.status(404).send('Not found');
-    res.render('admin/project-form', { item, isNew: false });
+    res.render('admin/entity-form', { item, isNew: false, entity: 'projects' });
   } catch (e) {
     next(e);
   }

@@ -397,6 +397,44 @@ body.admin {
   border-top: 1px solid var(--admin-border);
 }
 
+/* Collapsible "More options" / deliverables (native <details>) */
+.admin__advanced {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--admin-border);
+}
+
+.admin__advanced > summary {
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--admin-text);
+  list-style-position: outside;
+  padding: 0.35rem 0;
+}
+
+.admin__advanced > summary::-webkit-details-marker {
+  color: var(--admin-text-muted);
+}
+
+.admin__advanced-body {
+  padding-top: 1rem;
+}
+
+.admin__advanced-summary--row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.admin__advanced--deliverables .admin__deliverables {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: none;
+}
+
 /* ─── Deliverables ─────────────────────────────────────────────────────── */
 .admin__deliverables {
   margin-top: 2rem;
