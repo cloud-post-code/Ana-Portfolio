@@ -7,13 +7,13 @@
 }
 
 :root {
-  --admin-bg: #f8f7f4;
+  --admin-bg: #f8f8f6;
   --admin-sidebar: #1a1a1a;
-  --admin-sidebar-text: #e8e0d0;
-  --admin-accent: #dc4b74;
-  --admin-accent-hover: #c43d64;
+  --admin-sidebar-text: #dce0eb;
+  --admin-accent: #00167a;
+  --admin-accent-hover: #00124d;
   --admin-card-bg: #fff;
-  --admin-border: #e6e0d4;
+  --admin-border: #dfe2ea;
   --admin-text: #2d2d2d;
   --admin-text-muted: #6b6b6b;
   --admin-radius: 10px;
@@ -262,7 +262,7 @@ body.admin {
   height: 48px;
   border-radius: 8px;
   object-fit: contain;
-  background: #fdfaf0;
+  background: #f8f8f6;
   padding: 4px;
 }
 
@@ -385,7 +385,7 @@ body.admin {
   max-height: 80px;
   border-radius: 8px;
   object-fit: contain;
-  background: #fdfaf0;
+  background: #f8f8f6;
   padding: 4px;
 }
 
@@ -665,7 +665,7 @@ body.admin {
 .admin__jobs-search-input:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__jobs-search-count {
@@ -828,7 +828,7 @@ body.admin {
 .admin__job-hunter__search:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__job-hunter__textarea {
@@ -850,7 +850,7 @@ body.admin {
 .admin__job-hunter__textarea:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__job-hunter__hint {
@@ -1016,7 +1016,7 @@ body.admin {
 }
 
 .admin__jobs-table tbody tr:hover {
-  background: rgba(220, 75, 116, 0.04);
+  background: rgba(0, 22, 122, 0.04);
 }
 
 .admin__jobs-th-star {
@@ -1047,7 +1047,7 @@ body.admin {
 }
 
 .admin__job-star:hover {
-  background: rgba(220, 75, 116, 0.12);
+  background: rgba(0, 22, 122, 0.12);
   color: var(--admin-accent);
 }
 
@@ -1112,13 +1112,13 @@ body.admin {
 }
 
 .admin__job-status:hover {
-  border-color: rgba(220, 75, 116, 0.45);
+  border-color: rgba(0, 22, 122, 0.45);
 }
 
 .admin__job-status:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__jobs-details-cell {
@@ -1147,7 +1147,7 @@ body.admin {
 .admin__job-details:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__jobs-deadline-cell {
@@ -1172,7 +1172,7 @@ body.admin {
 .admin__job-deadline:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__jobs-yoe-cell {
@@ -1197,7 +1197,7 @@ body.admin {
 .admin__job-yoe:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__jobs-pri-cell {
@@ -1243,7 +1243,7 @@ body.admin {
 .admin__job-priority:focus {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 2px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 0 0 2px rgba(0, 22, 122, 0.2);
 }
 
 .admin__jobs-num {
@@ -1571,13 +1571,13 @@ label.admin__resume-dropzone {
 .admin__resume-dropzone:focus-visible {
   outline: none;
   border-color: var(--admin-accent);
-  box-shadow: 0 0 0 3px rgba(220, 75, 116, 0.15);
+  box-shadow: 0 0 0 3px rgba(0, 22, 122, 0.15);
 }
 
 .admin__resume-dropzone--active {
   border-color: var(--admin-accent);
   background: #fff;
-  box-shadow: 0 0 0 3px rgba(220, 75, 116, 0.12);
+  box-shadow: 0 0 0 3px rgba(0, 22, 122, 0.12);
 }
 
 .admin__resume-dropzone--has-file {
@@ -1785,7 +1785,7 @@ select.admin__resume-model-select {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(220, 75, 116, 0.35), transparent 55%),
+    radial-gradient(ellipse 80% 60% at 20% 0%, rgba(0, 22, 122, 0.35), transparent 55%),
     radial-gradient(ellipse 60% 50% at 100% 100%, rgba(232, 200, 160, 0.12), transparent 50%);
   pointer-events: none;
 }
@@ -1926,8 +1926,8 @@ select.admin__resume-model-select {
 }
 
 .admin-dash__pulse-icon--exp {
-  background: linear-gradient(135deg, rgba(220, 75, 116, 0.2), rgba(220, 75, 116, 0.05));
-  border: 1px solid rgba(220, 75, 116, 0.35);
+  background: linear-gradient(135deg, rgba(0, 22, 122, 0.2), rgba(0, 22, 122, 0.05));
+  border: 1px solid rgba(0, 22, 122, 0.35);
 }
 
 .admin-dash__pulse-icon--proj {
@@ -1958,7 +1958,7 @@ select.admin__resume-model-select {
   letter-spacing: 0.06em;
   padding: 0.1rem 0.35rem;
   border-radius: 4px;
-  background: rgba(220, 75, 116, 0.12);
+  background: rgba(0, 22, 122, 0.12);
   color: var(--admin-accent);
   vertical-align: middle;
 }
@@ -2038,7 +2038,7 @@ select.admin__resume-model-select {
 }
 
 .admin-dash__bar:nth-child(4) {
-  background: linear-gradient(180deg, #dc4b74 0%, #7c3050 100%);
+  background: linear-gradient(180deg, #00167a 0%, #0a1a4a 100%);
 }
 
 .admin-dash__bar:nth-child(5) {
@@ -2177,7 +2177,7 @@ select.admin__resume-model-select {
   width: 12rem;
   height: 12rem;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(220, 75, 116, 0.14), transparent 70%);
+  background: radial-gradient(circle, rgba(0, 22, 122, 0.14), transparent 70%);
   pointer-events: none;
 }
 

@@ -4,15 +4,15 @@
    ============================================ */
 
 :root {
-  --color-bg: #fdfaf0;
-  --color-accent: #dc4b74;
-  --color-accent-light: #f0799a;
+  --color-bg: #f8f8f6;
+  --color-accent: #00167a;
+  --color-accent-light: #3d5a9e;
   --color-dark: #1a1a1a;
   --color-dark-bg: #181218;
   --color-text: #2d2d2d;
   --color-text-muted: #6b6b6b;
-  --color-text-light: #e8e0d0;
-  --color-border: #e6e0d4;
+  --color-text-light: #dce0eb;
+  --color-border: #dfe2ea;
   --font-title: 'Anton', sans-serif;
   --font-body: 'DM Sans', sans-serif;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
@@ -132,7 +132,7 @@ a {
   background: transparent;
   color: var(--color-accent);
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(220, 75, 116, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 22, 122, 0.25);
 }
 
 .btn--outline {
@@ -145,7 +145,7 @@ a {
   background: var(--color-accent);
   color: #fff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(220, 75, 116, 0.25);
+  box-shadow: 0 8px 30px rgba(0, 22, 122, 0.25);
 }
 
 .btn--large {
@@ -191,10 +191,10 @@ a {
 }
 
 .nav--scrolled .nav__inner {
-  background: rgba(253, 250, 240, 0.86);
+  background: rgba(248, 248, 246, 0.86);
   backdrop-filter: blur(18px) saturate(1.15);
   -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  border-color: rgba(230, 224, 212, 0.95);
+  border-color: rgba(210, 214, 222, 0.95);
   box-shadow:
     0 10px 40px rgba(26, 26, 26, 0.07),
     0 1px 0 rgba(255, 255, 255, 0.75) inset;
@@ -215,8 +215,8 @@ a {
   min-height: 2.65rem;
   padding: 0 0.2rem;
   border-radius: 50%;
-  border: 2px solid rgba(230, 224, 212, 0.95);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95) 0%, rgba(253, 250, 240, 0.65) 100%);
+  border: 2px solid rgba(210, 214, 222, 0.95);
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 248, 246, 0.65) 100%);
   font-family: var(--font-title);
   font-size: 1.05rem;
   letter-spacing: 0.08em;
@@ -231,7 +231,7 @@ a {
 .nav__logo:hover .nav__logo-mark {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  box-shadow: 0 4px 18px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 4px 18px rgba(0, 22, 122, 0.2);
   transform: translateY(-1px);
 }
 
@@ -282,7 +282,7 @@ a {
   border-radius: 999px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  box-shadow: 0 2px 12px rgba(220, 75, 116, 0.25);
+  box-shadow: 0 2px 12px rgba(0, 22, 122, 0.25);
 }
 
 .nav__cta::after {
@@ -315,7 +315,7 @@ a {
 }
 
 .nav__toggle:hover {
-  border-color: rgba(220, 75, 116, 0.35);
+  border-color: rgba(0, 22, 122, 0.35);
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
 }
 
@@ -497,7 +497,7 @@ a {
   border-radius: var(--radius-lg);
   overflow: hidden;
   aspect-ratio: 4 / 5;
-  background: linear-gradient(135deg, var(--color-accent) 0%, #e87da0 100%);
+  background: linear-gradient(135deg, var(--color-accent) 0%, #3d5a9e 100%);
 }
 
 .about__image {
@@ -705,125 +705,6 @@ a {
 }
 
 /* ============================================
-   Experience
-   ============================================ */
-
-.experience__timeline {
-  position: relative;
-  padding-left: 3rem;
-}
-
-.experience__timeline::before {
-  content: '';
-  position: absolute;
-  left: 7px;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: linear-gradient(to bottom, var(--color-accent), var(--color-border));
-}
-
-.experience__item {
-  position: relative;
-  margin-bottom: 3rem;
-}
-
-.experience__item:last-child {
-  margin-bottom: 0;
-}
-
-.experience__marker {
-  position: absolute;
-  left: -3rem;
-  top: 0.5rem;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: var(--color-bg);
-  border: 3px solid var(--color-accent);
-  z-index: 1;
-}
-
-.experience__card {
-  padding: 2rem;
-  background: #fff;
-  border-radius: var(--radius);
-  border: 1px solid var(--color-border);
-}
-
-.experience__item:focus-visible .experience__card {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 3px;
-}
-
-.experience__type {
-  display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--color-accent);
-  background: rgba(220, 75, 116, 0.08);
-  padding: 0.3rem 0.8rem;
-  border-radius: 50px;
-  margin-bottom: 0.8rem;
-}
-
-.experience__role {
-  font-family: var(--font-title);
-  font-size: 1.4rem;
-  text-transform: uppercase;
-  margin-bottom: 0.3rem;
-}
-
-.experience__company {
-  font-weight: 500;
-  color: var(--color-text-muted);
-  margin-bottom: 0.3rem;
-}
-
-.experience__date {
-  font-size: 0.85rem;
-  color: var(--color-accent);
-  margin-bottom: 0.8rem;
-}
-
-.experience__desc {
-  font-size: 0.95rem;
-  color: var(--color-text-muted);
-  line-height: 1.7;
-}
-
-.experience__bullets {
-  list-style: none;
-  margin-top: 1rem;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.experience__bullets li {
-  position: relative;
-  padding-left: 1.2rem;
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-  line-height: 1.65;
-}
-
-.experience__bullets li::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0.55em;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--color-accent);
-  opacity: 0.6;
-}
-
-/* ============================================
    Work / Projects
    ============================================ */
 
@@ -914,27 +795,27 @@ a.work__card:focus-visible {
 }
 
 .work__card-image--1 {
-  background: linear-gradient(135deg, #dc4b74, #e87da0, #f4a5be);
+  background: linear-gradient(135deg, #00167a, #3d5a9e, #6b8cc9);
 }
 
 .work__card-image--2 {
-  background: linear-gradient(135deg, #1a1a1a, #3a2a30, #dc4b74);
+  background: linear-gradient(135deg, #1a1a1a, #2a3148, #00167a);
 }
 
 .work__card-image--3 {
-  background: linear-gradient(135deg, #e87da0, #dc4b74, #1a1a1a);
+  background: linear-gradient(135deg, #3d5a9e, #00167a, #1a1a1a);
 }
 
 .work__card-image--4 {
-  background: linear-gradient(135deg, #2a1f24, #4a3038, #dc4b74);
+  background: linear-gradient(135deg, #1e2436, #3d4558, #00167a);
 }
 
 .work__card-image--5 {
-  background: linear-gradient(135deg, #dc4b74, #2f2a3a, #6a5acd);
+  background: linear-gradient(135deg, #00167a, #2f2a3a, #6a5acd);
 }
 
 .work__card-image--6 {
-  background: linear-gradient(135deg, #0f172a, #dc4b74, #e87da0);
+  background: linear-gradient(135deg, #0f172a, #00167a, #3d5a9e);
 }
 
 .work__card-overlay {
@@ -972,7 +853,7 @@ a.work__card:focus-visible {
 
 .work__card-desc {
   font-size: 0.9rem;
-  color: rgba(232, 224, 208, 0.65);
+  color: rgba(200, 208, 218, 0.65);
   line-height: 1.7;
   margin-bottom: 1.2rem;
 }
@@ -989,7 +870,7 @@ a.work__card:focus-visible {
   padding: 0.3rem 0.7rem;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 50px;
-  color: rgba(232, 224, 208, 0.6);
+  color: rgba(200, 208, 218, 0.6);
 }
 
 /* ============================================
@@ -1065,7 +946,7 @@ a.work__card:focus-visible {
 .marquee--inline {
   width: min(100%, 42rem);
   border-radius: 999px;
-  box-shadow: 0 8px 30px rgba(220, 75, 116, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 22, 122, 0.2);
   padding-left: 1rem;
   padding-right: 1rem;
 }
@@ -1132,7 +1013,6 @@ body.portfolio-hero-marquee-focus .hero__actions,
 body.portfolio-hero-marquee-focus #brands .brands__focus-main,
 body.portfolio-hero-marquee-focus #projects,
 body.portfolio-hero-marquee-focus #about,
-body.portfolio-hero-marquee-focus #experience,
 body.portfolio-hero-marquee-focus #strengths,
 body.portfolio-hero-marquee-focus #contact,
 body.portfolio-hero-marquee-focus .footer {
@@ -1193,13 +1073,13 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .footer__tagline {
   font-size: 0.85rem;
-  color: rgba(232, 224, 208, 0.5);
+  color: rgba(200, 208, 218, 0.5);
   margin-bottom: 1rem;
 }
 
 .footer__copy {
   font-size: 0.75rem;
-  color: rgba(232, 224, 208, 0.3);
+  color: rgba(200, 208, 218, 0.3);
 }
 
 /* ============================================
@@ -1320,18 +1200,6 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .hero__title-line:nth-child(2) .hero__title-inner { transition-delay: 0.35s; }
 
-/* ---- Timeline Draw Animation ---- */
-
-.experience__timeline::before {
-  transform: scaleY(0);
-  transform-origin: top;
-  transition: transform 1.5s var(--ease-out);
-}
-
-.experience__timeline.timeline-drawn::before {
-  transform: scaleY(1);
-}
-
 /* ---- Parallax Sections ---- */
 
 .parallax-layer {
@@ -1368,22 +1236,6 @@ body.portfolio-hero-marquee-focus #brands.section {
   100% { transform: scale(1) rotate(0deg); opacity: 1; }
 }
 
-/* ---- Experience Marker Pulse ---- */
-
-.experience__marker {
-  transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
-}
-
-.experience__item.reveal--visible .experience__marker {
-  animation: markerPulse 0.6s var(--ease-out) forwards;
-}
-
-@keyframes markerPulse {
-  0% { transform: scale(0); }
-  60% { transform: scale(1.4); }
-  100% { transform: scale(1); }
-}
-
 /* ---- Contact Glow ---- */
 
 .contact__content::after {
@@ -1393,7 +1245,7 @@ body.portfolio-hero-marquee-focus #brands.section {
   left: 50%;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, rgba(220,75,116,0.12) 0%, transparent 70%);
+  background: radial-gradient(circle, rgba(0,22,122,0.12) 0%, transparent 70%);
   border-radius: 50%;
   transform: translate(-50%, -50%) scale(0);
   transition: transform 1.2s var(--ease-out);
@@ -1466,10 +1318,10 @@ body.portfolio-hero-marquee-focus #brands.section {
   }
 
   .nav__inner {
-    background: rgba(253, 250, 240, 0.94);
+    background: rgba(248, 248, 246, 0.94);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
-    border-color: rgba(230, 224, 212, 0.92);
+    border-color: rgba(210, 214, 222, 0.92);
     box-shadow: 0 8px 28px rgba(26, 26, 26, 0.07);
   }
 
@@ -1483,7 +1335,7 @@ body.portfolio-hero-marquee-focus #brands.section {
     max-height: 100dvh;
     flex-direction: column;
     align-items: stretch;
-    background: linear-gradient(180deg, #fdfaf0 0%, #faf6ea 100%);
+    background: linear-gradient(180deg, #f8f8f6 0%, #eceef2 100%);
     padding: max(5rem, calc(3.5rem + env(safe-area-inset-top, 0px))) 1.75rem max(2rem, env(safe-area-inset-bottom, 0px));
     gap: 0.5rem;
     transform: translateX(100%);
@@ -1790,7 +1642,7 @@ body.portfolio-hero-marquee-focus #brands.section {
   gap: 0.25rem 0.85rem;
   margin: 0 0 1rem;
   padding: 0 0 0.85rem;
-  border-bottom: 1px solid rgba(230, 224, 212, 0.95);
+  border-bottom: 1px solid rgba(210, 214, 222, 0.95);
 }
 
 .detail__header-desc .detail__header-inline .detail__subtitle {
@@ -2011,7 +1863,7 @@ body.portfolio-hero-marquee-focus #brands.section {
   font-weight: 600;
   padding: 0.4rem 0.9rem;
   border-radius: 999px;
-  background: rgba(220, 75, 116, 0.1);
+  background: rgba(0, 22, 122, 0.1);
   color: var(--color-accent);
 }
 

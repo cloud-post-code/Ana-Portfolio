@@ -180,30 +180,6 @@
     });
   });
 
-  // ---- Experience Timeline Stagger ----
-  const experienceItems = document.querySelectorAll('.experience__item');
-  experienceItems.forEach((item, i) => {
-    item.style.transitionDelay = `${i * 0.15}s`;
-  });
-
-  // ---- Timeline Draw Animation ----
-  const timeline = document.querySelector('.experience__timeline');
-
-  if (timeline) {
-    const timelineObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            timeline.classList.add('timeline-drawn');
-            timelineObserver.unobserve(timeline);
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-    timelineObserver.observe(timeline);
-  }
-
   // ---- Contact Glow Effect ----
   const contactContent = document.querySelector('.contact__content');
 

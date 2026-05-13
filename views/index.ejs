@@ -15,10 +15,10 @@
         <span class="hero__title-line"><span class="hero__title-inner">Ana</span></span>
         <span class="hero__title-line hero__title-line--accent"><span class="hero__title-inner">Machuca</span></span>
       </h1>
-      <p class="hero__tagline reveal-blur">If you're hiring for marketing or brand roles,<br />here's how I combine strategy, creativity, and storytelling to drive <em>measurable</em> results—so you can decide if I'm the right fit.</p>
+      <p class="hero__tagline reveal-blur">Take a look around my marketing playground</p>
       <div class="hero__actions reveal-scale">
-        <a href="#contact" class="btn btn--primary">Contact me about a role</a>
-        <a href="#brands" class="btn btn--outline">Review experience &amp; work</a>
+        <a href="#contact" class="btn btn--primary">Contact me</a>
+        <a href="#brands" class="btn btn--outline">View my work</a>
       </div>
     </div>
   </section>
@@ -153,33 +153,6 @@
     </div>
   </section>
 
-  <!-- Work Experience -->
-  <section class="experience section" id="experience" aria-label="Work experience — timeline">
-    <div class="container">
-      <p class="section__label reveal-blur">Work Experience</p>
-      <h2 class="section__title reveal-clip">Where I've <span class="highlight">grown.</span></h2>
-      <% if (!experiences.length) { %>
-      <p class="portfolio-empty">Add roles in the admin dashboard to build this timeline.</p>
-      <% } else { %>
-      <div class="experience__timeline">
-        <% experiences.forEach(function(exp) { %>
-        <a href="/experience/<%= exp.slug %>" class="experience__item reveal-right" data-site-search="<%= encodeURIComponent([exp.title, exp.role, exp.type, exp.company, exp.description, (exp.skills || []).join(' ')].filter(Boolean).join(' ')) %>">
-          <div class="experience__marker"></div>
-          <div class="experience__card">
-            <span class="experience__type"><%= exp.type %></span>
-            <h3 class="experience__role"><%= exp.role || exp.title %></h3>
-            <p class="experience__company"><%= exp.company %></p>
-            <% if (exp.dateRange) { %><p class="experience__date"><%= exp.dateRange %></p><% } %>
-            <p class="experience__desc"><%= exp.description %></p>
-            <span class="experience__cta">View details</span>
-          </div>
-        </a>
-        <% }); %>
-      </div>
-      <% } %>
-    </div>
-  </section>
-
   <!-- Strengths -->
   <section class="strengths section" id="strengths">
     <div class="container">
@@ -250,7 +223,7 @@
           </a>
           <% } %>
           <% } %>
-          <a href="mailto:ana.machuca@email.com" class="btn btn--primary btn--large">
+          <a href="mailto:ana.machuca.agon@gmail.com" class="btn btn--primary btn--large">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13L2 4"/></svg>
             Email about a role
           </a>
