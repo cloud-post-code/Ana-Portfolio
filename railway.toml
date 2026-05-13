@@ -6,8 +6,11 @@ builder = "DOCKERFILE"
 dockerfilePath = "Dockerfile"
 
 [deploy]
-# Sync data/experiences.json, data/projects.json, and other data/*.json into Postgres before the new release goes live.
-# Requires DATABASE_URL (Railway Postgres). Skips harmlessly if unset. Binary assets ship in the image; JSON only stores paths.
+# Bootstrap Postgres from data/*.json only when a collection or KV key is empty.
+# Admin edits made via /admin live in Postgres and survive deploys because the
+# seed will see existing rows and log "preserving DB" instead of overwriting.
+# Set SEED_FORCE=1 in the service env to overwrite from JSON for a deliberate reset.
+# Requires DATABASE_URL (Railway Postgres). Skips harmlessly if unset.
 # One array element only (Railway schema); full command as a single string.
 preDeployCommand = ["npm run db:seed"]
 startCommand = "npm start"

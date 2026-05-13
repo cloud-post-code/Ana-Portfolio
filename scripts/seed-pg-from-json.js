@@ -1,11 +1,24 @@
 #!/usr/bin/env node
 /**
- * Import committed JSON from data/ (and public/resume.md) into PostgreSQL.
- * Used on Railway (pre-deploy) so portfolio + resume metadata match the repo.
- * Image binary assets (e.g. /assets, /logos) come from the container; paths in JSON must match.
+ * Bootstrap PostgreSQL from committed JSON when (and only when) a collection
+ * or key is empty. The live admin UI is the source of truth for production
+ * content; this script only fills in blanks on a fresh database so the site
+ * is not empty after a cold start.
+ *
+ * Default behaviour (preserves admin edits across deploys):
+ *   - portfolio_items: skip a collection if any rows already exist.
+ *   - app_kv:          skip a key if a row already exists.
+ *   - public/resume.md: imported only if resume_markdown KV row is absent.
  *
  * Run: npm run db:seed
- * Optional: SKIP_DB_SEED=1 to no-op; without DATABASE_URL, exits 0 and skips.
+ *
+ * Env flags:
+ *   SKIP_DB_SEED=1  → no-op (used to bypass entirely).
+ *   SEED_FORCE=1    → restore the original destructive behaviour: overwrite
+ *                     every collection and KV key from the JSON files. Use
+ *                     only for deliberate resets, never in routine deploys.
+ *
+ * Without DATABASE_URL the script exits 0 (app falls back to data/*.json).
  */
 
 const fs = require('fs');
@@ -44,26 +57,45 @@ async function main() {
   await require('../lib/db').initDb();
   const cms = require('../lib/cms-store');
 
-  const ex = read('experiences.json');
-  if (Array.isArray(ex) && ex.length) {
-    await cms.savePortfolio('experiences', ex);
-    console.log('Imported experiences:', ex.length);
-  } else {
-    console.log('[seed] No experiences.json or empty array — not writing experiences collection.');
+  const force = process.env.SEED_FORCE === '1';
+  if (force) {
+    console.log('[seed] SEED_FORCE=1 → overwriting every collection and KV key from JSON. Admin edits in Postgres will be lost.');
   }
 
-  const pr = read('projects.json');
-  if (Array.isArray(pr) && pr.length) {
-    await cms.savePortfolio('projects', pr);
-    console.log('Imported projects:', pr.length);
-  } else {
-    console.log('[seed] No projects.json or empty array — not writing projects collection.');
+  async function seedCollection(name, file) {
+    const items = read(file);
+    if (!Array.isArray(items) || !items.length) {
+      console.log('[seed] No', file, 'or empty array — skipping', name + '.');
+      return;
+    }
+    const existing = await cms.countPortfolio(name);
+    if (existing > 0 && !force) {
+      console.log('[seed]', name, 'already populated (' + existing + ' rows) — preserving DB.');
+      return;
+    }
+    await cms.savePortfolio(name, items);
+    console.log('[seed] Imported', name + ':', items.length, force ? '(forced overwrite)' : '(fresh bootstrap)');
+  }
+
+  await seedCollection('experiences', 'experiences.json');
+  await seedCollection('projects', 'projects.json');
+
+  async function seedKv(key, value, label) {
+    if (value == null) return;
+    if (await cms.hasKv(key)) {
+      if (!force) {
+        console.log('[seed]', key, 'already present in app_kv — preserving DB.');
+        return;
+      }
+      console.log('[seed] Overwriting', key, '(SEED_FORCE=1)');
+    }
+    await cms.setKv(key, value);
+    console.log('[seed] Imported', label || key);
   }
 
   const resume = read('resume.json');
   if (resume && typeof resume === 'object') {
-    await cms.setKv('resume', resume);
-    console.log('Imported resume.json');
+    await seedKv('resume', resume, 'data/resume.json → resume');
   }
 
   for (const { file, key } of KV_FILES) {
@@ -73,18 +105,16 @@ async function main() {
       console.warn('[seed] Skip', file, '(expected a JSON object).');
       continue;
     }
-    await cms.setKv(key, data);
-    console.log('Imported data/' + file, '→', key);
+    await seedKv(key, data, 'data/' + file + ' → ' + key);
   }
 
   const resumeMdPath = path.join(ROOT, 'public', 'resume.md');
   if (fs.existsSync(resumeMdPath)) {
     const content = fs.readFileSync(resumeMdPath, 'utf8');
-    await cms.setKv('resume_markdown', { content });
-    console.log('Imported public/resume.md → resume_markdown');
+    await seedKv('resume_markdown', { content }, 'public/resume.md → resume_markdown');
   }
 
-  console.log('Done.');
+  console.log('[seed] Done.');
   process.exit(0);
 }
 
