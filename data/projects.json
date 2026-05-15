@@ -2,9 +2,7 @@
   {
     "id": "proj-hult",
     "logo": "logos/Hult.png?v=2",
-    "role": "",
     "slug": "hult",
-    "type": "",
     "order": 1,
     "title": "Hult",
     "skills": [
@@ -12,10 +10,7 @@
       "Graphic Design",
       "Social Media"
     ],
-    "company": "",
-    "dateRange": "",
     "description": "Academic project for Hult International Business School featuring branded graphics, social media content, and promotional materials.",
-    "headerStyle": "standard",
     "deliverables": [
       {
         "id": "hult-bah",
@@ -47,8 +42,7 @@
           }
         ],
         "title": "Boston Agent Hack",
-        "description": "Deliverables and documentation from the Boston Agent Hack.",
-        "galleryClass": ""
+        "description": "Deliverables and documentation from the Boston Agent Hack."
       },
       {
         "id": "hult-stickers",
@@ -60,8 +54,7 @@
           }
         ],
         "title": "Stickers",
-        "description": "Orientation stickers for Hult.",
-        "galleryClass": ""
+        "description": "Orientation stickers for Hult."
       },
       {
         "id": "hult-fliers",
@@ -88,18 +81,14 @@
           }
         ],
         "title": "Fliers",
-        "description": "Event and seasonal promotional fliers and print pieces.",
-        "galleryClass": ""
+        "description": "Event and seasonal promotional fliers and print pieces."
       }
-    ],
-    "sectionLabel": "Personal project"
+    ]
   },
   {
     "id": "proj-madamecurie",
     "logo": "assets/projects/madamecurie/logo.png",
-    "role": "",
     "slug": "madame-curie-school",
-    "type": "",
     "order": 2,
     "title": "Madame Curie School",
     "skills": [
@@ -107,12 +96,8 @@
       "Storytelling",
       "Brand Development"
     ],
-    "company": "",
-    "logoWide": true,
-    "dateRange": "",
     "tileClass": "brand-tile--wide-logo",
     "description": "A brand and marketing project centered on humanizing an educational institution through storytelling and visual identity.",
-    "headerStyle": "standard",
     "deliverables": [
       {
         "id": "madamecurie-docs",
@@ -154,18 +139,14 @@
           }
         ],
         "title": "Project Documentation",
-        "description": "Brand strategy and marketing documentation for Madame Curie School.",
-        "galleryClass": ""
+        "description": "Brand strategy and marketing documentation for Madame Curie School."
       }
-    ],
-    "sectionLabel": "Personal project"
+    ]
   },
   {
     "id": "proj-fletcher",
     "logo": "logos/Tufts_Fletcher_scSchool.png?v=2",
-    "role": "",
     "slug": "fletcher",
-    "type": "",
     "order": 3,
     "title": "The Fletcher School",
     "skills": [
@@ -173,17 +154,13 @@
       "Strategy",
       "Presentation"
     ],
-    "company": "",
-    "dateRange": "",
     "description": "MGA · Team 6 — coursework for The Fletcher School (Tufts University): a full written report and supporting slide deck developed with Team 6.",
-    "headerStyle": "standard",
     "deliverables": [
       {
         "id": "fletcher-report",
         "media": [],
         "title": "Report",
-        "description": "MGA Fletcher Report — Team 6 (full document, page by page).",
-        "galleryClass": ""
+        "description": "MGA Fletcher Report — Team 6 (full document, page by page)."
       },
       {
         "id": "fletcher-slides",
@@ -330,18 +307,15 @@
           }
         ],
         "title": "Presentation",
-        "description": "MGA Fletcher Slides — Team 6.",
-        "galleryClass": ""
+        "description": "MGA Fletcher Slides — Team 6."
       }
     ],
-    "sectionLabel": "Academic project"
+    "subtitle": "Academic project"
   },
   {
     "id": "proj-tufts",
     "logo": "logos/Tufts_Fletcher_scSchool.png?v=2",
-    "role": "",
     "slug": "tufts",
-    "type": "",
     "order": 4,
     "title": "Tufts",
     "hidden": true,
@@ -350,20 +324,13 @@
       "Research",
       "Creative Direction"
     ],
-    "company": "",
-    "dateRange": "",
     "description": "This academic brand project showcases strategic thinking and creative execution applied to a real institutional challenge. Deeper case materials, deliverables, and outcomes will be added here shortly.",
-    "headerStyle": "standard",
-    "deliverables": [],
-    "sectionLabel": "Personal project"
+    "deliverables": []
   },
   {
     "id": "proj-airbnb",
     "logo": "logos/Airbnb.png?v=2",
-    "meta": "Full case study coming soon",
-    "role": "",
     "slug": "airbnb",
-    "type": "",
     "order": 5,
     "title": "Airbnb",
     "hidden": true,
@@ -372,12 +339,8 @@
       "Consumer Insights",
       "Storytelling"
     ],
-    "company": "",
-    "subtitle": "Strategy project",
-    "dateRange": "",
+    "subtitle": "Strategy project — Full case study coming soon",
     "description": "A strategy-focused project exploring brand positioning, consumer insights, and campaign ideation for one of the world's most recognized platforms. Frameworks, visuals, and recommendations will be published here when finalized.",
-    "headerStyle": "card",
-    "deliverables": [],
-    "sectionLabel": "Personal project"
+    "deliverables": []
   }
 ]

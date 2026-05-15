@@ -4,7 +4,6 @@
     "logo": "logos/FarOut.png?v=2",
     "role": "Marketing Intern",
     "slug": "far-out-ice-cream",
-    "type": "Marketing Internship",
     "order": 1,
     "title": "Far Out Ice Cream",
     "skills": [
@@ -14,10 +13,8 @@
       "Short-form video",
       "Campaign analytics"
     ],
-    "company": "Far Out Ice Cream — Cambridge, MA",
     "dateRange": "November 2025 – Present",
     "description": "Drove foot traffic and local engagement through pop-up activations, social campaigns, and community outreach—enhancing brand presence in Cambridge.",
-    "headerStyle": "standard",
     "deliverables": [
       {
         "id": "farout-social",
@@ -40,7 +37,7 @@
         ],
         "title": "Social Media Content",
         "description": "Sample social media content created for Far Out Ice Cream.",
-        "galleryClass": "detail__gallery--farout-social"
+        "gridColumns": "3"
       },
       {
         "id": "farout-videos",
@@ -112,19 +109,16 @@
           }
         ],
         "title": "Social Media Video Proposals",
-        "description": "Short-form video content proposals for social media campaigns. Hover a tile to preview the video.",
-        "galleryClass": ""
+        "description": "Short-form video content proposals for social media campaigns. Hover a tile to preview the video."
       }
     ],
-    "sectionLabel": "Work experience"
+    "subtitle": "Marketing Internship — Far Out Ice Cream — Cambridge, MA"
   },
   {
     "id": "exp-mainstreet",
     "logo": "logos/Main St.png?v=2",
-    "meta": "Social Entrepreneurship Competition",
     "role": "Main Street",
     "slug": "main-street",
-    "type": "Experience",
     "order": 2,
     "title": "Main Street",
     "skills": [
@@ -132,11 +126,8 @@
       "Social Impact",
       "Pitch Deck"
     ],
-    "company": "Details coming soon",
-    "subtitle": "Hult Prize Pitch",
-    "dateRange": "",
+    "subtitle": "Hult Prize Pitch — Social Entrepreneurship Competition",
     "description": "Main Street Hult Prize pitch presentation - a comprehensive business plan and pitch deck for a social entrepreneurship initiative.",
-    "headerStyle": "card",
     "deliverables": [
       {
         "id": "mainst-slides",
@@ -513,10 +504,8 @@
           }
         ],
         "title": "Pitch Presentation",
-        "description": "Complete Hult Prize pitch deck.",
-        "galleryClass": ""
+        "description": "Complete Hult Prize pitch deck."
       }
-    ],
-    "sectionLabel": "Work Experience"
+    ]
   }
 ]

@@ -6,7 +6,9 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "db:seed": "node scripts/seed-pg-from-json.js"
+    "db:seed": "node scripts/seed-pg-from-json.js",
+    "migrate:portfolio": "node scripts/migrate-portfolio-schema.js",
+    "migrate:portfolio:db": "node scripts/migrate-portfolio-schema.js --database"
   },
   "engines": {
     "node": ">=18"
