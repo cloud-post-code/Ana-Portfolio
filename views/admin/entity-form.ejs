@@ -1,16 +1,8 @@
 <%
-var defaultSectionLabel = entity === 'experiences' ? 'Work experience' : 'Personal project';
 var openAdvanced = false;
 if (!isNew && item) {
-  var sl = String(item.sectionLabel || '').trim();
   openAdvanced = (
-    (sl && sl !== defaultSectionLabel) ||
-    (item.headerStyle && item.headerStyle !== 'standard') ||
-    String(item.subtitle || '').trim() !== '' ||
-    String(item.meta || '').trim() !== '' ||
-    (entity === 'experiences' && (String(item.type || '').trim() !== '' || String(item.company || '').trim() !== '')) ||
     (entity === 'projects' && String(item.tileClass || '').trim() !== '') ||
-    !!item.logoWide ||
     !!item.hidden
   );
 }
@@ -28,6 +20,11 @@ var adminTitle = isNew
     <div class="admin__form-group admin__form-group--full">
       <label>Title</label>
       <input type="text" name="title" value="<%= isNew ? '' : item.title %>" required />
+    </div>
+
+    <div class="admin__form-group admin__form-group--full">
+      <label>Subtitle</label>
+      <input type="text" name="subtitle" value="<%= isNew ? '' : (item.subtitle || '') %>" placeholder="e.g. Marketing Lead for E-commerce Platform Start Up" />
     </div>
 
     <div class="admin__form-group admin__form-group--full">
@@ -69,45 +66,12 @@ var adminTitle = isNew
     <summary>More options</summary>
     <div class="admin__advanced-body">
       <div class="admin__form-grid">
-        <div class="admin__form-group">
-          <label>Section Label</label>
-          <input type="text" name="sectionLabel" value="<%= isNew ? defaultSectionLabel : item.sectionLabel %>" placeholder="<%= defaultSectionLabel %>" />
-        </div>
-
-        <div class="admin__form-group">
-          <label>Header Style</label>
-          <select name="headerStyle">
-            <option value="standard" <%= !isNew && item.headerStyle === 'standard' ? 'selected' : '' %>>Standard (logo + title)</option>
-            <option value="card" <%= !isNew && item.headerStyle === 'card' ? 'selected' : '' %>>Card (tile + description)</option>
-          </select>
-        </div>
-
-        <% if (entity === 'experiences') { %>
-        <div class="admin__form-group">
-          <label>Type</label>
-          <input type="text" name="type" value="<%= isNew ? '' : item.type %>" placeholder="e.g. Marketing Internship" />
-        </div>
-
-        <div class="admin__form-group">
-          <label>Company &amp; Location</label>
-          <input type="text" name="company" value="<%= isNew ? '' : item.company %>" placeholder="e.g. Company — City, ST" />
-        </div>
-        <% } else { %>
+        <% if (entity === 'projects') { %>
         <div class="admin__form-group admin__form-group--full">
           <label>Tile CSS Class (optional)</label>
           <input type="text" name="tileClass" value="<%= isNew ? '' : (item.tileClass || '') %>" placeholder="e.g. brand-tile--wide-logo" />
         </div>
         <% } %>
-
-        <div class="admin__form-group">
-          <label>Subtitle (card style only)</label>
-          <input type="text" name="subtitle" value="<%= isNew ? '' : (item.subtitle || '') %>" placeholder="e.g. Strategy project" />
-        </div>
-
-        <div class="admin__form-group">
-          <label>Meta Text (card style only)</label>
-          <input type="text" name="meta" value="<%= isNew ? '' : (item.meta || '') %>" placeholder="e.g. Full case study coming soon" />
-        </div>
 
         <div class="admin__form-group">
           <label>Display Order</label>
@@ -116,10 +80,6 @@ var adminTitle = isNew
 
         <div class="admin__form-group admin__form-group--check">
           <label><input type="checkbox" name="hidden" <%= !isNew && item.hidden ? 'checked' : '' %> /> Hidden from public site</label>
-        </div>
-
-        <div class="admin__form-group admin__form-group--check">
-          <label><input type="checkbox" name="logoWide" <%= !isNew && item.logoWide ? 'checked' : '' %> /> Wide logo</label>
         </div>
       </div>
     </div>
@@ -133,6 +93,14 @@ var adminTitle = isNew
     <section class="admin__deliverables">
       <div id="deliverablesList">
         <% if (!isNew && item.deliverables) { item.deliverables.forEach(function(del, dIdx) { %>
+        <%
+          var delCols = del.gridColumns;
+          if (delCols == null || delCols === '') {
+            if (del.galleryClass && String(del.galleryClass).indexOf('farout-social') >= 0) delCols = '3';
+            else delCols = '';
+          }
+          delCols = String(delCols);
+        %>
         <div class="admin__deliverable" data-del-id="<%= del.id %>">
           <div class="admin__deliverable-header">
             <span class="admin__deliverable-drag" title="Drag to reorder">&#9776;</span>
@@ -145,12 +113,22 @@ var adminTitle = isNew
               <input type="text" name="del_title" value="<%= del.title %>" />
             </div>
             <div class="admin__form-group admin__form-group--full">
+              <label>Subtitle</label>
+              <input type="text" name="del_subtitle" value="<%= del.subtitle || '' %>" placeholder="Optional line under the section title" />
+            </div>
+            <div class="admin__form-group admin__form-group--full">
               <label>Description</label>
               <textarea name="del_description" rows="2"><%= del.description %></textarea>
             </div>
             <div class="admin__form-group">
-              <label>Gallery CSS Class (optional)</label>
-              <input type="text" name="del_galleryClass" value="<%= del.galleryClass || '' %>" placeholder="e.g. detail__gallery--farout-social" />
+              <label>Grid columns</label>
+              <select name="del_gridColumns">
+                <option value="" <%= delCols === '' ? 'selected' : '' %>>Auto</option>
+                <option value="1" <%= delCols === '1' ? 'selected' : '' %>>1</option>
+                <option value="2" <%= delCols === '2' ? 'selected' : '' %>>2</option>
+                <option value="3" <%= delCols === '3' ? 'selected' : '' %>>3</option>
+                <option value="4" <%= delCols === '4' ? 'selected' : '' %>>4</option>
+              </select>
             </div>
           </div>
 

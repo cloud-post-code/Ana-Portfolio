@@ -66,7 +66,7 @@
           <% } else { %>
           <div class="brands__grid">
             <% experiences.forEach(function(exp) { %>
-            <a href="/experience/<%= exp.slug %>" class="brand-tile" data-site-search="<%= encodeURIComponent([exp.title, exp.role, exp.type, exp.company, exp.description].filter(Boolean).join(' ')) %>">
+            <a href="/experience/<%= exp.slug %>" class="brand-tile">
               <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
               <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
@@ -90,7 +90,7 @@
           <% } else { %>
           <div class="brands__grid">
             <% visibleProjects.forEach(function(proj) { %>
-            <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>" data-site-search="<%= encodeURIComponent([proj.title, proj.sectionLabel, proj.role, proj.description, (proj.skills || []).join(' ')].filter(Boolean).join(' ')) %>">
+            <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>">
               <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
               <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>

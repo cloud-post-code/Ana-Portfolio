@@ -129,18 +129,12 @@ function crudRoutes(entityName, filename) {
         id: `${entityName.slice(0, 3)}-${uuidv4().slice(0, 8)}`,
         slug: slugify(req.body.title || 'untitled'),
         title: req.body.title || '',
-        sectionLabel: req.body.sectionLabel || (entityName === 'experiences' ? 'Work experience' : 'Personal project'),
-        type: req.body.type || '',
         role: req.body.role || '',
-        company: req.body.company || '',
         dateRange: req.body.dateRange || '',
         description: req.body.description || '',
         logo: req.body.logo || '',
         skills: req.body.skills || [],
         subtitle: req.body.subtitle || '',
-        meta: req.body.meta || '',
-        headerStyle: req.body.headerStyle || 'standard',
-        logoWide: req.body.logoWide || false,
         tileClass: req.body.tileClass || '',
         hidden: req.body.hidden || false,
         deliverables: req.body.deliverables || [],
@@ -208,8 +202,9 @@ function crudRoutes(entityName, filename) {
       const deliverable = {
         id: `del-${uuidv4().slice(0, 8)}`,
         title: req.body.title || '',
+        subtitle: req.body.subtitle || '',
         description: req.body.description || '',
-        galleryClass: req.body.galleryClass || '',
+        gridColumns: req.body.gridColumns != null ? String(req.body.gridColumns) : '',
         media: req.body.media || []
       };
 

@@ -6,74 +6,12 @@
 <% var nProj = projects.length; %>
 
 <div class="admin-dash">
-  <header class="admin-dash__hero" aria-labelledby="dash-hero-title">
-    <div class="admin-dash__hero-bg" aria-hidden="true"></div>
-    <div class="admin-dash__hero-inner">
-      <h2 id="dash-hero-title" class="admin-dash__hero-title">Shape the story visitors feel</h2>
-    </div>
-    <div class="admin-dash__hero-art" aria-hidden="true">
-      <span class="admin-dash__blob admin-dash__blob--a"></span>
-      <span class="admin-dash__blob admin-dash__blob--b"></span>
-      <span class="admin-dash__blob admin-dash__blob--c"></span>
-    </div>
-  </header>
-
   <div class="admin-dash__below">
-    <p class="admin-dash__eyebrow">Portfolio command center</p>
-    <p class="admin-dash__hero-lead">Curated highlights — open the drawers when you need the full library. Numbers in the pulse strip are illustrative mood checks, not analytics.</p>
     <div class="admin-dash__hero-cta">
       <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">New experience</a>
       <a href="/admin/projects/new" class="admin__btn admin__btn--outline">New project</a>
       <a href="/" class="admin__btn admin__btn--outline" target="_blank" rel="noopener">Live site</a>
     </div>
-
-    <section class="admin-dash__pulse" aria-label="Illustrative studio pulse">
-      <div class="admin-dash__pulse-card">
-        <span class="admin-dash__pulse-icon admin-dash__pulse-icon--exp" aria-hidden="true"></span>
-        <span class="admin-dash__pulse-value"><%= nExp %></span>
-        <span class="admin-dash__pulse-label">Experiences live</span>
-      </div>
-      <div class="admin-dash__pulse-card">
-        <span class="admin-dash__pulse-icon admin-dash__pulse-icon--proj" aria-hidden="true"></span>
-        <span class="admin-dash__pulse-value"><%= nProj %></span>
-        <span class="admin-dash__pulse-label">Project capsules</span>
-      </div>
-      <div class="admin-dash__pulse-card admin-dash__pulse-card--fake">
-        <span class="admin-dash__pulse-value">94%</span>
-        <span class="admin-dash__pulse-label">Narrative resonance <span class="admin-dash__fake-tag">demo</span></span>
-      </div>
-      <div class="admin-dash__pulse-card admin-dash__pulse-card--fake">
-        <span class="admin-dash__pulse-value">A−</span>
-        <span class="admin-dash__pulse-label">Visual rhythm grade <span class="admin-dash__fake-tag">demo</span></span>
-      </div>
-      <div class="admin-dash__pulse-card admin-dash__pulse-card--fake">
-        <span class="admin-dash__pulse-value">2h</span>
-        <span class="admin-dash__pulse-label">Since last “sync” <span class="admin-dash__fake-tag">demo</span></span>
-      </div>
-    </section>
-
-    <section class="admin-dash__chart-block" aria-label="Illustrative content mix">
-      <div class="admin-dash__chart-visual">
-        <h3 class="admin-dash__chart-title">Content mix <span class="admin-dash__fake-tag">visual only</span></h3>
-        <div class="admin-dash__chart" role="presentation">
-          <div class="admin-dash__bar" style="--h: 42%"></div>
-          <div class="admin-dash__bar" style="--h: 78%"></div>
-          <div class="admin-dash__bar" style="--h: 55%"></div>
-          <div class="admin-dash__bar" style="--h: 91%"></div>
-          <div class="admin-dash__bar" style="--h: 63%"></div>
-          <div class="admin-dash__bar" style="--h: 48%"></div>
-          <div class="admin-dash__bar" style="--h: 72%"></div>
-        </div>
-      </div>
-      <div class="admin-dash__chart-below">
-        <p class="admin-dash__chart-sub">Invented bars — vibes for the room, not your database.</p>
-        <div class="admin-dash__chart-legend">
-          <span><i class="admin-dash__swatch admin-dash__swatch--rose"></i> Story</span>
-          <span><i class="admin-dash__swatch admin-dash__swatch--ink"></i> Proof</span>
-          <span><i class="admin-dash__swatch admin-dash__swatch--sand"></i> Texture</span>
-        </div>
-      </div>
-    </section>
 
     <section class="admin-dash__spotlight admin-dash__spotlight--anchor" id="admin-work-experience">
       <div class="admin-dash__spotlight-head">

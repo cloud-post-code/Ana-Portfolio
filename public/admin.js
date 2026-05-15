@@ -200,12 +200,22 @@ function addDeliverable() {
           '<input type="text" name="del_title" value="" />' +
         '</div>' +
         '<div class="admin__form-group admin__form-group--full">' +
+          '<label>Subtitle</label>' +
+          '<input type="text" name="del_subtitle" value="" placeholder="Optional line under the section title" />' +
+        '</div>' +
+        '<div class="admin__form-group admin__form-group--full">' +
           '<label>Description</label>' +
           '<textarea name="del_description" rows="2"></textarea>' +
         '</div>' +
         '<div class="admin__form-group">' +
-          '<label>Gallery CSS Class (optional)</label>' +
-          '<input type="text" name="del_galleryClass" value="" />' +
+          '<label>Grid columns</label>' +
+          '<select name="del_gridColumns">' +
+            '<option value="" selected>Auto</option>' +
+            '<option value="1">1</option>' +
+            '<option value="2">2</option>' +
+            '<option value="3">3</option>' +
+            '<option value="4">4</option>' +
+          '</select>' +
         '</div>' +
       '</div>' +
       '<div class="admin__media-section">' +
@@ -258,19 +268,13 @@ if (form) {
 
     var payload = {
       title: getValue('title'),
-      sectionLabel: getValue('sectionLabel'),
-      headerStyle: getValue('headerStyle'),
-      type: getValue('type'),
       role: getValue('role'),
-      company: getValue('company'),
       dateRange: getValue('dateRange'),
       description: getValue('description'),
       logo: getValue('logo'),
       subtitle: getValue('subtitle'),
-      meta: getValue('meta'),
       tileClass: getValue('tileClass'),
       hidden: getValue('hidden'),
-      logoWide: getValue('logoWide'),
       order: parseInt(getValue('order'), 10) || 1,
       skills: getValue('skills')
         .split(',')
@@ -308,11 +312,14 @@ function collectDeliverables() {
   var blocks = document.querySelectorAll('.admin__deliverable');
 
   blocks.forEach(function (block) {
+    var subEl = block.querySelector('[name="del_subtitle"]');
+    var colsEl = block.querySelector('[name="del_gridColumns"]');
     var del = {
       id: block.dataset.delId || '',
       title: block.querySelector('[name="del_title"]').value,
+      subtitle: subEl ? subEl.value : '',
       description: block.querySelector('[name="del_description"]').value,
-      galleryClass: block.querySelector('[name="del_galleryClass"]').value,
+      gridColumns: colsEl ? colsEl.value : '',
       media: []
     };
 
