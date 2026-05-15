@@ -44,11 +44,6 @@ var adminTitle = isNew
       <% } %>
     </div>
 
-    <div class="admin__form-group admin__form-group--full">
-      <label>Skills (comma-separated)</label>
-      <input type="text" name="skills" value="<%= isNew ? '' : (item.skills || []).join(', ') %>" placeholder="Skill 1, Skill 2, Skill 3" />
-    </div>
-
     <% if (entity === 'experiences') { %>
     <div class="admin__form-group admin__form-group--full">
       <label>Role / Job Title</label>

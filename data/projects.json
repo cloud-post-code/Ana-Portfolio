@@ -5,11 +5,7 @@
     "slug": "hult",
     "order": 1,
     "title": "Hult",
-    "skills": [
-      "Brand Strategy",
-      "Graphic Design",
-      "Social Media"
-    ],
+    "skills": [],
     "description": "Academic project for Hult International Business School featuring branded graphics, social media content, and promotional materials.",
     "deliverables": [
       {
@@ -91,11 +87,7 @@
     "slug": "madame-curie-school",
     "order": 2,
     "title": "Madame Curie School",
-    "skills": [
-      "Visual Identity",
-      "Storytelling",
-      "Brand Development"
-    ],
+    "skills": [],
     "tileClass": "brand-tile--wide-logo",
     "description": "A brand and marketing project centered on humanizing an educational institution through storytelling and visual identity.",
     "deliverables": [
@@ -149,11 +141,7 @@
     "slug": "fletcher",
     "order": 3,
     "title": "The Fletcher School",
-    "skills": [
-      "Research",
-      "Strategy",
-      "Presentation"
-    ],
+    "skills": [],
     "description": "MGA · Team 6 — coursework for The Fletcher School (Tufts University): a full written report and supporting slide deck developed with Team 6.",
     "deliverables": [
       {
@@ -319,11 +307,7 @@
     "order": 4,
     "title": "Tufts",
     "hidden": true,
-    "skills": [
-      "Brand Strategy",
-      "Research",
-      "Creative Direction"
-    ],
+    "skills": [],
     "description": "This academic brand project showcases strategic thinking and creative execution applied to a real institutional challenge. Deeper case materials, deliverables, and outcomes will be added here shortly.",
     "deliverables": []
   },
@@ -334,11 +318,7 @@
     "order": 5,
     "title": "Airbnb",
     "hidden": true,
-    "skills": [
-      "Campaign Ideation",
-      "Consumer Insights",
-      "Storytelling"
-    ],
+    "skills": [],
     "subtitle": "Strategy project — Full case study coming soon",
     "description": "A strategy-focused project exploring brand positioning, consumer insights, and campaign ideation for one of the world's most recognized platforms. Frameworks, visuals, and recommendations will be published here when finalized.",
     "deliverables": []

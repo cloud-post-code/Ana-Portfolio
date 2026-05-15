@@ -326,19 +326,140 @@
       wrap.addEventListener('mouseleave', reset);
       wrap.addEventListener('focusin', tryPlay);
       wrap.addEventListener('focusout', reset);
-    } else {
-      wrap.addEventListener('click', () => {
-        if (wrap.classList.contains('detail__video-hover--playing') && !video.paused) {
-          reset();
-        } else {
-          wrap.classList.add('detail__video-hover--playing');
-          tryPlay();
-        }
-      });
     }
 
     wrap.setAttribute('tabindex', '0');
   });
+
+  // ---- Detail page: fullscreen lightbox for gallery images & videos ----
+  const detailMain = document.querySelector('main.detail');
+  if (detailMain) {
+    function closeDetailLightbox() {
+      const root = document.getElementById('detailLightbox');
+      if (!root || root.hidden) return;
+      const frame = root.querySelector('.detail-lightbox__frame');
+      if (frame) {
+        frame.querySelectorAll('video').forEach((v) => {
+          try {
+            v.pause();
+          } catch {
+            /* ignore */
+          }
+        });
+        frame.innerHTML = '';
+      }
+      root.hidden = true;
+      document.body.classList.remove('detail-lightbox-open');
+    }
+
+    function ensureDetailLightbox() {
+      let root = document.getElementById('detailLightbox');
+      if (root) return root;
+      root = document.createElement('div');
+      root.id = 'detailLightbox';
+      root.className = 'detail-lightbox';
+      root.hidden = true;
+      root.setAttribute('role', 'dialog');
+      root.setAttribute('aria-modal', 'true');
+      root.setAttribute('aria-label', 'Fullscreen media');
+      root.innerHTML =
+        '<button type="button" class="detail-lightbox__close" aria-label="Close fullscreen">&times;</button>' +
+        '<div class="detail-lightbox__backdrop" aria-hidden="true"></div>' +
+        '<div class="detail-lightbox__stage"><div class="detail-lightbox__frame"></div></div>';
+      document.body.appendChild(root);
+      root.querySelector('.detail-lightbox__backdrop').addEventListener('click', closeDetailLightbox);
+      root.querySelector('.detail-lightbox__close').addEventListener('click', closeDetailLightbox);
+      return root;
+    }
+
+    document.addEventListener('keydown', (ev) => {
+      if (ev.key !== 'Escape') return;
+      const r = document.getElementById('detailLightbox');
+      if (r && !r.hidden) closeDetailLightbox();
+    });
+
+    function resolveVideoUrl(videoEl) {
+      try {
+        if (videoEl.currentSrc) return videoEl.currentSrc;
+      } catch {
+        /* ignore */
+      }
+      const s = videoEl.querySelector('source');
+      const raw = s ? s.getAttribute('src') : '';
+      if (!raw) return '';
+      try {
+        return new URL(raw, window.location.origin).href;
+      } catch {
+        return raw;
+      }
+    }
+
+    function openDetailLightboxFromEventTarget(target) {
+      const gallery = target.closest('.detail__gallery');
+      if (!gallery) return;
+      const img = target.closest('img');
+      const hoverWrap = target.closest('.detail__video-hover');
+      const still = target.closest('video.detail__slide-still');
+      if (!img && !hoverWrap && !still) return;
+
+      let node = null;
+      if (img && gallery.contains(img)) {
+        const i = document.createElement('img');
+        i.alt = img.getAttribute('alt') || '';
+        i.src = img.currentSrc || img.getAttribute('src') || '';
+        node = i;
+      } else if (hoverWrap && gallery.contains(hoverWrap)) {
+        const inner = hoverWrap.querySelector('video');
+        if (!inner) return;
+        const url = resolveVideoUrl(inner);
+        if (!url) return;
+        const v = document.createElement('video');
+        v.setAttribute('controls', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('loop', '');
+        v.src = url;
+        node = v;
+      } else if (still && gallery.contains(still)) {
+        const url = resolveVideoUrl(still);
+        if (!url) return;
+        const v = document.createElement('video');
+        v.setAttribute('controls', '');
+        v.setAttribute('playsinline', '');
+        v.src = url;
+        node = v;
+      }
+      if (!node) return;
+
+      videoHoverWraps.forEach((w) => {
+        const ve = w.querySelector('video');
+        if (ve) {
+          try {
+            ve.pause();
+          } catch {
+            /* ignore */
+          }
+        }
+      });
+
+      const root = ensureDetailLightbox();
+      const frame = root.querySelector('.detail-lightbox__frame');
+      frame.innerHTML = '';
+      frame.appendChild(node);
+      root.hidden = false;
+      document.body.classList.add('detail-lightbox-open');
+      if (node.tagName === 'VIDEO') {
+        node.play().catch(() => {});
+      }
+      const btn = root.querySelector('.detail-lightbox__close');
+      if (btn) btn.focus();
+    }
+
+    detailMain.addEventListener('click', (e) => {
+      const g = e.target.closest('.detail__gallery');
+      if (!g) return;
+      openDetailLightboxFromEventTarget(e.target);
+    });
+  }
 
   // ---- Homepage presentation mode (hero + skills strip only) ----
   const PORTFOLIO_FOCUS_KEY = 'portfolioHeroMarqueeFocus';

@@ -276,10 +276,7 @@ if (form) {
       tileClass: getValue('tileClass'),
       hidden: getValue('hidden'),
       order: parseInt(getValue('order'), 10) || 1,
-      skills: getValue('skills')
-        .split(',')
-        .map(function (s) { return s.trim(); })
-        .filter(Boolean),
+      skills: [],
       deliverables: collectDeliverables()
     };
 
