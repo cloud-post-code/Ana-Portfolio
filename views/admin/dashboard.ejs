@@ -32,12 +32,12 @@
       <div class="admin-dash__presentation-card admin__card admin-dash__hero-video-card">
         <h4 class="admin-dash__presentation-title">Hero background video</h4>
         <p class="admin-dash__presentation-lead admin__text-muted">
-          Full-screen loop behind the homepage name block. MP4, WebM, or MOV · max 50 MB. Without a video, the hero uses the default light background.
+          Full-screen loop behind the homepage name block. MP4, WebM, or MOV · max 50 MB. Without a video, the hero uses the default light background.<% if (typeof databaseEnabled !== 'undefined' && databaseEnabled) { %> Video is stored in PostgreSQL and persists across deploys.<% } %>
         </p>
-        <% var heroHasVideo = heroVideo && heroVideo.fileExists && heroVideo.path; %>
+        <% var heroHasVideo = heroVideo && heroVideo.fileExists; %>
         <% if (heroHasVideo) { %>
         <p class="admin__resume-meta" style="margin-bottom:0.75rem;">
-          <strong>Current:</strong> <%= heroVideo.originalFilename || heroVideo.path %>
+          <strong>Current:</strong> <%= heroVideo.originalFilename || heroVideo.serveUrl || 'Hero video' %>
           <% if (heroVideo.updatedAt) { %>
           <span class="admin__text-muted"> · Uploaded <%= new Date(heroVideo.updatedAt).toLocaleString() %></span>
           <% } %>

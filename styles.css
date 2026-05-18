@@ -476,18 +476,6 @@ a {
   object-position: center;
 }
 
-.hero__video-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(248, 248, 246, 0.82) 0%,
-    rgba(248, 248, 246, 0.58) 42%,
-    rgba(248, 248, 246, 0.75) 100%
-  );
-  pointer-events: none;
-}
-
 .hero--has-video .hero__tagline {
   color: var(--color-text);
 }

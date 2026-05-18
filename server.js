@@ -5,6 +5,7 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 const cms = require('./lib/cms-store');
+const { getHeroVideoForServe } = require('./lib/hero-video');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -22,6 +23,24 @@ app.get('/resume.md', async function (req, res, next) {
       return res.send(row.content);
     }
     return next();
+  } catch (e) {
+    next(e);
+  }
+});
+
+/** Hero background video from PostgreSQL when DATABASE_URL is set (survives Railway redeploys). */
+app.get('/hero-video/file', async function (req, res, next) {
+  try {
+    if (!cms.isDatabaseEnabled()) return next();
+    const blob = await getHeroVideoForServe();
+    if (!blob || !blob.data || !blob.data.length) return next();
+    res.set({
+      'Content-Type': blob.mimeType || 'video/mp4',
+      'Content-Length': blob.data.length,
+      'Cache-Control': 'public, max-age=86400',
+      'Accept-Ranges': 'bytes'
+    });
+    return res.send(blob.data);
   } catch (e) {
     next(e);
   }

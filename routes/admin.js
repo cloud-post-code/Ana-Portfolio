@@ -22,7 +22,8 @@ router.get('/', async function (req, res, next) {
       clientProjects,
       personalProjects,
       projectTypeLabel,
-      heroVideo
+      heroVideo,
+      databaseEnabled: cms.isDatabaseEnabled()
     });
   } catch (e) {
     next(e);

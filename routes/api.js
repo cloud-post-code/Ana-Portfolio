@@ -29,7 +29,7 @@ const upload = multer({
 });
 
 const uploadHeroVideo = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname || '').toLowerCase();
@@ -112,7 +112,14 @@ router.post('/upload/multiple', upload.array('files', 20), (req, res) => {
   res.json(results);
 });
 
-const { HERO_VIDEO_KV, getHeroVideoMeta, unlinkHeroVideoFile } = require('../lib/hero-video');
+const {
+  HERO_VIDEO_KV,
+  getHeroVideoMeta,
+  guessVideoMime,
+  setHeroVideoBlob,
+  removePreviousHeroVideo,
+  writeHeroVideoToDisk
+} = require('../lib/hero-video');
 
 router.get('/hero-video', async function (req, res, next) {
   try {
@@ -124,19 +131,41 @@ router.get('/hero-video', async function (req, res, next) {
 
 router.post('/hero-video', uploadHeroVideo.single('video'), async function (req, res, next) {
   try {
-    if (!req.file) {
+    if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: 'Upload an MP4, WebM, or MOV file (max 50 MB).' });
     }
     const prev = await cms.getKv(HERO_VIDEO_KV);
-    if (prev && prev.path) unlinkHeroVideoFile(prev.path);
+    await removePreviousHeroVideo(prev);
 
-    const meta = {
-      path: `uploads/${req.file.filename}`,
-      originalFilename: req.file.originalname || req.file.filename,
-      updatedAt: new Date().toISOString()
-    };
+    const ext = path.extname(req.file.originalname || '').toLowerCase();
+    const mimeType = req.file.mimetype || guessVideoMime(ext);
+    const originalFilename = req.file.originalname || `hero${ext || '.mp4'}`;
+    const updatedAt = new Date().toISOString();
+
+    let meta;
+    if (cms.isDatabaseEnabled()) {
+      await setHeroVideoBlob(req.file.buffer, mimeType, originalFilename);
+      meta = {
+        storage: 'database',
+        path: null,
+        mimeType,
+        originalFilename,
+        updatedAt
+      };
+    } else {
+      const rel = writeHeroVideoToDisk(req.file.buffer, originalFilename);
+      meta = {
+        storage: 'disk',
+        path: rel,
+        mimeType,
+        originalFilename,
+        updatedAt
+      };
+    }
+
     await cms.setKv(HERO_VIDEO_KV, meta);
-    res.json({ ...meta, fileExists: true });
+    const out = await getHeroVideoMeta();
+    res.json(out);
   } catch (e) {
     next(e);
   }
@@ -145,9 +174,11 @@ router.post('/hero-video', uploadHeroVideo.single('video'), async function (req,
 router.delete('/hero-video', async function (req, res, next) {
   try {
     const prev = await cms.getKv(HERO_VIDEO_KV);
-    if (prev && prev.path) unlinkHeroVideoFile(prev.path);
+    await removePreviousHeroVideo(prev);
     await cms.setKv(HERO_VIDEO_KV, {
+      storage: null,
       path: null,
+      mimeType: null,
       originalFilename: null,
       updatedAt: null
     });
