@@ -2023,6 +2023,27 @@ select.admin__resume-model-select {
   padding: 1.25rem 1.35rem;
 }
 
+.admin-dash__hero-video-variant {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-dash__hero-video-variant:first-of-type {
+  margin-top: 0.75rem;
+  padding-top: 0;
+  border-top: none;
+}
+
+.admin-dash__hero-video-variant-title {
+  margin: 0 0 0.65rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+}
+
 .admin-dash__presentation-title {
   font-size: 1rem;
   font-weight: 700;

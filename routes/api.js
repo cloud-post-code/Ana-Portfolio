@@ -138,7 +138,9 @@ router.post('/hero-video', uploadHeroVideo.single('video'), async function (req,
     if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: 'Upload an MP4, WebM, or MOV file (max 50 MB).' });
     }
-    const variant = parseHeroVideoVariant(req.body && req.body.variant);
+    const variant = parseHeroVideoVariant(
+      (req.body && req.body.variant) || (req.query && req.query.variant)
+    );
     if (!variant) {
       return res.status(400).json({ error: 'variant must be desktop or mobile' });
     }

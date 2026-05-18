@@ -388,9 +388,10 @@ function isHeroVideoFile(file) {
   return /\.(mp4|webm|mov)$/.test(name) || (file.type && file.type.indexOf('video/') === 0);
 }
 
-function deleteHeroVideo() {
-  if (!confirm('Remove the hero background video from the server?')) return;
-  fetch('/api/hero-video', { method: 'DELETE' })
+function deleteHeroVideo(variant) {
+  var label = variant === 'mobile' ? 'mobile' : 'desktop';
+  if (!confirm('Remove the ' + label + ' hero video from the server?')) return;
+  fetch('/api/hero-video/' + encodeURIComponent(variant), { method: 'DELETE' })
     .then(function (res) {
       return res.json().then(function (j) {
         return { ok: res.ok, j: j };
@@ -398,7 +399,7 @@ function deleteHeroVideo() {
     })
     .then(function (o) {
       if (!o.ok) throw new Error((o.j && o.j.error) || 'Could not remove video');
-      showToast('Hero video removed', 'success');
+      showToast(label.charAt(0).toUpperCase() + label.slice(1) + ' hero video removed', 'success');
       setTimeout(function () {
         location.reload();
       }, 400);
@@ -408,13 +409,16 @@ function deleteHeroVideo() {
     });
 }
 
-function initHeroVideoUpload() {
-  var form = document.getElementById('heroVideoUploadForm');
-  var input = document.getElementById('heroVideoFile');
-  var submitBtn = document.getElementById('heroVideoSubmitBtn');
-  var fileNameEl = document.getElementById('heroVideoFileName');
-  var dropzone = document.getElementById('heroVideoDropzone');
-  if (!form || !input) return;
+function initHeroVideoUploadForm(form) {
+  var variant = form.getAttribute('data-hero-variant');
+  if (variant !== 'desktop' && variant !== 'mobile') return;
+
+  var suffix = variant === 'mobile' ? 'Mobile' : 'Desktop';
+  var input = document.getElementById('heroVideoFile' + suffix);
+  var submitBtn = document.getElementById('heroVideoSubmitBtn' + suffix);
+  var fileNameEl = document.getElementById('heroVideoFileName' + suffix);
+  var dropzone = document.getElementById('heroVideoDropzone' + suffix);
+  if (!input) return;
 
   function setFileNameLabel(file) {
     if (!fileNameEl) return;
@@ -487,6 +491,7 @@ function initHeroVideoUpload() {
       return;
     }
     var fd = new FormData();
+    fd.append('variant', variant);
     fd.append('video', f);
     if (submitBtn) submitBtn.disabled = true;
     fetch('/api/hero-video', { method: 'POST', body: fd })
@@ -497,7 +502,10 @@ function initHeroVideoUpload() {
       })
       .then(function (o) {
         if (!o.ok) throw new Error((o.j && o.j.error) || 'Upload failed');
-        showToast('Hero video saved. Refresh the homepage to preview.', 'success');
+        showToast(
+          (variant === 'mobile' ? 'Mobile' : 'Desktop') + ' hero video saved. Refresh the homepage.',
+          'success'
+        );
         setTimeout(function () {
           location.reload();
         }, 500);
@@ -509,6 +517,10 @@ function initHeroVideoUpload() {
         syncSubmit();
       });
   });
+}
+
+function initHeroVideoUpload() {
+  document.querySelectorAll('.admin-dash__hero-video-form').forEach(initHeroVideoUploadForm);
 }
 
 function initAdminPortfolioFocusToggle() {

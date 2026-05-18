@@ -1,16 +1,18 @@
 {
   "desktop": {
-    "storage": null,
-    "path": null,
-    "mimeType": null,
-    "originalFilename": null,
-    "updatedAt": null
+    "storage": "disk",
+    "path": "uploads/1779137789020-hero-desktop.mp4",
+    "mimeType": "application/octet-stream",
+    "originalFilename": "1.mp4",
+    "updatedAt": "2026-05-18T20:56:29.020Z"
   },
   "mobile": {
     "storage": null,
     "path": null,
     "mimeType": null,
     "originalFilename": null,
-    "updatedAt": null
+    "updatedAt": null,
+    "fileExists": false,
+    "serveUrl": null
   }
 }

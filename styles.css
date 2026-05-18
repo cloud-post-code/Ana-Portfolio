@@ -158,6 +158,8 @@ a {
    ============================================ */
 
 .nav {
+  --nav-bg-opacity: 0.78;
+  --nav-border-opacity: 0.55;
   position: fixed;
   top: 0;
   left: 0;
@@ -181,18 +183,21 @@ a {
   gap: 0.75rem 1rem;
   padding: 0.45rem 0.6rem 0.45rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid rgba(210, 214, 222, 0.95);
-  background: #fff;
+  border: 1px solid rgba(210, 214, 222, var(--nav-border-opacity));
+  background: rgba(255, 255, 255, var(--nav-bg-opacity));
+  -webkit-backdrop-filter: blur(16px) saturate(1.12);
+  backdrop-filter: blur(16px) saturate(1.12);
   box-shadow: 0 4px 24px rgba(26, 26, 26, 0.06);
   transition:
-    box-shadow 0.45s var(--ease-out),
-    border-color 0.45s var(--ease-out);
+    background 0.15s linear,
+    border-color 0.15s linear,
+    box-shadow 0.45s var(--ease-out);
 }
 
 .nav--scrolled .nav__inner {
   box-shadow:
-    0 10px 40px rgba(26, 26, 26, 0.08),
-    0 1px 0 rgba(255, 255, 255, 0.9) inset;
+    0 10px 40px rgba(26, 26, 26, 0.1),
+    0 1px 0 rgba(255, 255, 255, 0.85) inset;
 }
 
 .nav__logo {
@@ -210,8 +215,12 @@ a {
   min-height: 2.65rem;
   padding: 0 0.2rem;
   border-radius: 50%;
-  border: 2px solid rgba(210, 214, 222, 0.95);
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.95) 0%, rgba(248, 248, 246, 0.65) 100%);
+  border: 2px solid rgba(210, 214, 222, calc(var(--nav-border-opacity, 0.55) + 0.25));
+  background: linear-gradient(
+    165deg,
+    rgba(255, 255, 255, calc(var(--nav-bg-opacity, 0.78) + 0.12)) 0%,
+    rgba(248, 248, 246, calc(var(--nav-bg-opacity, 0.78) * 0.85)) 100%
+  );
   font-family: var(--font-title);
   font-size: 1.05rem;
   letter-spacing: 0.08em;
@@ -242,7 +251,8 @@ a {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--color-text);
+  color: var(--color-dark);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.65);
   transition: color 0.3s var(--ease-out);
   position: relative;
   white-space: nowrap;
@@ -277,7 +287,8 @@ a {
   border-radius: 999px;
   font-weight: 700;
   letter-spacing: 0.08em;
-  box-shadow: 0 2px 12px rgba(0, 22, 122, 0.25);
+  text-shadow: none;
+  box-shadow: 0 2px 12px rgba(0, 22, 122, 0.32);
 }
 
 .nav__cta::after {
@@ -469,6 +480,20 @@ a {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.hero__video--mobile {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .hero__video--desktop {
+    display: none;
+  }
+
+  .hero__video--mobile {
+    display: block;
+  }
 }
 
 .hero--has-video .hero__content {
@@ -902,6 +927,18 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .reveal-scale.reveal--visible {
   opacity: 1;
+  transform: scale(1);
+}
+
+/* Work Experiences: slower pop-in on scroll */
+#brands .reveal-scale {
+  transform: scale(0.88);
+  transition:
+    opacity 1.5s var(--ease-out),
+    transform 1.5s var(--ease-pop);
+}
+
+#brands .reveal-scale.reveal--visible {
   transform: scale(1);
 }
 

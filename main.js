@@ -43,7 +43,20 @@
 
   const handleNavScroll = () => {
     if (!nav) return;
-    nav.classList.toggle('nav--scrolled', window.scrollY > 60);
+    const scrollY = window.scrollY;
+    const scrolled = scrollY > 48;
+    nav.classList.toggle('nav--scrolled', scrolled);
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      nav.style.setProperty('--nav-bg-opacity', scrolled ? '0.96' : '0.88');
+      nav.style.setProperty('--nav-border-opacity', '0.9');
+      return;
+    }
+
+    const fadeEnd = 320;
+    const t = Math.min(1, Math.max(0, scrollY / fadeEnd));
+    nav.style.setProperty('--nav-bg-opacity', (0.74 + t * 0.22).toFixed(3));
+    nav.style.setProperty('--nav-border-opacity', (0.5 + t * 0.42).toFixed(3));
   };
 
   // ---- Hero Parallax Fade on Scroll ----
@@ -160,12 +173,11 @@
   window.addEventListener('load', alignToHash);
 
   // ---- Staggered Reveal for Grid Children ----
-  const staggerContainers = document.querySelectorAll('.brands__groups');
-
-  staggerContainers.forEach((container) => {
-    const children = container.querySelectorAll(revealSelectors);
-    children.forEach((child, i) => {
-      child.style.transitionDelay = `${i * 0.12}s`;
+  document.querySelectorAll('.brands__groups').forEach((container) => {
+    const isWorkExperiences = container.closest('#brands');
+    const step = isWorkExperiences ? 0.22 : 0.12;
+    container.querySelectorAll(revealSelectors).forEach((child, i) => {
+      child.style.transitionDelay = `${i * step}s`;
     });
   });
 

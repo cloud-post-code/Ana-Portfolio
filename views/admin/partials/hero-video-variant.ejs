@@ -1,0 +1,50 @@
+<%#
+  locals: variant ('desktop' | 'mobile'), label, meta
+%>
+<% var v = meta || {}; %>
+<% var hasVideo = v.fileExists; %>
+<% var suffix = variant === 'mobile' ? 'Mobile' : 'Desktop'; %>
+<div class="admin-dash__hero-video-variant">
+  <h5 class="admin-dash__hero-video-variant-title"><%= label %></h5>
+  <% if (hasVideo) { %>
+  <p class="admin__resume-meta" style="margin-bottom:0.5rem;">
+    <strong>Current:</strong> <%= v.originalFilename || v.serveUrl || 'Video' %>
+    <% if (v.updatedAt) { %>
+    <span class="admin__text-muted"> · <%= new Date(v.updatedAt).toLocaleString() %></span>
+    <% } %>
+  </p>
+  <div class="admin__resume-actions" style="margin-bottom:0.75rem;">
+    <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteHeroVideo('<%= variant %>')">Remove</button>
+    <% if (v.serveUrl) { %>
+    <a href="<%= v.serveUrl %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank" rel="noopener">Preview file</a>
+    <% } %>
+  </div>
+  <% } else { %>
+  <p class="admin__text-muted" style="margin-bottom:0.75rem;font-size:0.88rem;">No <%= variant %> video yet.</p>
+  <% } %>
+  <form class="admin__resume-form admin-dash__hero-video-form" id="heroVideoUploadForm<%= suffix %>" data-hero-variant="<%= variant %>" novalidate>
+    <p class="admin__resume-upload-meta">MP4, WebM, or MOV · max 50 MB</p>
+    <div class="admin__resume-upload-field">
+      <input
+        type="file"
+        id="heroVideoFile<%= suffix %>"
+        name="video"
+        accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+        class="admin__resume-file-input-native"
+        tabindex="-1"
+        aria-label="Choose <%= label %> hero video"
+      />
+      <label for="heroVideoFile<%= suffix %>" class="admin__resume-dropzone" id="heroVideoDropzone<%= suffix %>" tabindex="0">
+        <span class="admin__visually-hidden">Choose <%= label %> hero video</span>
+        <div class="admin__resume-dropzone__body">
+          <p class="admin__resume-dropzone__lead">Drop video here</p>
+          <p class="admin__resume-dropzone__or">or <span class="admin__resume-browse">click to browse</span></p>
+          <p class="admin__resume-file-name" id="heroVideoFileName<%= suffix %>"><span class="admin__resume-file-name__placeholder">No file selected</span></p>
+        </div>
+      </label>
+    </div>
+    <div class="admin__resume-upload-actions">
+      <button type="submit" class="admin__btn admin__btn--primary admin__btn--small" id="heroVideoSubmitBtn<%= suffix %>" disabled><%= hasVideo ? 'Replace' : 'Upload' %></button>
+    </div>
+  </form>
+</div>

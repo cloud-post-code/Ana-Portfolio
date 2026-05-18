@@ -32,48 +32,21 @@
       <div class="admin-dash__presentation-card admin__card admin-dash__hero-video-card">
         <h4 class="admin-dash__presentation-title">Hero background video</h4>
         <p class="admin-dash__presentation-lead admin__text-muted">
-          Full-screen loop behind the homepage name block. MP4, WebM, or MOV · max 50 MB. Without a video, the hero uses the default light background.<% if (typeof databaseEnabled !== 'undefined' && databaseEnabled) { %> Video is stored in PostgreSQL and persists across deploys.<% } %>
+          Upload separate loops for desktop (browser) and mobile. MP4, WebM, or MOV · max 50 MB each. If only one is uploaded, it is used on all screen sizes.<% if (typeof databaseEnabled !== 'undefined' && databaseEnabled) { %> Videos are stored in PostgreSQL and persist across deploys.<% } %>
         </p>
-        <% var heroHasVideo = heroVideo && heroVideo.fileExists; %>
-        <% if (heroHasVideo) { %>
-        <p class="admin__resume-meta" style="margin-bottom:0.75rem;">
-          <strong>Current:</strong> <%= heroVideo.originalFilename || heroVideo.serveUrl || 'Hero video' %>
-          <% if (heroVideo.updatedAt) { %>
-          <span class="admin__text-muted"> · Uploaded <%= new Date(heroVideo.updatedAt).toLocaleString() %></span>
-          <% } %>
-        </p>
-        <div class="admin__resume-actions" style="margin-bottom:1rem;">
-          <button type="button" class="admin__btn admin__btn--danger" onclick="deleteHeroVideo()">Remove video</button>
+        <p class="admin__resume-actions" style="margin-bottom:1rem;">
           <a href="/" class="admin__btn admin__btn--outline" target="_blank" rel="noopener">Preview homepage</a>
-        </div>
-        <% } else { %>
-        <p class="admin__text-muted" style="margin-bottom:1rem;font-size:0.88rem;">No hero video yet — upload one below.</p>
-        <% } %>
-        <form class="admin__resume-form" id="heroVideoUploadForm" novalidate>
-          <p class="admin__resume-upload-meta">MP4, WebM, or MOV · max 50 MB</p>
-          <div class="admin__resume-upload-field">
-            <input
-              type="file"
-              id="heroVideoFile"
-              name="video"
-              accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
-              class="admin__resume-file-input-native"
-              tabindex="-1"
-              aria-label="Choose hero background video"
-            />
-            <label for="heroVideoFile" class="admin__resume-dropzone" id="heroVideoDropzone" tabindex="0">
-              <span class="admin__visually-hidden">Choose hero background video</span>
-              <div class="admin__resume-dropzone__body">
-                <p class="admin__resume-dropzone__lead">Drop your video here</p>
-                <p class="admin__resume-dropzone__or">or <span class="admin__resume-browse">click to browse</span></p>
-                <p class="admin__resume-file-name" id="heroVideoFileName"><span class="admin__resume-file-name__placeholder">No file selected</span></p>
-              </div>
-            </label>
-          </div>
-          <div class="admin__resume-upload-actions">
-            <button type="submit" class="admin__btn admin__btn--primary" id="heroVideoSubmitBtn" disabled><%= heroHasVideo ? 'Upload & replace' : 'Upload video' %></button>
-          </div>
-        </form>
+        </p>
+        <%- include('partials/hero-video-variant', {
+          variant: 'desktop',
+          label: 'Desktop (browser)',
+          meta: heroVideo && heroVideo.desktop ? heroVideo.desktop : {}
+        }) %>
+        <%- include('partials/hero-video-variant', {
+          variant: 'mobile',
+          label: 'Mobile',
+          meta: heroVideo && heroVideo.mobile ? heroVideo.mobile : {}
+        }) %>
       </div>
 
       <div class="admin-dash__presentation-card admin__card">

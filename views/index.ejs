@@ -10,13 +10,25 @@
   <%- include('partials/nav') %>
 
   <!-- Hero -->
-  <% var heroVideoSrc = (typeof heroVideo !== 'undefined' && heroVideo && heroVideo.fileExists && heroVideo.serveUrl)
-    ? heroVideo.serveUrl
-    : ''; %>
-  <section class="hero<%= heroVideoSrc ? ' hero--has-video' : '' %>" id="hero">
-    <% if (heroVideoSrc) { %>
+  <%
+    var hv = (typeof heroVideo !== 'undefined' && heroVideo) ? heroVideo : {};
+    var hvDesktop = hv.desktop || {};
+    var hvMobile = hv.mobile || {};
+    var heroDesktopSrc = (hvDesktop.fileExists && hvDesktop.serveUrl) ? hvDesktop.serveUrl : '';
+    var heroMobileSrc = (hvMobile.fileExists && hvMobile.serveUrl) ? hvMobile.serveUrl : '';
+    var heroDesktopPlay = heroDesktopSrc || heroMobileSrc;
+    var heroMobilePlay = heroMobileSrc || heroDesktopSrc;
+    var heroHasVideo = !!(heroDesktopPlay || heroMobilePlay);
+  %>
+  <section class="hero<%= heroHasVideo ? ' hero--has-video' : '' %>" id="hero">
+    <% if (heroHasVideo) { %>
     <div class="hero__video-wrap" aria-hidden="true">
-      <video class="hero__video" src="<%= heroVideoSrc %>" autoplay muted loop playsinline></video>
+      <% if (heroDesktopPlay) { %>
+      <video class="hero__video hero__video--desktop" src="<%= heroDesktopPlay %>" autoplay muted loop playsinline></video>
+      <% } %>
+      <% if (heroMobilePlay) { %>
+      <video class="hero__video hero__video--mobile" src="<%= heroMobilePlay %>" autoplay muted loop playsinline></video>
+      <% } %>
     </div>
     <% } %>
     <div class="hero__content">
