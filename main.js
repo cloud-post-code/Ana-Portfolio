@@ -2,7 +2,7 @@
   'use strict';
 
   // ---- Scroll Reveal (all animation types) ----
-  const revealSelectors = '.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-rotate, .reveal-blur, .reveal-clip, .reveal-flip';
+  const revealSelectors = '.reveal, .reveal-left, .reveal-right, .reveal-scale, .reveal-blur, .reveal-clip';
   const revealElements = document.querySelectorAll(revealSelectors);
 
   const revealObserver = new IntersectionObserver(
@@ -48,7 +48,6 @@
 
   // ---- Hero Parallax Fade on Scroll ----
   const heroContent = document.querySelector('.hero__content');
-  const heroBgText = document.querySelector('.hero__bg-text');
   const heroSection = document.querySelector('.hero');
 
   const handleHeroParallax = () => {
@@ -56,18 +55,10 @@
     const scrollY = window.scrollY;
     const heroH = heroSection ? heroSection.offsetHeight : window.innerHeight;
 
-    if (scrollY < heroH) {
+    if (scrollY < heroH && heroContent) {
       const ratio = scrollY / heroH;
-
-      if (heroContent) {
-        heroContent.style.opacity = 1 - ratio * 1.5;
-        heroContent.style.transform = `translateY(${scrollY * 0.35}px)`;
-      }
-
-      if (heroBgText) {
-        heroBgText.style.transform = `translateX(${-scrollY * 0.2}px)`;
-        heroBgText.style.opacity = Math.max(0, 0.4 - ratio * 0.5);
-      }
+      heroContent.style.opacity = 1 - ratio * 1.5;
+      heroContent.style.transform = `translateY(${scrollY * 0.35}px)`;
     }
   };
 
@@ -169,9 +160,7 @@
   window.addEventListener('load', alignToHash);
 
   // ---- Staggered Reveal for Grid Children ----
-  const staggerContainers = document.querySelectorAll(
-    '.brands__groups, .work__grid, .strengths__grid'
-  );
+  const staggerContainers = document.querySelectorAll('.brands__groups');
 
   staggerContainers.forEach((container) => {
     const children = container.querySelectorAll(revealSelectors);
@@ -197,29 +186,6 @@
     );
     contactObserver.observe(contactContent);
   }
-
-  // ---- 3D Tilt on Project Cards ----
-  const workCards = document.querySelectorAll('.work__card');
-
-  workCards.forEach((card) => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      const centerX = rect.width / 2;
-      const centerY = rect.height / 2;
-      const rotateX = ((y - centerY) / centerY) * -8;
-      const rotateY = ((x - centerX) / centerX) * 8;
-
-      card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
-      card.classList.add('tilt-active');
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.transform = '';
-      card.classList.remove('tilt-active');
-    });
-  });
 
   // ---- Parallax Float on About Accent Shape ----
   const accentShape = document.querySelector('.about__accent-shape');
@@ -266,16 +232,6 @@
   );
 
   sections.forEach((section) => activeLinkObserver.observe(section));
-
-  // ---- Strength Icons: Stagger the Pop Animation ----
-  const strengthItems = document.querySelectorAll('.strengths__item');
-
-  strengthItems.forEach((item, i) => {
-    const icon = item.querySelector('.strengths__icon');
-    if (icon) {
-      icon.style.animationDelay = `${i * 0.12 + 0.3}s`;
-    }
-  });
 
   // ---- Far Out: still slides (first frame only) + hover-to-preview videos ----
   const slideStills = document.querySelectorAll('.detail__slide-still');
@@ -355,10 +311,6 @@
     if (heroContent) {
       heroContent.style.opacity = '';
       heroContent.style.transform = '';
-    }
-    if (heroBgText) {
-      heroBgText.style.transform = '';
-      heroBgText.style.opacity = '';
     }
   };
 
