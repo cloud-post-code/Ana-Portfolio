@@ -4,9 +4,7 @@
 <div class="brands__grid">
   <% projects.forEach(function(proj) { %>
   <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>">
-    <div class="brand-tile__logo-box">
-      <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
-    </div>
+    <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
     <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
     <span class="brand-tile__cta">VIEW DETAILS</span>
   </a>

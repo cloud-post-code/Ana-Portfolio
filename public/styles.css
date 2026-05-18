@@ -69,7 +69,7 @@ a {
 }
 
 .section {
-  padding: clamp(3.5rem, 8vw, 6rem) 0;
+  padding: clamp(1.75rem, 4vw, 3rem) 0;
 }
 
 .section--dark {
@@ -466,7 +466,14 @@ a {
   display: grid;
   grid-template-columns: 1fr 1.3fr;
   gap: clamp(3rem, 6vw, 6rem);
-  align-items: center;
+  align-items: start;
+}
+
+.about .section__label {
+  font-family: var(--font-title);
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  letter-spacing: 0.1em;
+  margin-bottom: 1.25rem;
 }
 
 .about__visual {
@@ -551,7 +558,7 @@ a {
 .brands__groups {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 /* Slightly tighter section padding for logo strip */
@@ -559,19 +566,19 @@ a {
 #client-projects.section,
 #personal-projects.section,
 #projects.section {
-  padding: clamp(2.25rem, 5vw, 3.75rem) 0;
+  padding: clamp(1.125rem, 2.5vw, 1.875rem) 0;
 }
 
 .brands__group-title {
   font-family: var(--font-title);
-  font-size: 1.1rem;
+  font-size: 3.3rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--color-text-muted);
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 2px solid var(--color-border);
-  max-width: 280px;
+  color: var(--color-accent);
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid var(--color-accent);
+  max-width: none;
 }
 
 .brands__grid {
@@ -605,8 +612,8 @@ a {
   justify-content: center;
   width: 100%;
   aspect-ratio: 2.35 / 1;
-  min-height: clamp(5.75rem, 17vw, 10.5rem);
-  padding: clamp(0.65rem, 1.75vw, 1.1rem) clamp(0.85rem, 2.25vw, 1.35rem);
+  min-height: clamp(17.25rem, 51vw, 31.5rem);
+  padding: clamp(1.95rem, 5.25vw, 3.3rem) clamp(2.55rem, 6.75vw, 4.05rem);
   background: #f7f7f5;
   border: 1px solid rgba(210, 214, 222, 0.85);
   border-radius: calc(var(--radius) * 0.65);
@@ -657,7 +664,31 @@ a {
 /* Extra-wide marks (Madame Curie, Fletcher, etc.) */
 .brand-tile--wide-logo .brand-tile__logo-box {
   aspect-ratio: 2.85 / 1;
-  min-height: clamp(5.25rem, 15vw, 9rem);
+  min-height: clamp(15.75rem, 45vw, 27rem);
+}
+
+/* Direct logo image on tile (no logo-box wrapper) */
+.brand-tile > img.brand-tile__logo {
+  flex: 1 1 auto;
+  display: block;
+  width: auto;
+  max-width: min(100%, 42rem);
+  max-height: 25.5rem;
+  min-height: 16.5rem;
+  height: auto;
+  margin: 0 auto;
+  border-radius: 0;
+  background: transparent;
+  border: none;
+  object-fit: contain;
+  object-position: center;
+}
+
+.brand-tile--wide-logo > img.brand-tile__logo {
+  max-height: 12.75rem;
+  width: auto;
+  max-width: min(100%, 45rem);
+  object-fit: contain;
 }
 
 [id^="work-"],
@@ -748,12 +779,12 @@ body.portfolio-hero-marquee-focus .footer {
 }
 
 body.portfolio-hero-marquee-focus #brands.section {
-  padding: clamp(0.65rem, 2vw, 1rem) 0;
+  padding: clamp(0.325rem, 1vw, 0.5rem) 0;
 }
 
 /* Tighter top padding on About when it follows the marquee */
 .marquee-strip + #about {
-  padding-top: clamp(3.5rem, 9vw, 7rem);
+  padding-top: clamp(1.75rem, 4.5vw, 3.5rem);
 }
 
 /* ============================================
@@ -966,7 +997,7 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 @media (max-width: 1024px) {
   .section {
-    padding: clamp(3rem, 7vw, 5rem) 0;
+    padding: clamp(1.5rem, 3.5vw, 2.5rem) 0;
   }
 }
 @media (max-width: 1024px) {
@@ -978,7 +1009,7 @@ body.portfolio-hero-marquee-focus #brands.section {
 @media (max-width: 768px) {
 
   .section {
-    padding: clamp(2.5rem, 7vw, 4rem) 0;
+    padding: clamp(1.25rem, 3.5vw, 2rem) 0;
   }
 
   .nav__toggle {
@@ -1075,14 +1106,14 @@ body.portfolio-hero-marquee-focus #brands.section {
   #client-projects.section,
   #personal-projects.section,
   #projects.section {
-    padding: clamp(1.75rem, 5vw, 3rem) 0;
+    padding: clamp(0.875rem, 2.5vw, 1.5rem) 0;
   }
 }
 
 @media (max-width: 480px) {
 
   .section {
-    padding: 2.25rem 0;
+    padding: 1.125rem 0;
   }
 
   .about__detail {

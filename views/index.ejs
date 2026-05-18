@@ -69,9 +69,7 @@
           <div class="brands__grid">
             <% experiences.forEach(function(exp) { %>
             <a href="/experience/<%= exp.slug %>" class="brand-tile">
-              <div class="brand-tile__logo-box">
-                <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
-              </div>
+              <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
               <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
             </a>
