@@ -59,7 +59,7 @@
             <p class="detail__deliverable-subtitle"><%= del.subtitle %></p>
             <% } %>
           </div>
-          <div class="detail__deliverable-layout">
+          <div class="detail__deliverable-layout<%= del.description ? ' detail__deliverable-layout--has-about' : '' %>">
             <% if (del.media && del.media.length > 0) { %>
             <%
               var cols = del.gridColumns;
@@ -87,11 +87,22 @@
               </div>
             </div>
             <% } %>
-            <div class="detail__deliverable-copy">
-              <% if (del.description) { %>
-              <p class="detail__deliverable-desc"><%= del.description %></p>
-              <% } %>
-            </div>
+            <% if (del.description) { %>
+            <aside class="detail__deliverable-about" aria-label="About this project">
+              <button
+                type="button"
+                class="detail__about-toggle"
+                aria-expanded="false"
+                aria-controls="about-<%= del.id %>"
+              >
+                <span class="detail__about-toggle-label">About The Project</span>
+                <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
+              </button>
+              <div id="about-<%= del.id %>" class="detail__deliverable-copy" hidden>
+                <p class="detail__deliverable-desc"><%= del.description %></p>
+              </div>
+            </aside>
+            <% } %>
           </div>
         </section>
         <% }); %>

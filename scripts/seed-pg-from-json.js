@@ -29,6 +29,7 @@ const dataDir = path.join(ROOT, 'data');
 
 /** @type { { file: string, key: string }[] } */
 const KV_FILES = [
+  { file: 'hero_video.json', key: 'hero_video' },
   { file: 'job-search-profile.json', key: 'job_search_profile' },
   { file: 'resume-notes.json', key: 'resume_notes' },
   { file: 'resume-profile-notes.json', key: 'resume_profile_notes' }

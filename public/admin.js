@@ -382,6 +382,135 @@ function initDragAndDrop() {
   });
 }
 
+function isHeroVideoFile(file) {
+  if (!file) return false;
+  var name = (file.name || '').toLowerCase();
+  return /\.(mp4|webm|mov)$/.test(name) || (file.type && file.type.indexOf('video/') === 0);
+}
+
+function deleteHeroVideo() {
+  if (!confirm('Remove the hero background video from the server?')) return;
+  fetch('/api/hero-video', { method: 'DELETE' })
+    .then(function (res) {
+      return res.json().then(function (j) {
+        return { ok: res.ok, j: j };
+      });
+    })
+    .then(function (o) {
+      if (!o.ok) throw new Error((o.j && o.j.error) || 'Could not remove video');
+      showToast('Hero video removed', 'success');
+      setTimeout(function () {
+        location.reload();
+      }, 400);
+    })
+    .catch(function (e) {
+      showToast(e.message || 'Could not remove video', 'error');
+    });
+}
+
+function initHeroVideoUpload() {
+  var form = document.getElementById('heroVideoUploadForm');
+  var input = document.getElementById('heroVideoFile');
+  var submitBtn = document.getElementById('heroVideoSubmitBtn');
+  var fileNameEl = document.getElementById('heroVideoFileName');
+  var dropzone = document.getElementById('heroVideoDropzone');
+  if (!form || !input) return;
+
+  function setFileNameLabel(file) {
+    if (!fileNameEl) return;
+    if (file) {
+      fileNameEl.textContent = file.name;
+    } else {
+      fileNameEl.innerHTML =
+        '<span class="admin__resume-file-name__placeholder">No file selected</span>';
+    }
+  }
+
+  function syncSubmit() {
+    if (submitBtn) submitBtn.disabled = !(input.files && input.files[0]);
+  }
+
+  input.addEventListener('change', function () {
+    setFileNameLabel(input.files && input.files[0]);
+    syncSubmit();
+  });
+
+  if (dropzone) {
+    dropzone.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        input.click();
+      }
+    });
+    ['dragenter', 'dragover'].forEach(function (ev) {
+      dropzone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.add('admin__resume-dropzone--active');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (ev) {
+      dropzone.addEventListener(ev, function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        dropzone.classList.remove('admin__resume-dropzone--active');
+      });
+    });
+    dropzone.addEventListener('drop', function (e) {
+      var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (!f) return;
+      if (!isHeroVideoFile(f)) {
+        showToast('Please choose an MP4, WebM, or MOV file.', 'error');
+        return;
+      }
+      try {
+        var dt = new DataTransfer();
+        dt.items.add(f);
+        input.files = dt.files;
+      } catch (err) {
+        return;
+      }
+      setFileNameLabel(f);
+      syncSubmit();
+    });
+  }
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var f = input.files && input.files[0];
+    if (!f) {
+      showToast('Choose a video file to upload.', 'error');
+      return;
+    }
+    if (!isHeroVideoFile(f)) {
+      showToast('Please choose an MP4, WebM, or MOV file.', 'error');
+      return;
+    }
+    var fd = new FormData();
+    fd.append('video', f);
+    if (submitBtn) submitBtn.disabled = true;
+    fetch('/api/hero-video', { method: 'POST', body: fd })
+      .then(function (res) {
+        return res.json().then(function (j) {
+          return { ok: res.ok, j: j };
+        });
+      })
+      .then(function (o) {
+        if (!o.ok) throw new Error((o.j && o.j.error) || 'Upload failed');
+        showToast('Hero video saved. Refresh the homepage to preview.', 'success');
+        setTimeout(function () {
+          location.reload();
+        }, 500);
+      })
+      .catch(function (err) {
+        showToast(err.message || 'Upload failed', 'error');
+      })
+      .finally(function () {
+        syncSubmit();
+      });
+  });
+}
+
 function initAdminPortfolioFocusToggle() {
   var el = document.getElementById('adminPortfolioFocusToggle');
   if (!el) return;
@@ -409,5 +538,6 @@ function initAdminPortfolioFocusToggle() {
 
 document.addEventListener('DOMContentLoaded', function () {
   initDragAndDrop();
+  initHeroVideoUpload();
   initAdminPortfolioFocusToggle();
 });

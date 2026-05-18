@@ -28,6 +28,18 @@ const upload = multer({
   }
 });
 
+const uploadHeroVideo = multer({
+  storage,
+  limits: { fileSize: 50 * 1024 * 1024 },
+  fileFilter: (req, file, cb) => {
+    const ext = path.extname(file.originalname || '').toLowerCase();
+    const mime = String(file.mimetype || '').toLowerCase();
+    const okExt = /\.(mp4|webm|mov)$/i.test(ext);
+    const okMime = mime.startsWith('video/');
+    cb(null, okExt || okMime);
+  }
+});
+
 const uploadResume = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 },
@@ -98,6 +110,51 @@ router.post('/upload/multiple', upload.array('files', 20), (req, res) => {
   if (!req.files || req.files.length === 0) return res.status(400).json({ error: 'No files uploaded' });
   const results = req.files.map(f => ({ path: `uploads/${f.filename}`, filename: f.filename }));
   res.json(results);
+});
+
+const { HERO_VIDEO_KV, getHeroVideoMeta, unlinkHeroVideoFile } = require('../lib/hero-video');
+
+router.get('/hero-video', async function (req, res, next) {
+  try {
+    res.json(await getHeroVideoMeta());
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.post('/hero-video', uploadHeroVideo.single('video'), async function (req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ error: 'Upload an MP4, WebM, or MOV file (max 50 MB).' });
+    }
+    const prev = await cms.getKv(HERO_VIDEO_KV);
+    if (prev && prev.path) unlinkHeroVideoFile(prev.path);
+
+    const meta = {
+      path: `uploads/${req.file.filename}`,
+      originalFilename: req.file.originalname || req.file.filename,
+      updatedAt: new Date().toISOString()
+    };
+    await cms.setKv(HERO_VIDEO_KV, meta);
+    res.json({ ...meta, fileExists: true });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.delete('/hero-video', async function (req, res, next) {
+  try {
+    const prev = await cms.getKv(HERO_VIDEO_KV);
+    if (prev && prev.path) unlinkHeroVideoFile(prev.path);
+    await cms.setKv(HERO_VIDEO_KV, {
+      path: null,
+      originalFilename: null,
+      updatedAt: null
+    });
+    res.json({ success: true });
+  } catch (e) {
+    next(e);
+  }
 });
 
 // ─── Generic CRUD factory ──────────────────────────────────────────────────

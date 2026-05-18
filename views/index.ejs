@@ -10,7 +10,16 @@
   <%- include('partials/nav') %>
 
   <!-- Hero -->
-  <section class="hero" id="hero">
+  <% var heroVideoSrc = (typeof heroVideo !== 'undefined' && heroVideo && heroVideo.fileExists && heroVideo.path)
+    ? ('/' + String(heroVideo.path).replace(/^\//, ''))
+    : ''; %>
+  <section class="hero<%= heroVideoSrc ? ' hero--has-video' : '' %>" id="hero">
+    <% if (heroVideoSrc) { %>
+    <div class="hero__video-wrap" aria-hidden="true">
+      <video class="hero__video" src="<%= heroVideoSrc %>" autoplay muted loop playsinline></video>
+      <span class="hero__video-overlay"></span>
+    </div>
+    <% } %>
     <div class="hero__content">
       <p class="hero__intro reveal-blur">Marketing Strategist &amp; Brand Storyteller</p>
       <h1 class="hero__title">

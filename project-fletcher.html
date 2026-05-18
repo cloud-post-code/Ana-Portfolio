@@ -20,9 +20,8 @@
       </button>
       <ul class="nav__links" id="navLinks">
         <li><a href="index.html#about">About</a></li>
-        <li><a href="index.html#brands">Work Experiences</a></li>
-        <li><a href="index.html#client-projects">Client Projects</a></li>
-        <li><a href="index.html#personal-projects">Personal Projects</a></li>
+        <li><a href="index.html#brands">Work Experience</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
         <li><a href="index.html#contact" class="nav__cta">Hire me</a></li>
       </ul>
     </div>
@@ -32,7 +31,7 @@
     <div class="container">
       <article>
         <header class="detail__header">
-          <a href="index.html#client-projects" class="detail__back">&larr; Back to portfolio</a>
+          <a href="index.html#projects" class="detail__back">&larr; Back to portfolio</a>
 
           <div class="detail__header-info reveal-blur">
             <h1 class="detail__title">The Fletcher School</h1>
@@ -58,13 +57,24 @@
             <h2 id="fletcher-report-heading" class="detail__deliverable-title">Report</h2>
             
           </div>
-          <div class="detail__deliverable-layout">
+          <div class="detail__deliverable-layout detail__deliverable-layout--has-about">
             
-            <div class="detail__deliverable-copy">
-              
-              <p class="detail__deliverable-desc">MGA Fletcher Report — Team 6 (full document, page by page).</p>
-              
-            </div>
+            
+            <aside class="detail__deliverable-about" aria-label="About this project">
+              <button
+                type="button"
+                class="detail__about-toggle"
+                aria-expanded="false"
+                aria-controls="about-fletcher-report"
+              >
+                <span class="detail__about-toggle-label">About The Project</span>
+                <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
+              </button>
+              <div id="about-fletcher-report" class="detail__deliverable-copy" hidden>
+                <p class="detail__deliverable-desc">MGA Fletcher Report — Team 6 (full document, page by page).</p>
+              </div>
+            </aside>
+            
           </div>
         </section>
         
@@ -73,7 +83,7 @@
             <h2 id="fletcher-slides-heading" class="detail__deliverable-title">Presentation</h2>
             
           </div>
-          <div class="detail__deliverable-layout">
+          <div class="detail__deliverable-layout detail__deliverable-layout--has-about">
             
             
             <div class="detail__deliverable-media">
@@ -194,11 +204,22 @@
               </div>
             </div>
             
-            <div class="detail__deliverable-copy">
-              
-              <p class="detail__deliverable-desc">MGA Fletcher Slides — Team 6.</p>
-              
-            </div>
+            
+            <aside class="detail__deliverable-about" aria-label="About this project">
+              <button
+                type="button"
+                class="detail__about-toggle"
+                aria-expanded="false"
+                aria-controls="about-fletcher-slides"
+              >
+                <span class="detail__about-toggle-label">About The Project</span>
+                <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
+              </button>
+              <div id="about-fletcher-slides" class="detail__deliverable-copy" hidden>
+                <p class="detail__deliverable-desc">MGA Fletcher Slides — Team 6.</p>
+              </div>
+            </aside>
+            
           </div>
         </section>
         

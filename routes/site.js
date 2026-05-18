@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
+const { getHeroVideoMeta } = require('../lib/hero-video');
 
 router.get('/', async function (req, res, next) {
   try {
@@ -29,7 +30,8 @@ router.get('/', async function (req, res, next) {
       if (hasMd) resume.path = '/resume.md';
       else resume.path = hasPdf ? '/resume.pdf' : '/resume.docx';
     }
-    res.render('index', { experiences, projects, resume, resumeFileExists });
+    const heroVideo = await getHeroVideoMeta();
+    res.render('index', { experiences, projects, resume, resumeFileExists, heroVideo });
   } catch (e) {
     next(e);
   }

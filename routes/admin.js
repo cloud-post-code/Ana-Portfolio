@@ -7,6 +7,7 @@ const { getProjectType, projectTypeLabel } = require('../lib/portfolio-helpers')
 const { getResumeTailorModelOptions, getResumeTailorDefaultSelection } = require('../lib/resume-tailor-models');
 const { getMaxResumePageLines, getMaxCoverLetterLines } = require('../lib/resume-line-budget');
 const { getProfileNotesCount } = require('../lib/resume-profile-notes');
+const { getHeroVideoMeta } = require('../lib/hero-video');
 
 router.get('/', async function (req, res, next) {
   try {
@@ -14,12 +15,14 @@ router.get('/', async function (req, res, next) {
     const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
     const clientProjects = projects.filter((p) => getProjectType(p) === 'client');
     const personalProjects = projects.filter((p) => getProjectType(p) === 'personal');
+    const heroVideo = await getHeroVideoMeta();
     res.render('admin/dashboard', {
       experiences,
       projects,
       clientProjects,
       personalProjects,
-      projectTypeLabel
+      projectTypeLabel,
+      heroVideo
     });
   } catch (e) {
     next(e);

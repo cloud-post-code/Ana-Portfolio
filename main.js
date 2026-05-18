@@ -417,6 +417,23 @@
     });
   }
 
+  // ---- Detail page: collapsible "About The Project" panel ----
+  document.querySelectorAll('.detail__about-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const layout = btn.closest('.detail__deliverable-layout');
+      const panel = layout && document.getElementById(btn.getAttribute('aria-controls') || '');
+      if (!layout || !panel) return;
+
+      const open = !layout.classList.contains('detail__deliverable-layout--about-open');
+      layout.classList.toggle('detail__deliverable-layout--about-open', open);
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+      panel.hidden = !open;
+
+      const icon = btn.querySelector('.detail__about-toggle-icon');
+      if (icon) icon.textContent = open ? '\u00d7' : '+';
+    });
+  });
+
   // ---- Homepage presentation mode (hero + skills strip only) ----
   const PORTFOLIO_FOCUS_KEY = 'portfolioHeroMarqueeFocus';
   const PORTFOLIO_FOCUS_CLASS = 'portfolio-hero-marquee-focus';

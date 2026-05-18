@@ -458,6 +458,50 @@ a {
   flex-wrap: wrap;
 }
 
+.hero--has-video {
+  background: #0a0a12;
+}
+
+.hero__video-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.hero__video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero__video-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(248, 248, 246, 0.82) 0%,
+    rgba(248, 248, 246, 0.58) 42%,
+    rgba(248, 248, 246, 0.75) 100%
+  );
+  pointer-events: none;
+}
+
+.hero--has-video .hero__tagline {
+  color: var(--color-text);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__video {
+    display: none;
+  }
+
+  .hero--has-video {
+    background: var(--color-bg);
+  }
+}
+
 /* ============================================
    About
    ============================================ */
@@ -471,9 +515,9 @@ a {
 
 .about .section__label {
   font-family: var(--font-title);
-  font-size: 3.3rem;
+  font-size: 4.125rem;
   letter-spacing: 0.08em;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 
 .about__visual {
@@ -571,12 +615,12 @@ a {
 
 .brands__group-title {
   font-family: var(--font-title);
-  font-size: clamp(1.5rem, 4vw, 2.4rem);
+  font-size: clamp(1.125rem, 3vw, 1.8rem);
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-accent);
-  margin-bottom: 1.25rem;
-  padding-bottom: 0.75rem;
+  margin-bottom: 0.94rem;
+  padding-bottom: 0.56rem;
   border-bottom: 2px solid var(--color-accent);
   max-width: none;
 }
@@ -1270,9 +1314,112 @@ body.portfolio-hero-marquee-focus #brands.section {
   align-items: start;
 }
 
+/* Collapsible about panel: media full width until toggled open */
+.detail__deliverable-layout--has-about {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.detail__deliverable-layout--has-about .detail__deliverable-media {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.detail__deliverable-layout--has-about .detail__deliverable-about {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: end;
+  align-self: start;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: 100%;
+  padding: clamp(0.5rem, 1.5vw, 0.85rem);
+  pointer-events: none;
+}
+
+.detail__deliverable-layout--has-about .detail__about-toggle {
+  pointer-events: auto;
+}
+
+.detail__deliverable-layout--has-about.detail__deliverable-layout--about-open {
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+}
+
+.detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-media {
+  grid-column: auto;
+  grid-row: auto;
+}
+
+.detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-about {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: stretch;
+  align-self: start;
+  padding: 0;
+  pointer-events: auto;
+  align-items: stretch;
+}
+
+.detail__about-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  background: #e8e8e8;
+  color: #1a1a1a;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.detail__about-toggle:hover,
+.detail__about-toggle:focus-visible {
+  background: #dcdcdc;
+  outline: none;
+}
+
+.detail__about-toggle-icon {
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.detail__deliverable-layout--has-about .detail__deliverable-copy {
+  width: 100%;
+  min-height: clamp(10rem, 28vw, 16rem);
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+  background: #d9d9d9;
+  box-sizing: border-box;
+}
+
+.detail__deliverable-layout--has-about .detail__deliverable-copy[hidden] {
+  display: none !important;
+}
+
 @media (max-width: 900px) {
   .detail__deliverable-layout {
     grid-template-columns: 1fr;
+  }
+
+  .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open {
+    grid-template-columns: 1fr;
+  }
+
+  .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-media,
+  .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-about {
+    grid-column: 1;
+    grid-row: auto;
+  }
+
+  .detail__deliverable-layout--has-about:not(.detail__deliverable-layout--about-open) .detail__deliverable-about {
+    grid-row: 1;
   }
 }
 
