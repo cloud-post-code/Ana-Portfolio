@@ -471,9 +471,9 @@ a {
 
 .about .section__label {
   font-family: var(--font-title);
-  font-size: clamp(1.5rem, 4vw, 2.4rem);
-  letter-spacing: 0.1em;
-  margin-bottom: 1.25rem;
+  font-size: 3.3rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 2rem;
 }
 
 .about__visual {
@@ -571,12 +571,12 @@ a {
 
 .brands__group-title {
   font-family: var(--font-title);
-  font-size: 3.3rem;
+  font-size: clamp(1.5rem, 4vw, 2.4rem);
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--color-accent);
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 2px solid var(--color-accent);
   max-width: none;
 }
