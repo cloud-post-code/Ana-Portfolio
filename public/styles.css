@@ -181,23 +181,18 @@ a {
   gap: 0.75rem 1rem;
   padding: 0.45rem 0.6rem 0.45rem 0.55rem;
   border-radius: 999px;
-  border: 1px solid transparent;
-  background: transparent;
+  border: 1px solid rgba(210, 214, 222, 0.95);
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(26, 26, 26, 0.06);
   transition:
-    background 0.45s var(--ease-out),
     box-shadow 0.45s var(--ease-out),
-    border-color 0.45s var(--ease-out),
-    backdrop-filter 0.45s var(--ease-out);
+    border-color 0.45s var(--ease-out);
 }
 
 .nav--scrolled .nav__inner {
-  background: rgba(248, 248, 246, 0.86);
-  backdrop-filter: blur(18px) saturate(1.15);
-  -webkit-backdrop-filter: blur(18px) saturate(1.15);
-  border-color: rgba(210, 214, 222, 0.95);
   box-shadow:
-    0 10px 40px rgba(26, 26, 26, 0.07),
-    0 1px 0 rgba(255, 255, 255, 0.75) inset;
+    0 10px 40px rgba(26, 26, 26, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.9) inset;
 }
 
 .nav__logo {
@@ -302,7 +297,7 @@ a {
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.55);
+  background: #fff;
   border: 1px solid var(--color-border);
   border-radius: 12px;
   cursor: pointer;
@@ -476,8 +471,15 @@ a {
   object-position: center;
 }
 
+.hero--has-video .hero__content {
+  color: #fff;
+  text-shadow: 0 1px 18px rgba(0, 0, 0, 0.45);
+}
+
 .hero--has-video .hero__intro,
 .hero--has-video .hero__title,
+.hero--has-video .hero__title-line,
+.hero--has-video .hero__title-inner,
 .hero--has-video .hero__title-line--accent,
 .hero--has-video .hero__tagline,
 .hero--has-video .hero__tagline em {
@@ -514,38 +516,6 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .hero__video {
     display: none;
-  }
-
-  .hero--has-video {
-    background: var(--color-bg);
-  }
-
-  .hero--has-video .hero__intro {
-    color: var(--color-accent);
-  }
-
-  .hero--has-video .hero__title,
-  .hero--has-video .hero__tagline {
-    color: inherit;
-  }
-
-  .hero--has-video .hero__title-line--accent {
-    color: var(--color-accent);
-  }
-
-  .hero--has-video .hero__tagline em {
-    color: var(--color-accent);
-  }
-
-  .hero--has-video .btn--primary {
-    background: var(--color-accent);
-    color: #fff;
-    border-color: var(--color-accent);
-  }
-
-  .hero--has-video .btn--outline {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
   }
 }
 
@@ -1063,10 +1033,8 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .nav__inner {
     flex-wrap: wrap;
-    background: rgba(248, 248, 246, 0.94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
-    border-color: rgba(210, 214, 222, 0.92);
+    background: #fff;
+    border-color: rgba(210, 214, 222, 0.95);
     box-shadow: 0 8px 28px rgba(26, 26, 26, 0.07);
   }
 
@@ -1147,6 +1115,62 @@ body.portfolio-hero-marquee-focus #brands.section {
     font-size: clamp(3rem, 14vw, 6rem);
   }
 
+  /* Video hero: compact stacked layout — video + copy scale down together */
+  .hero--has-video {
+    min-height: 0;
+    height: auto;
+    padding: max(4.75rem, calc(3.75rem + env(safe-area-inset-top, 0px))) clamp(1rem, 4vw, 1.25rem)
+      clamp(2rem, 5vw, 2.5rem);
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: clamp(1rem, 3vw, 1.5rem);
+  }
+
+  .hero--has-video .hero__video-wrap {
+    position: relative;
+    inset: unset;
+    width: min(88vw, 360px);
+    max-width: 100%;
+    margin: 0 auto;
+    aspect-ratio: 4 / 5;
+    max-height: min(42svh, 320px);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  }
+
+  .hero--has-video .hero__video {
+    border-radius: inherit;
+  }
+
+  .hero--has-video .hero__content {
+    padding: 0 clamp(0.25rem, 2vw, 0.5rem);
+  }
+
+  .hero--has-video .hero__intro {
+    font-size: clamp(0.72rem, 2.8vw, 0.85rem);
+    letter-spacing: 0.18em;
+    margin-bottom: 1rem;
+  }
+
+  .hero--has-video .hero__title {
+    font-size: clamp(2.5rem, 12vw, 4.25rem);
+    margin-bottom: 1rem;
+  }
+
+  .hero--has-video .hero__tagline {
+    font-size: clamp(0.9rem, 3.5vw, 1.05rem);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero--has-video .hero__actions {
+    gap: 0.75rem;
+  }
+
+  .hero--has-video .hero__actions .btn {
+    font-size: 0.88rem;
+    padding: 0.75rem 1.5rem;
+  }
+
   #brands.section,
   #client-projects.section,
   #personal-projects.section,
@@ -1179,6 +1203,16 @@ body.portfolio-hero-marquee-focus #brands.section {
   .hero__actions {
     flex-direction: column;
     align-items: center;
+  }
+
+  .hero--has-video .hero__video-wrap {
+    width: min(92vw, 300px);
+    max-height: min(38svh, 260px);
+    aspect-ratio: 3 / 4;
+  }
+
+  .hero--has-video .hero__title {
+    font-size: clamp(2.15rem, 13vw, 3.5rem);
   }
 
   .hero__tagline br {
