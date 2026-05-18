@@ -385,7 +385,13 @@ function initDragAndDrop() {
 function isHeroVideoFile(file) {
   if (!file) return false;
   var name = (file.name || '').toLowerCase();
-  return /\.(mp4|webm|mov)$/.test(name) || (file.type && file.type.indexOf('video/') === 0);
+  var type = (file.type || '').toLowerCase();
+  return (
+    /\.(mp4|webm|mov|html?)$/.test(name) ||
+    type.indexOf('video/') === 0 ||
+    type === 'text/html' ||
+    type === 'application/xhtml+xml'
+  );
 }
 
 function deleteHeroVideo(variant) {
@@ -464,7 +470,7 @@ function initHeroVideoUploadForm(form) {
       var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
       if (!f) return;
       if (!isHeroVideoFile(f)) {
-        showToast('Please choose an MP4, WebM, or MOV file.', 'error');
+        showToast('Please choose an MP4, WebM, MOV, or HTML file.', 'error');
         return;
       }
       try {
@@ -483,11 +489,11 @@ function initHeroVideoUploadForm(form) {
     e.preventDefault();
     var f = input.files && input.files[0];
     if (!f) {
-      showToast('Choose a video file to upload.', 'error');
+      showToast('Choose a video or HTML file to upload.', 'error');
       return;
     }
     if (!isHeroVideoFile(f)) {
-      showToast('Please choose an MP4, WebM, or MOV file.', 'error');
+      showToast('Please choose an MP4, WebM, MOV, or HTML file.', 'error');
       return;
     }
     var fd = new FormData();

@@ -22,8 +22,12 @@
   // ---- Hero background video (respect reduced motion) ----
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.querySelectorAll('.hero__video').forEach((el) => {
-      el.pause();
-      el.removeAttribute('autoplay');
+      if (el.tagName === 'VIDEO') {
+        el.pause();
+        el.removeAttribute('autoplay');
+      } else if (el.tagName === 'IFRAME') {
+        el.style.visibility = 'hidden';
+      }
     });
   }
 

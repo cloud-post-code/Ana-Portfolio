@@ -20,16 +20,16 @@
     <% } %>
   </div>
   <% } else { %>
-  <p class="admin__text-muted" style="margin-bottom:0.75rem;font-size:0.88rem;">No <%= variant %> video yet.</p>
+  <p class="admin__text-muted" style="margin-bottom:0.75rem;font-size:0.88rem;">No <%= variant %> background yet.</p>
   <% } %>
   <form class="admin__resume-form admin-dash__hero-video-form" id="heroVideoUploadForm<%= suffix %>" data-hero-variant="<%= variant %>" novalidate>
-    <p class="admin__resume-upload-meta">MP4, WebM, or MOV · max 50 MB</p>
+    <p class="admin__resume-upload-meta">MP4, WebM, MOV, or HTML · max 50 MB</p>
     <div class="admin__resume-upload-field">
       <input
         type="file"
         id="heroVideoFile<%= suffix %>"
         name="video"
-        accept="video/mp4,video/webm,video/quicktime,.mp4,.webm,.mov"
+        accept="video/mp4,video/webm,video/quicktime,text/html,.mp4,.webm,.mov,.html,.htm"
         class="admin__resume-file-input-native"
         tabindex="-1"
         aria-label="Choose <%= label %> hero video"
@@ -37,7 +37,7 @@
       <label for="heroVideoFile<%= suffix %>" class="admin__resume-dropzone" id="heroVideoDropzone<%= suffix %>" tabindex="0">
         <span class="admin__visually-hidden">Choose <%= label %> hero video</span>
         <div class="admin__resume-dropzone__body">
-          <p class="admin__resume-dropzone__lead">Drop video here</p>
+          <p class="admin__resume-dropzone__lead">Drop video or HTML here</p>
           <p class="admin__resume-dropzone__or">or <span class="admin__resume-browse">click to browse</span></p>
           <p class="admin__resume-file-name" id="heroVideoFileName<%= suffix %>"><span class="admin__resume-file-name__placeholder">No file selected</span></p>
         </div>

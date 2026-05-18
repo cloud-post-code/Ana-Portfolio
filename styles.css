@@ -482,6 +482,12 @@ a {
   object-position: center;
 }
 
+.hero__html {
+  border: 0;
+  display: block;
+  pointer-events: none;
+}
+
 .hero__video--mobile {
   display: none;
 }

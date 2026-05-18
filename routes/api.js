@@ -34,8 +34,9 @@ const uploadHeroVideo = multer({
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname || '').toLowerCase();
     const mime = String(file.mimetype || '').toLowerCase();
-    const okExt = /\.(mp4|webm|mov)$/i.test(ext);
-    const okMime = mime.startsWith('video/');
+    const okExt = /\.(mp4|webm|mov|html?)$/i.test(ext);
+    const okMime =
+      mime.startsWith('video/') || mime === 'text/html' || mime === 'application/xhtml+xml';
     cb(null, okExt || okMime);
   }
 });
@@ -136,7 +137,9 @@ router.get('/hero-video', async function (req, res, next) {
 router.post('/hero-video', uploadHeroVideo.single('video'), async function (req, res, next) {
   try {
     if (!req.file || !req.file.buffer) {
-      return res.status(400).json({ error: 'Upload an MP4, WebM, or MOV file (max 50 MB).' });
+      return res.status(400).json({
+        error: 'Upload an MP4, WebM, MOV, or HTML file (max 50 MB).'
+      });
     }
     const variant = parseHeroVideoVariant(
       (req.body && req.body.variant) || (req.query && req.query.variant)
