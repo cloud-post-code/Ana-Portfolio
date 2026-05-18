@@ -51,8 +51,21 @@
 
         
         <section class="detail__deliverable reveal-blur" aria-labelledby="madamecurie-docs-heading">
-          <div class="detail__deliverable-heading">
-            <h2 id="madamecurie-docs-heading" class="detail__deliverable-title">Project Documentation</h2>
+          <div class="detail__deliverable-heading detail__deliverable-heading--has-about">
+            <div class="detail__deliverable-heading-text">
+              <h2 id="madamecurie-docs-heading" class="detail__deliverable-title">Project Documentation</h2>
+              
+            </div>
+            
+            <button
+              type="button"
+              class="detail__about-toggle"
+              aria-expanded="false"
+              aria-controls="about-madamecurie-docs"
+            >
+              <span class="detail__about-toggle-label">About The Project</span>
+              <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
+            </button>
             
           </div>
           <div class="detail__deliverable-layout detail__deliverable-layout--has-about">
@@ -93,17 +106,8 @@
             </div>
             
             
-            <aside class="detail__deliverable-about" aria-label="About this project">
-              <button
-                type="button"
-                class="detail__about-toggle"
-                aria-expanded="false"
-                aria-controls="about-madamecurie-docs"
-              >
-                <span class="detail__about-toggle-label">About The Project</span>
-                <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
-              </button>
-              <div id="about-madamecurie-docs" class="detail__deliverable-copy" hidden>
+            <aside class="detail__deliverable-about" aria-label="About this project" hidden>
+              <div id="about-madamecurie-docs" class="detail__deliverable-copy">
                 <p class="detail__deliverable-desc">Brand strategy and marketing documentation for Madame Curie School.</p>
               </div>
             </aside>

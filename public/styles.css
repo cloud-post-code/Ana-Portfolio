@@ -1288,6 +1288,24 @@ body.portfolio-hero-marquee-focus #brands.section {
   margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
 }
 
+.detail__deliverable-heading--has-about {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+}
+
+.detail__deliverable-heading-text {
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.detail__deliverable-heading--has-about .detail__about-toggle {
+  flex-shrink: 0;
+  align-self: flex-start;
+}
+
 .detail__deliverable-title {
   font-family: var(--font-title);
   font-size: clamp(1.35rem, 2.8vw, 1.65rem);
@@ -1314,58 +1332,30 @@ body.portfolio-hero-marquee-focus #brands.section {
   align-items: start;
 }
 
-/* Collapsible about panel: media full width until toggled open */
+/* Collapsible about panel: full-width media until toggled open (no overlay on gallery) */
 .detail__deliverable-layout--has-about {
   grid-template-columns: minmax(0, 1fr);
 }
 
-.detail__deliverable-layout--has-about .detail__deliverable-media {
-  grid-column: 1;
-  grid-row: 1;
-}
-
-.detail__deliverable-layout--has-about .detail__deliverable-about {
-  grid-column: 1;
-  grid-row: 1;
-  justify-self: end;
-  align-self: start;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  max-width: 100%;
-  padding: clamp(0.5rem, 1.5vw, 0.85rem);
-  pointer-events: none;
-}
-
-.detail__deliverable-layout--has-about .detail__about-toggle {
-  pointer-events: auto;
+.detail__deliverable-layout--has-about:not(.detail__deliverable-layout--about-open) .detail__deliverable-about {
+  display: none !important;
 }
 
 .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open {
   grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
 }
 
-.detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-media {
-  grid-column: auto;
-  grid-row: auto;
-}
-
 .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-about {
-  grid-column: 2;
-  grid-row: 1;
-  justify-self: stretch;
-  align-self: start;
-  padding: 0;
-  pointer-events: auto;
-  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .detail__about-toggle {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  margin: 0 0 0.5rem;
+  margin: 0;
   padding: 0.5rem 0.9rem;
   border: none;
   background: #e8e8e8;
@@ -1399,10 +1389,6 @@ body.portfolio-hero-marquee-focus #brands.section {
   box-sizing: border-box;
 }
 
-.detail__deliverable-layout--has-about .detail__deliverable-copy[hidden] {
-  display: none !important;
-}
-
 @media (max-width: 900px) {
   .detail__deliverable-layout {
     grid-template-columns: 1fr;
@@ -1410,16 +1396,6 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open {
     grid-template-columns: 1fr;
-  }
-
-  .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-media,
-  .detail__deliverable-layout--has-about.detail__deliverable-layout--about-open .detail__deliverable-about {
-    grid-column: 1;
-    grid-row: auto;
-  }
-
-  .detail__deliverable-layout--has-about:not(.detail__deliverable-layout--about-open) .detail__deliverable-about {
-    grid-row: 1;
   }
 }
 

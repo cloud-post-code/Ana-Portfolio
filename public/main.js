@@ -427,14 +427,16 @@
   // ---- Detail page: collapsible "About The Project" panel ----
   document.querySelectorAll('.detail__about-toggle').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const layout = btn.closest('.detail__deliverable-layout');
-      const panel = layout && document.getElementById(btn.getAttribute('aria-controls') || '');
-      if (!layout || !panel) return;
+      const deliverable = btn.closest('.detail__deliverable');
+      const layout = deliverable && deliverable.querySelector('.detail__deliverable-layout');
+      const panel = document.getElementById(btn.getAttribute('aria-controls') || '');
+      const aside = panel && panel.closest('.detail__deliverable-about');
+      if (!layout || !panel || !aside) return;
 
       const open = !layout.classList.contains('detail__deliverable-layout--about-open');
       layout.classList.toggle('detail__deliverable-layout--about-open', open);
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      panel.hidden = !open;
+      aside.hidden = !open;
 
       const icon = btn.querySelector('.detail__about-toggle-icon');
       if (icon) icon.textContent = open ? '\u00d7' : '+';

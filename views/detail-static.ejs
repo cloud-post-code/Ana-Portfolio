@@ -53,10 +53,23 @@
 
         <% (item.deliverables || []).forEach(function(del) { %>
         <section class="detail__deliverable reveal-blur" aria-labelledby="<%= del.id %>-heading">
-          <div class="detail__deliverable-heading">
-            <h2 id="<%= del.id %>-heading" class="detail__deliverable-title"><%= del.title %></h2>
-            <% if (del.subtitle) { %>
-            <p class="detail__deliverable-subtitle"><%= del.subtitle %></p>
+          <div class="detail__deliverable-heading<%= del.description ? ' detail__deliverable-heading--has-about' : '' %>">
+            <div class="detail__deliverable-heading-text">
+              <h2 id="<%= del.id %>-heading" class="detail__deliverable-title"><%= del.title %></h2>
+              <% if (del.subtitle) { %>
+              <p class="detail__deliverable-subtitle"><%= del.subtitle %></p>
+              <% } %>
+            </div>
+            <% if (del.description) { %>
+            <button
+              type="button"
+              class="detail__about-toggle"
+              aria-expanded="false"
+              aria-controls="about-<%= del.id %>"
+            >
+              <span class="detail__about-toggle-label">About The Project</span>
+              <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
+            </button>
             <% } %>
           </div>
           <div class="detail__deliverable-layout<%= del.description ? ' detail__deliverable-layout--has-about' : '' %>">
@@ -88,17 +101,8 @@
             </div>
             <% } %>
             <% if (del.description) { %>
-            <aside class="detail__deliverable-about" aria-label="About this project">
-              <button
-                type="button"
-                class="detail__about-toggle"
-                aria-expanded="false"
-                aria-controls="about-<%= del.id %>"
-              >
-                <span class="detail__about-toggle-label">About The Project</span>
-                <span class="detail__about-toggle-icon" aria-hidden="true">+</span>
-              </button>
-              <div id="about-<%= del.id %>" class="detail__deliverable-copy" hidden>
+            <aside class="detail__deliverable-about" aria-label="About this project" hidden>
+              <div id="about-<%= del.id %>" class="detail__deliverable-copy">
                 <p class="detail__deliverable-desc"><%= del.description %></p>
               </div>
             </aside>
