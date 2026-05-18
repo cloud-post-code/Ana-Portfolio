@@ -604,19 +604,18 @@ a {
   height: 100%;
 }
 
+/* 300×150px logo slot (150 tall × 300 wide); cover centers square marks, crops top/bottom */
 .brand-tile__logo {
-  flex: 1 1 auto;
   display: block;
-  width: auto;
-  max-width: min(100%, 42rem);
-  max-height: 25.5rem;
-  min-height: 16.5rem;
-  height: auto;
+  flex: 0 0 auto;
+  width: 300px;
+  height: 150px;
+  max-width: 100%;
   margin: 0 auto;
+  border: none;
   border-radius: 0;
   background: transparent;
-  border: none;
-  object-fit: contain;
+  object-fit: cover;
   object-position: center;
 }
 
@@ -644,14 +643,6 @@ a {
 #projects .brand-tile:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
-}
-
-/* Wide horizontal logos (Madame Curie, etc.) */
-.brand-tile--wide-logo .brand-tile__logo {
-  max-height: 12.75rem;
-  width: auto;
-  max-width: min(100%, 45rem);
-  object-fit: contain;
 }
 
 [id^="work-"],
