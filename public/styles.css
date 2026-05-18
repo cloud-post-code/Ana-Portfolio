@@ -556,6 +556,8 @@ a {
 
 /* Slightly tighter section padding for logo strip */
 #brands.section,
+#client-projects.section,
+#personal-projects.section,
 #projects.section {
   padding: clamp(2.25rem, 5vw, 3.75rem) 0;
 }
@@ -582,11 +584,11 @@ a {
 .brand-tile {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
   text-align: center;
   gap: 0.75rem;
-  padding: 1.5rem 1rem;
+  padding: 1.15rem 1rem 1.25rem;
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -595,18 +597,33 @@ a {
   height: 100%;
 }
 
-.brand-tile__logo {
+/* Wide rectangle logo area — logos scale to fill */
+.brand-tile__logo-box {
   flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 2.35 / 1;
+  min-height: clamp(5.75rem, 17vw, 10.5rem);
+  padding: clamp(0.65rem, 1.75vw, 1.1rem) clamp(0.85rem, 2.25vw, 1.35rem);
+  background: #f7f7f5;
+  border: 1px solid rgba(210, 214, 222, 0.85);
+  border-radius: calc(var(--radius) * 0.65);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.brand-tile__logo {
   display: block;
-  width: auto;
-  max-width: min(100%, 14rem);
-  max-height: 8.5rem;
-  min-height: 5.5rem;
-  height: auto;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  border: none;
   border-radius: 0;
   background: transparent;
-  border: none;
   object-fit: contain;
   object-position: center;
 }
@@ -630,17 +647,17 @@ a {
 }
 
 #brands .brand-tile:focus-visible,
+#client-projects .brand-tile:focus-visible,
+#personal-projects .brand-tile:focus-visible,
 #projects .brand-tile:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
-/* Wide horizontal logos (Madame Curie, etc.) */
-.brand-tile--wide-logo .brand-tile__logo {
-  max-height: 4.25rem;
-  width: auto;
-  max-width: min(100%, 15rem);
-  object-fit: contain;
+/* Extra-wide marks (Madame Curie, Fletcher, etc.) */
+.brand-tile--wide-logo .brand-tile__logo-box {
+  aspect-ratio: 2.85 / 1;
+  min-height: clamp(5.25rem, 15vw, 9rem);
 }
 
 [id^="work-"],
@@ -721,6 +738,8 @@ body.portfolio-hero-marquee-focus #scrollProgress,
 body.portfolio-hero-marquee-focus .nav__backdrop,
 body.portfolio-hero-marquee-focus .hero__actions,
 body.portfolio-hero-marquee-focus #brands .brands__focus-main,
+body.portfolio-hero-marquee-focus #client-projects,
+body.portfolio-hero-marquee-focus #personal-projects,
 body.portfolio-hero-marquee-focus #projects,
 body.portfolio-hero-marquee-focus #about,
 body.portfolio-hero-marquee-focus #contact,
@@ -1053,6 +1072,8 @@ body.portfolio-hero-marquee-focus #brands.section {
   }
 
   #brands.section,
+  #client-projects.section,
+  #personal-projects.section,
   #projects.section {
     padding: clamp(1.75rem, 5vw, 3rem) 0;
   }

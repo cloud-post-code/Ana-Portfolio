@@ -2,14 +2,14 @@
 var openAdvanced = false;
 if (!isNew && item) {
   openAdvanced = (
-    (entity === 'projects' && String(item.tileClass || '').trim() !== '') ||
+    (entity === 'projects' && item.projectType === 'personal') ||
     !!item.hidden
   );
 }
 var nDel = (!isNew && item && item.deliverables) ? item.deliverables.length : 0;
 var openDeliverables = nDel > 0;
 var adminTitle = isNew
-  ? (entity === 'experiences' ? 'New Work Experience' : 'New Project')
+  ? (entity === 'experiences' ? 'New Work Experience' : (typeof initialProjectType !== 'undefined' && initialProjectType === 'personal' ? 'New Personal Project' : 'New Client Project'))
   : ('Edit: ' + item.title);
 %>
 <%- include('layout-top', { adminTitle: adminTitle }) %>
@@ -31,6 +31,21 @@ var adminTitle = isNew
       <label>Description / Lead Text</label>
       <textarea name="description" rows="3"><%= isNew ? '' : item.description %></textarea>
     </div>
+
+    <% if (entity === 'projects') { %>
+    <%
+      var defaultProjectType = 'client';
+      if (isNew && typeof initialProjectType !== 'undefined' && initialProjectType === 'personal') defaultProjectType = 'personal';
+      var projectTypeVal = isNew ? defaultProjectType : ((item.projectType === 'personal') ? 'personal' : 'client');
+    %>
+    <div class="admin__form-group admin__form-group--full">
+      <label>Project section</label>
+      <select name="projectType">
+        <option value="client"<%= projectTypeVal === 'client' ? ' selected' : '' %>>Client project (homepage: Client Projects)</option>
+        <option value="personal"<%= projectTypeVal === 'personal' ? ' selected' : '' %>>Personal project (homepage: Personal Projects)</option>
+      </select>
+    </div>
+    <% } %>
 
     <div class="admin__form-group admin__form-group--full">
       <label>Logo</label>
@@ -61,13 +76,6 @@ var adminTitle = isNew
     <summary>More options</summary>
     <div class="admin__advanced-body">
       <div class="admin__form-grid">
-        <% if (entity === 'projects') { %>
-        <div class="admin__form-group admin__form-group--full">
-          <label>Tile CSS Class (optional)</label>
-          <input type="text" name="tileClass" value="<%= isNew ? '' : (item.tileClass || '') %>" placeholder="e.g. brand-tile--wide-logo" />
-        </div>
-        <% } %>
-
         <div class="admin__form-group">
           <label>Display Order</label>
           <input type="number" name="order" value="<%= isNew ? '' : item.order %>" min="1" />

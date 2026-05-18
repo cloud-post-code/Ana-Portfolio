@@ -135,8 +135,8 @@ function crudRoutes(entityName, filename) {
         logo: req.body.logo || '',
         skills: req.body.skills || [],
         subtitle: req.body.subtitle || '',
-        tileClass: req.body.tileClass || '',
         hidden: req.body.hidden || false,
+        projectType: req.body.projectType === 'personal' ? 'personal' : 'client',
         deliverables: req.body.deliverables || [],
         order: req.body.order != null ? req.body.order : data.length + 1
       };

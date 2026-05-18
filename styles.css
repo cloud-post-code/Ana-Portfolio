@@ -556,6 +556,8 @@ a {
 
 /* Slightly tighter section padding for logo strip */
 #brands.section,
+#client-projects.section,
+#personal-projects.section,
 #projects.section {
   padding: clamp(2.25rem, 5vw, 3.75rem) 0;
 }
@@ -582,11 +584,11 @@ a {
 .brand-tile {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   justify-content: flex-start;
   text-align: center;
   gap: 0.75rem;
-  padding: 1.5rem 1rem;
+  padding: 1.15rem 1rem 1.25rem;
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -595,18 +597,33 @@ a {
   height: 100%;
 }
 
-.brand-tile__logo {
+/* Wide rectangle logo area — logos scale to fill */
+.brand-tile__logo-box {
   flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  aspect-ratio: 2.35 / 1;
+  min-height: clamp(5.75rem, 17vw, 10.5rem);
+  padding: clamp(0.65rem, 1.75vw, 1.1rem) clamp(0.85rem, 2.25vw, 1.35rem);
+  background: #f7f7f5;
+  border: 1px solid rgba(210, 214, 222, 0.85);
+  border-radius: calc(var(--radius) * 0.65);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.brand-tile__logo {
   display: block;
-  width: auto;
-  max-width: min(100%, 14rem);
-  max-height: 8.5rem;
-  min-height: 5.5rem;
-  height: auto;
-  margin: 0 auto;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  max-height: 100%;
+  margin: 0;
+  border: none;
   border-radius: 0;
   background: transparent;
-  border: none;
   object-fit: contain;
   object-position: center;
 }
@@ -630,17 +647,17 @@ a {
 }
 
 #brands .brand-tile:focus-visible,
+#client-projects .brand-tile:focus-visible,
+#personal-projects .brand-tile:focus-visible,
 #projects .brand-tile:focus-visible {
   outline: 2px solid var(--color-accent);
   outline-offset: 3px;
 }
 
-/* Wide horizontal logos (Madame Curie, etc.) */
-.brand-tile--wide-logo .brand-tile__logo {
-  max-height: 4.25rem;
-  width: auto;
-  max-width: min(100%, 15rem);
-  object-fit: contain;
+/* Extra-wide marks (Madame Curie, Fletcher, etc.) */
+.brand-tile--wide-logo .brand-tile__logo-box {
+  aspect-ratio: 2.85 / 1;
+  min-height: clamp(5.25rem, 15vw, 9rem);
 }
 
 [id^="work-"],
@@ -721,6 +738,8 @@ body.portfolio-hero-marquee-focus #scrollProgress,
 body.portfolio-hero-marquee-focus .nav__backdrop,
 body.portfolio-hero-marquee-focus .hero__actions,
 body.portfolio-hero-marquee-focus #brands .brands__focus-main,
+body.portfolio-hero-marquee-focus #client-projects,
+body.portfolio-hero-marquee-focus #personal-projects,
 body.portfolio-hero-marquee-focus #projects,
 body.portfolio-hero-marquee-focus #about,
 body.portfolio-hero-marquee-focus #contact,
@@ -967,6 +986,7 @@ body.portfolio-hero-marquee-focus #brands.section {
   }
 
   .nav__inner {
+    flex-wrap: wrap;
     background: rgba(248, 248, 246, 0.94);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
@@ -974,7 +994,17 @@ body.portfolio-hero-marquee-focus #brands.section {
     box-shadow: 0 8px 28px rgba(26, 26, 26, 0.07);
   }
 
+  .nav__logo {
+    order: 1;
+  }
+
+  .nav__toggle {
+    order: 2;
+    margin-left: auto;
+  }
+
   .nav__links {
+    order: 3;
     position: fixed;
     top: 0;
     right: 0;
@@ -1033,7 +1063,7 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .brands__grid {
     grid-template-columns: 1fr;
-    max-width: 400px;
+    max-width: min(100%, 36rem);
     margin: 0 auto;
   }
 
@@ -1042,6 +1072,8 @@ body.portfolio-hero-marquee-focus #brands.section {
   }
 
   #brands.section,
+  #client-projects.section,
+  #personal-projects.section,
   #projects.section {
     padding: clamp(1.75rem, 5vw, 3rem) 0;
   }
@@ -1085,6 +1117,9 @@ body.portfolio-hero-marquee-focus #brands.section {
 .page-detail {
   padding-top: max(3.5rem, calc(2.75rem + env(safe-area-inset-top, 0px)));
   padding-bottom: env(safe-area-inset-bottom, 0px);
+  overflow-x: hidden;
+  background: #fff;
+  color: #000;
 }
 
 .detail {
@@ -1092,227 +1127,51 @@ body.portfolio-hero-marquee-focus #brands.section {
 }
 
 .detail__header {
-  padding: clamp(1.25rem, 3.5vw, 2rem) 0 1.5rem;
-  margin-bottom: clamp(1rem, 3vw, 1.75rem);
-}
-
-/* Detail header: brand tile | title block | description card */
-.detail__header-brand {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  gap: clamp(1.25rem, 3.5vw, 2rem);
-  margin-top: 0.25rem;
-}
-
-/* Experience / simple pages: logo image only, beside title (no stacked tile text) */
-.detail__header-brand--experience {
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-@media (min-width: 480px) {
-  .detail__header-brand--experience {
-    flex-wrap: nowrap;
-  }
-}
-
-.detail__header-logo {
-  flex-shrink: 0;
-  width: clamp(88px, 20vw, 120px);
-}
-
-.detail__header-logo img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border-radius: var(--radius);
-}
-
-.detail__header-logo--wide {
-  width: auto;
-  max-width: min(100%, 240px);
-}
-
-.detail__header-logo--wide img {
-  width: 100%;
-  height: auto;
-  max-height: 5rem;
-  object-fit: contain;
-  object-position: left center;
-}
-
-.detail__header-brand--experience .detail__header-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.detail__header-main {
-  flex: 1;
-  min-width: min(100%, 280px);
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: clamp(1.25rem, 2.5vw, 1.75rem);
-}
-
-/* Desktop: 3-column grid only when title + description card layout exists */
-@media (min-width: 900px) {
-  .detail__header-brand:has(.detail__header-main) {
-    display: grid;
-    grid-template-columns: minmax(168px, 200px) minmax(220px, 1fr) minmax(300px, 1.05fr);
-    gap: clamp(1.5rem, 3vw, 2.5rem);
-    align-items: start;
-  }
-
-  .detail__header-brand:has(.detail__header-main) .detail__header-main {
-    display: contents;
-  }
-}
-
-.detail__header-inline {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0.35rem 0.75rem;
-}
-
-.detail__header-inline .detail__subtitle {
+  padding: clamp(1.25rem, 3.5vw, 2rem) 0 clamp(0.75rem, 2vw, 1.25rem);
   margin-bottom: 0;
+  text-align: left;
 }
 
-.detail__header-inline .detail__meta::before {
-  content: '·';
-  margin-right: 0.5rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
+.detail__header-info {
+  max-width: 100%;
+  text-align: left;
 }
 
-.brand-tile--detail {
-  pointer-events: none;
-  flex-shrink: 0;
-  width: min(100%, 200px);
-  max-width: 200px;
+/* Full-bleed neutral band + centered white box (detail lead / description) */
+.detail__lead-band {
+  background: #f5f5f5;
+  padding: clamp(1.75rem, 4vw, 2.75rem) 0;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  width: 100vw;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+.detail__lead-band-inner {
+  max-width: 1200px;
   margin: 0 auto;
+  padding-left: max(clamp(1.5rem, 4vw, 3rem), env(safe-area-inset-left, 0px));
+  padding-right: max(clamp(1.5rem, 4vw, 3rem), env(safe-area-inset-right, 0px));
 }
 
-@media (min-width: 600px) {
-  .brand-tile--detail {
-    margin: 0;
-  }
-}
-
-.detail__header-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.detail__header-text .section__label {
-  margin-bottom: 0.65rem;
-}
-
-/* Summary + skills below header (experience pages) */
-.detail__summary {
-  margin-bottom: clamp(0.5rem, 2vw, 1rem);
-  padding-top: clamp(0.25rem, 1vw, 0.5rem);
-}
-
-.detail__lead {
-  margin: 0 0 clamp(1.5rem, 3vw, 2rem);
-  font-size: 1.05rem;
-  line-height: 1.75;
-  color: var(--color-text);
-  max-width: 65ch;
-}
-
-.detail__skills-heading {
-  font-family: var(--font-title);
-  font-size: clamp(1.05rem, 2vw, 1.2rem);
-  line-height: 1.2;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  margin: 0 0 0.85rem;
-  color: var(--color-dark);
-}
-
-.detail__summary .detail__tags {
-  margin-top: 0;
-}
-
-/* Description card: role, dates, body, tags, footer meta */
-.detail__header-desc {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  padding: clamp(1.25rem, 2.5vw, 1.75rem) clamp(1.25rem, 2.5vw, 1.75rem);
+.detail__lead-box {
+  max-width: min(100%, 52rem);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 3vw, 2.25rem) clamp(1.25rem, 3vw, 2.5rem);
   background: #fff;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  box-shadow:
-    0 1px 0 rgba(255, 255, 255, 0.9) inset,
-    0 4px 28px rgba(26, 26, 26, 0.07);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
 }
 
-.detail__header-desc > p.detail__subtitle {
-  margin: 0 0 0.75rem;
-  font-size: 1.15rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-}
-
-.detail__header-desc .detail__header-inline {
-  gap: 0.25rem 0.85rem;
-  margin: 0 0 1rem;
-  padding: 0 0 0.85rem;
-  border-bottom: 1px solid rgba(210, 214, 222, 0.95);
-}
-
-.detail__header-desc .detail__header-inline .detail__subtitle {
-  font-size: 0.98rem;
-  font-weight: 600;
-  color: var(--color-text);
-  letter-spacing: 0.01em;
-}
-
-.detail__header-desc .detail__header-inline .detail__meta {
-  font-size: 0.9rem;
-  color: var(--color-text-muted);
-}
-
-.detail__header-desc .detail__header-inline + p {
-  margin-top: 0;
-}
-
-.detail__header-desc > p:not(.detail__subtitle):not(.detail__meta) {
-  margin: 0 0 1rem;
-  color: var(--color-text);
-  font-size: 0.98rem;
+.detail__lead-text {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1rem, 1.9vw, 1.08rem);
   line-height: 1.75;
-  max-width: 52ch;
-}
-
-.detail__header-desc > p.detail__meta {
-  margin: 1rem 0 0;
-  font-size: 0.95rem;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-  max-width: 16rem;
-}
-
-.detail__header-desc .detail__tags {
-  margin-top: 1rem;
-  margin-bottom: 0;
-}
-
-.detail__header-desc > .detail__header-inline:first-child + p:last-child {
-  margin-bottom: 0;
-}
-
-/* Inline dot between role and dates — subtle */
-.detail__header-desc .detail__header-inline .detail__meta::before {
-  color: var(--color-accent);
-  opacity: 0.85;
+  font-weight: 400;
+  color: #000;
 }
 
 .brand-tile__logo--img {
@@ -1357,7 +1216,17 @@ body.portfolio-hero-marquee-focus #brands.section {
   line-height: 1.05;
   letter-spacing: -0.02em;
   text-transform: uppercase;
-  margin-bottom: 0.75rem;
+  margin: 0 0 0.5rem;
+  color: #000;
+}
+
+.detail__subtitle-line {
+  font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+  font-weight: 400;
+  color: #000;
+  margin: 0 0 clamp(0.5rem, 2vw, 1rem);
+  line-height: 1.5;
+  max-width: 65ch;
 }
 
 .detail__subtitle {
@@ -1386,27 +1255,86 @@ body.portfolio-hero-marquee-focus #brands.section {
   border-top: 1px solid var(--color-border);
 }
 
+.detail__deliverable-heading {
+  margin-bottom: clamp(1rem, 2.5vw, 1.5rem);
+}
+
 .detail__deliverable-title {
   font-family: var(--font-title);
   font-size: clamp(1.35rem, 2.8vw, 1.65rem);
   line-height: 1.15;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-  margin-bottom: 0.5rem;
+  margin: 0 0 0.35rem;
   color: var(--color-dark);
+}
+
+.detail__deliverable-subtitle {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 500;
+  color: var(--color-text-muted);
+  line-height: 1.45;
+  max-width: 65ch;
+}
+
+.detail__deliverable-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .detail__deliverable-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.detail__deliverable-copy {
+  min-width: 0;
+}
+
+.detail__deliverable-media {
+  min-width: 0;
 }
 
 .detail__deliverable-desc {
   font-size: 0.95rem;
   color: var(--color-text-muted);
-  margin-bottom: 1.25rem;
-  max-width: 720px;
+  margin: 0;
+  line-height: 1.7;
+  max-width: 52ch;
 }
 
 .detail__gallery {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
   gap: 1rem;
+}
+
+.detail__gallery--cols-1 {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.detail__gallery--cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.detail__gallery--cols-3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.detail__gallery--cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 700px) {
+  .detail__gallery--cols-2,
+  .detail__gallery--cols-3,
+  .detail__gallery--cols-4 {
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  }
 }
 
 .detail__gallery img,
@@ -1420,19 +1348,6 @@ body.portfolio-hero-marquee-focus #brands.section {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   vertical-align: middle;
   display: block;
-}
-
-.detail__gallery--farout-social {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(0.75rem, 2vw, 1rem);
-  align-items: start;
-}
-
-@media (max-width: 900px) {
-  .detail__gallery--farout-social {
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
-  }
 }
 
 .detail__video-hover {
@@ -1455,7 +1370,13 @@ body.portfolio-hero-marquee-focus #brands.section {
 }
 
 .detail__slide-still {
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.detail__gallery img,
+.detail__gallery .detail__video-hover {
+  cursor: pointer;
 }
 
 .detail__body p {
@@ -1494,6 +1415,98 @@ body.portfolio-hero-marquee-focus #brands.section {
   margin-top: 0;
 }
 
+/* Fullscreen lightbox: gallery images & videos (detail pages) */
+.detail-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(0.75rem, env(safe-area-inset-top, 0px)) max(0.75rem, env(safe-area-inset-right, 0px))
+    max(0.75rem, env(safe-area-inset-bottom, 0px)) max(0.75rem, env(safe-area-inset-left, 0px));
+  box-sizing: border-box;
+}
+
+.detail-lightbox[hidden] {
+  display: none !important;
+}
+
+.detail-lightbox__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 10, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.detail-lightbox__close {
+  position: absolute;
+  top: max(0.75rem, env(safe-area-inset-top, 0px));
+  right: max(0.75rem, env(safe-area-inset-right, 0px));
+  z-index: 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s var(--ease-out);
+}
+
+.detail-lightbox__close:hover,
+.detail-lightbox__close:focus-visible {
+  background: rgba(255, 255, 255, 0.22);
+  outline: none;
+}
+
+.detail-lightbox__stage {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.detail-lightbox__frame {
+  pointer-events: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-lightbox__frame img,
+.detail-lightbox__frame video {
+  max-width: min(100vw - 2rem, 100%);
+  max-height: min(100dvh - 4rem, 100%);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: var(--radius);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+}
+
+.detail-lightbox__frame video {
+  width: min(100vw - 2rem, 1200px);
+  max-height: min(100dvh - 4rem, 85vh);
+  background: #000;
+}
+
+body.detail-lightbox-open {
+  overflow: hidden;
+}
+
 @media (max-width: 768px) {
   .detail__title {
     word-wrap: break-word;
@@ -1509,5 +1522,47 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .detail__body ul {
     padding-left: 0.25rem;
+  }
+}
+
+/* CMS empty states (homepage when collections are empty) */
+.portfolio-empty {
+  margin: 0;
+  max-width: 36rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(45, 45, 45, 0.72);
+}
+
+/* Ensure portfolio sections stay readable without JS or with reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale,
+  .reveal-blur {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .reveal-clip {
+    clip-path: inset(0 0 0 0) !important;
+  }
+}
+
+@media (scripting: none) {
+  .reveal,
+  .reveal-left,
+  .reveal-right,
+  .reveal-scale,
+  .reveal-blur {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  .reveal-clip {
+    clip-path: inset(0 0 0 0) !important;
   }
 }

@@ -273,8 +273,8 @@ if (form) {
       description: getValue('description'),
       logo: getValue('logo'),
       subtitle: getValue('subtitle'),
-      tileClass: getValue('tileClass'),
       hidden: getValue('hidden'),
+      projectType: getValue('projectType') === 'personal' ? 'personal' : 'client',
       order: parseInt(getValue('order'), 10) || 1,
       skills: [],
       deliverables: collectDeliverables()

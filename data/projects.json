@@ -79,7 +79,8 @@
         "title": "Fliers",
         "description": "Event and seasonal promotional fliers and print pieces."
       }
-    ]
+    ],
+    "projectType": "client"
   },
   {
     "id": "proj-madamecurie",
@@ -133,7 +134,8 @@
         "title": "Project Documentation",
         "description": "Brand strategy and marketing documentation for Madame Curie School."
       }
-    ]
+    ],
+    "projectType": "client"
   },
   {
     "id": "proj-fletcher",
@@ -298,7 +300,8 @@
         "description": "MGA Fletcher Slides — Team 6."
       }
     ],
-    "subtitle": "Academic project"
+    "subtitle": "Academic project",
+    "projectType": "client"
   },
   {
     "id": "proj-tufts",
@@ -309,7 +312,8 @@
     "hidden": true,
     "skills": [],
     "description": "This academic brand project showcases strategic thinking and creative execution applied to a real institutional challenge. Deeper case materials, deliverables, and outcomes will be added here shortly.",
-    "deliverables": []
+    "deliverables": [],
+    "projectType": "client"
   },
   {
     "id": "proj-airbnb",
@@ -321,6 +325,7 @@
     "skills": [],
     "subtitle": "Strategy project — Full case study coming soon",
     "description": "A strategy-focused project exploring brand positioning, consumer insights, and campaign ideation for one of the world's most recognized platforms. Frameworks, visuals, and recommendations will be published here when finalized.",
-    "deliverables": []
+    "deliverables": [],
+    "projectType": "client"
   }
 ]

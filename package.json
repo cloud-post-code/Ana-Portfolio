@@ -8,7 +8,8 @@
     "dev": "node server.js",
     "db:seed": "node scripts/seed-pg-from-json.js",
     "migrate:portfolio": "node scripts/migrate-portfolio-schema.js",
-    "migrate:portfolio:db": "node scripts/migrate-portfolio-schema.js --database"
+    "migrate:portfolio:db": "node scripts/migrate-portfolio-schema.js --database",
+    "generate:static-details": "node scripts/generate-static-details.js"
   },
   "engines": {
     "node": ">=18"

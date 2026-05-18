@@ -1,16 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <%- include('partials/head', { pageTitle: item.title + ' — ' + (itemType === 'experience' ? 'Work Experience' : 'Project') + ' — Ana Machuca', pageDesc: item.description }) %>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title><%= item.title %> — <%= itemType === 'experience' ? 'Work Experience' : 'Project' %> — Ana Machuca</title>
+  <meta name="description" content="<%= item.description %>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="page-detail">
-  <%- include('partials/nav', { isDetail: true }) %>
+  <div class="scroll-progress" id="scrollProgress"></div>
+  <nav class="nav" id="nav" aria-label="Primary">
+    <div class="nav__inner">
+      <a href="index.html" class="nav__logo"><span class="nav__logo-mark">AM</span></a>
+      <button type="button" class="nav__toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="navLinks">
+        <span class="nav__toggle-box" aria-hidden="true"><span></span><span></span><span></span></span>
+      </button>
+      <ul class="nav__links" id="navLinks">
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#brands">Work Experience</a></li>
+        <li><a href="index.html#projects">Projects</a></li>
+        <li><a href="index.html#contact" class="nav__cta">Hire me</a></li>
+      </ul>
+    </div>
+  </nav>
 
   <main class="detail">
     <div class="container">
       <article>
         <header class="detail__header">
-          <a href="<%= itemType === 'experience' ? '/#brands' : (item.projectType === 'personal' ? '/#personal-projects' : '/#client-projects') %>" class="detail__back">&larr; Back to portfolio</a>
+          <a href="index.html<%= itemType === 'experience' ? '#brands' : '#projects' %>" class="detail__back">&larr; Back to portfolio</a>
 
           <div class="detail__header-info reveal-blur">
             <h1 class="detail__title"><%= item.title %></h1>
@@ -50,16 +71,16 @@
               <div class="detail__gallery<%= galleryMod %>">
                 <% del.media.forEach(function(m) { %>
                   <% if (m.type === 'image') { %>
-                <img src="/<%= m.src %>" alt="<%= m.alt %>" loading="lazy" />
+                <img src="<%= m.src %>" alt="<%= m.alt %>" loading="lazy" />
                   <% } else if (m.type === 'video-hover') { %>
                 <div class="detail__video-hover">
                   <video class="detail__video-hover__media" muted playsinline loop preload="metadata" aria-label="<%= m.alt %>">
-                    <source src="/<%= m.src %>" type="video/mp4" />
+                    <source src="<%= m.src %>" type="video/mp4" />
                   </video>
                 </div>
                   <% } else if (m.type === 'video-still') { %>
                 <video class="detail__slide-still" muted playsinline preload="metadata" disablePictureInPicture aria-label="<%= m.alt %>">
-                  <source src="/<%= m.src %>" type="video/mp4" />
+                  <source src="<%= m.src %>" type="video/mp4" />
                 </video>
                   <% } %>
                 <% }); %>
@@ -82,7 +103,13 @@
     </div>
   </main>
 
-  <%- include('partials/footer') %>
-  <script src="/main.js"></script>
+  <footer class="footer">
+    <div class="container footer__inner">
+      <p class="footer__brand">Ana Machuca</p>
+      <p class="footer__tagline">Humanizing Brands — One Story at a Time</p>
+      <p class="footer__copy">&copy; 2026 Ana Machuca. Crafted with intention.</p>
+    </div>
+  </footer>
+  <script src="main.js"></script>
 </body>
 </html>

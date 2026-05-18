@@ -1,21 +1,25 @@
 <%- include('layout-top', { adminTitle: 'Dashboard' }) %>
 
 <% var spotExp = experiences.slice(0, 3); %>
-<% var spotProj = projects.slice(0, 3); %>
+<% var spotClient = clientProjects.slice(0, 3); %>
+<% var spotPersonal = personalProjects.slice(0, 3); %>
 <% var nExp = experiences.length; %>
+<% var nClient = clientProjects.length; %>
+<% var nPersonal = personalProjects.length; %>
 <% var nProj = projects.length; %>
 
 <div class="admin-dash">
   <div class="admin-dash__below">
     <div class="admin-dash__hero-cta">
       <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">New experience</a>
-      <a href="/admin/projects/new" class="admin__btn admin__btn--outline">New project</a>
+      <a href="/admin/projects/new" class="admin__btn admin__btn--outline">New client project</a>
+      <a href="/admin/projects/new?type=personal" class="admin__btn admin__btn--outline">New personal project</a>
       <a href="/" class="admin__btn admin__btn--outline" target="_blank" rel="noopener">Live site</a>
     </div>
 
     <section class="admin-dash__spotlight admin-dash__spotlight--anchor" id="admin-work-experience">
       <div class="admin-dash__spotlight-head">
-        <h3 class="admin-dash__spotlight-title">Work Experience</h3>
+        <h3 class="admin-dash__spotlight-title">Work Experiences</h3>
         <a href="/admin/experiences/new" class="admin__btn admin__btn--primary">New Work Experience</a>
       </div>
       <div class="admin-dash__spotlight-below-title">
@@ -67,22 +71,22 @@
       <% } %>
     </section>
 
-    <section class="admin-dash__spotlight admin-dash__spotlight--projects admin-dash__spotlight--anchor" id="admin-projects">
+    <section class="admin-dash__spotlight admin-dash__spotlight--projects admin-dash__spotlight--anchor" id="admin-client-projects">
       <div class="admin-dash__spotlight-head">
-        <h3 class="admin-dash__spotlight-title">Projects</h3>
-        <a href="/admin/projects/new" class="admin__btn admin__btn--primary">New Projects</a>
+        <h3 class="admin-dash__spotlight-title">Client Projects</h3>
+        <a href="/admin/projects/new" class="admin__btn admin__btn--primary">New client project</a>
       </div>
       <div class="admin-dash__spotlight-below-title">
-        <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Open the full project library drawer below for the rest.</p>
+        <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Open the full client project library drawer below for the rest.</p>
         <div class="admin-dash__spotlight-actions">
-          <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search" onclick="enhanceAllCollection('projects')">Enhance all</button>
+          <button type="button" class="admin__btn admin__btn--outline" title="AI + optional web search" onclick="enhanceAllCollection('projects')">Enhance all projects</button>
         </div>
       </div>
-      <% if (!spotProj.length) { %>
-      <p class="admin__empty-hint">No projects yet — mint a new case study.</p>
+      <% if (!spotClient.length) { %>
+      <p class="admin__empty-hint">No client projects yet — add your first case study.</p>
       <% } else { %>
       <div class="admin-dash__spotlight-grid">
-        <% spotProj.forEach(function(proj) { %>
+        <% spotClient.forEach(function(proj) { %>
         <article class="admin-dash__spot-card<%= proj.hidden ? ' admin-dash__spot-card--muted' : '' %>">
           <div class="admin-dash__spot-card__shine admin-dash__spot-card__shine--cool" aria-hidden="true"></div>
           <div class="admin-dash__spot-card__top">
@@ -92,7 +96,43 @@
             <h4 class="admin-dash__spot-name"><%= proj.title %></h4>
           </div>
           <div class="admin-dash__spot-card__below">
-            <p class="admin-dash__spot-role"><%= proj.sectionLabel %><%= proj.hidden ? ' · hidden' : '' %></p>
+            <p class="admin-dash__spot-role"><%= projectTypeLabel(proj) %><%= proj.hidden ? ' · hidden' : '' %></p>
+            <p class="admin-dash__spot-blurb"><%= (proj.description || '').slice(0, 100) %><%= (proj.description || '').length > 100 ? '…' : '' %></p>
+            <div class="admin-dash__spot-footer">
+              <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small admin__btn--primary">Edit</a>
+              <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank" rel="noopener">View</a>
+              <button type="button" class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>
+            </div>
+          </div>
+        </article>
+        <% }); %>
+      </div>
+      <% } %>
+    </section>
+
+    <section class="admin-dash__spotlight admin-dash__spotlight--projects admin-dash__spotlight--anchor" id="admin-personal-projects">
+      <div class="admin-dash__spotlight-head">
+        <h3 class="admin-dash__spotlight-title">Personal Projects</h3>
+        <a href="/admin/projects/new?type=personal" class="admin__btn admin__btn--primary">New personal project</a>
+      </div>
+      <div class="admin-dash__spotlight-below-title">
+        <p class="admin-dash__spotlight-sub">Spotlight — up to three featured. Open the full personal project library drawer below for the rest.</p>
+      </div>
+      <% if (!spotPersonal.length) { %>
+      <p class="admin__empty-hint">No personal projects yet — add your first one.</p>
+      <% } else { %>
+      <div class="admin-dash__spotlight-grid">
+        <% spotPersonal.forEach(function(proj) { %>
+        <article class="admin-dash__spot-card<%= proj.hidden ? ' admin-dash__spot-card--muted' : '' %>">
+          <div class="admin-dash__spot-card__shine admin-dash__spot-card__shine--cool" aria-hidden="true"></div>
+          <div class="admin-dash__spot-card__top">
+            <% if (proj.logo) { %>
+            <img src="/<%= proj.logo %>" alt="" class="admin-dash__spot-logo" onerror="this.style.display='none'" />
+            <% } %>
+            <h4 class="admin-dash__spot-name"><%= proj.title %></h4>
+          </div>
+          <div class="admin-dash__spot-card__below">
+            <p class="admin-dash__spot-role"><%= projectTypeLabel(proj) %><%= proj.hidden ? ' · hidden' : '' %></p>
             <p class="admin-dash__spot-blurb"><%= (proj.description || '').slice(0, 100) %><%= (proj.description || '').length > 100 ? '…' : '' %></p>
             <div class="admin-dash__spot-footer">
               <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small admin__btn--primary">Edit</a>
@@ -141,13 +181,13 @@
     </details>
 
     <details class="admin-dash__drawer">
-      <summary class="admin-dash__drawer-summary">Full project library <span class="admin-dash__drawer-count">(<%= nProj %>)</span></summary>
+      <summary class="admin-dash__drawer-summary">Full client project library <span class="admin-dash__drawer-count">(<%= nClient %>)</span></summary>
       <div class="admin-dash__drawer-body">
         <div class="admin__section-header" style="margin-bottom: 1rem;">
-          <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add Project</a>
+          <a href="/admin/projects/new" class="admin__btn admin__btn--primary">+ Add client project</a>
         </div>
         <div class="admin__card-grid">
-          <% projects.forEach(function(proj) { %>
+          <% clientProjects.forEach(function(proj) { %>
           <div class="admin__card<%= proj.hidden ? ' admin__card--hidden' : '' %>">
             <div class="admin__card-header">
               <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
@@ -156,7 +196,41 @@
               </div>
             </div>
             <div class="admin-dash__library-card-below">
-              <p class="admin__card-sub"><%= proj.sectionLabel %><%= proj.hidden ? ' (Hidden)' : '' %></p>
+              <p class="admin__card-sub"><%= projectTypeLabel(proj) %><%= proj.hidden ? ' (Hidden)' : '' %></p>
+              <p class="admin__card-desc"><%= (proj.description || '').slice(0, 120) %><%= (proj.description || '').length > 120 ? '...' : '' %></p>
+              <div class="admin__card-meta">
+                <span><%= (proj.deliverables || []).length %> sub-group(s)</span>
+              </div>
+              <div class="admin__card-actions">
+                <button type="button" class="admin__btn admin__btn--small admin__btn--outline" title="AI + web: fill missing text" onclick="enhanceOne('projects','<%= proj.id %>')">Enhance</button>
+                <a href="/admin/projects/<%= proj.id %>/edit" class="admin__btn admin__btn--small">Edit</a>
+                <a href="/project/<%= proj.slug %>" class="admin__btn admin__btn--small admin__btn--outline" target="_blank">View</a>
+                <button class="admin__btn admin__btn--small admin__btn--danger" onclick="deleteItem('projects', '<%= proj.id %>')">Delete</button>
+              </div>
+            </div>
+          </div>
+          <% }); %>
+        </div>
+      </div>
+    </details>
+
+    <details class="admin-dash__drawer">
+      <summary class="admin-dash__drawer-summary">Full personal project library <span class="admin-dash__drawer-count">(<%= nPersonal %>)</span></summary>
+      <div class="admin-dash__drawer-body">
+        <div class="admin__section-header" style="margin-bottom: 1rem;">
+          <a href="/admin/projects/new?type=personal" class="admin__btn admin__btn--primary">+ Add personal project</a>
+        </div>
+        <div class="admin__card-grid">
+          <% personalProjects.forEach(function(proj) { %>
+          <div class="admin__card<%= proj.hidden ? ' admin__card--hidden' : '' %>">
+            <div class="admin__card-header">
+              <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="admin__card-logo" onerror="this.style.display='none'" />
+              <div>
+                <h3 class="admin__card-title"><%= proj.title %></h3>
+              </div>
+            </div>
+            <div class="admin-dash__library-card-below">
+              <p class="admin__card-sub"><%= projectTypeLabel(proj) %><%= proj.hidden ? ' (Hidden)' : '' %></p>
               <p class="admin__card-desc"><%= (proj.description || '').slice(0, 120) %><%= (proj.description || '').length > 120 ? '...' : '' %></p>
               <div class="admin__card-meta">
                 <span><%= (proj.deliverables || []).length %> sub-group(s)</span>

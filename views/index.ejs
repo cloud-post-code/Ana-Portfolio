@@ -5,6 +5,8 @@
 </head>
 <body>
   <% var visibleProjects = projects.filter(function (p) { return !p.hidden; }); %>
+  <% var clientProjects = visibleProjects.filter(function (p) { return p.projectType !== 'personal'; }); %>
+  <% var personalProjects = visibleProjects.filter(function (p) { return p.projectType === 'personal'; }); %>
   <%- include('partials/nav') %>
 
   <!-- Hero -->
@@ -56,18 +58,20 @@
   </section>
 
   <!-- Brands strip: work experience -->
-  <section class="brands section" id="brands" aria-label="Work experience — company logos">
+  <section class="brands section" id="brands" aria-label="Work experiences — company logos">
     <div class="container brands__focus-main">
       <div class="brands__groups">
         <div class="brands__group reveal-scale">
-          <h3 class="brands__group-title">WORK EXPERIENCE</h3>
+          <h3 class="brands__group-title">WORK EXPERIENCES</h3>
           <% if (!experiences.length) { %>
           <p class="portfolio-empty">No work experience entries yet — add them from the admin dashboard and they appear here automatically.</p>
           <% } else { %>
           <div class="brands__grid">
             <% experiences.forEach(function(exp) { %>
             <a href="/experience/<%= exp.slug %>" class="brand-tile">
-              <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
+              <div class="brand-tile__logo-box">
+                <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
+              </div>
               <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
             </a>
@@ -79,25 +83,31 @@
     </div>
   </section>
 
-  <!-- Projects -->
-  <section class="brands section" id="projects" aria-label="Projects">
+  <!-- Client projects -->
+  <section class="brands section" id="client-projects" aria-label="Client projects">
     <div class="container brands__focus-main">
       <div class="brands__groups">
         <div class="brands__group reveal-scale">
-          <h3 class="brands__group-title">PROJECTS</h3>
-          <% if (!visibleProjects.length) { %>
-          <p class="portfolio-empty">No projects to show yet (or all are marked hidden). Add or unhide projects in the admin dashboard.</p>
-          <% } else { %>
-          <div class="brands__grid">
-            <% visibleProjects.forEach(function(proj) { %>
-            <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>">
-              <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
-              <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
-              <span class="brand-tile__cta">VIEW DETAILS</span>
-            </a>
-            <% }); %>
-          </div>
-          <% } %>
+          <h3 class="brands__group-title">CLIENT PROJECTS</h3>
+          <%- include('partials/project-tiles', {
+            projects: clientProjects,
+            emptyMessage: 'No client projects to show yet. Add them from the admin dashboard and mark them as Client project.'
+          }) %>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Personal projects -->
+  <section class="brands section" id="personal-projects" aria-label="Personal projects">
+    <div class="container brands__focus-main">
+      <div class="brands__groups">
+        <div class="brands__group reveal-scale">
+          <h3 class="brands__group-title">PERSONAL PROJECTS</h3>
+          <%- include('partials/project-tiles', {
+            projects: personalProjects,
+            emptyMessage: 'No personal projects yet. Add them from the admin dashboard and mark them as Personal project.'
+          }) %>
         </div>
       </div>
     </div>

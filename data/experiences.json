@@ -110,11 +110,40 @@
     "subtitle": "Marketing Internship — Far Out Ice Cream — Cambridge, MA"
   },
   {
+    "id": "exp-4goodvibes",
+    "logo": "logos/4GV.png?v=2",
+    "slug": "4goodvibes-marketplace",
+    "order": 2,
+    "title": "4GoodVibes Marketplace",
+    "skills": [],
+    "subtitle": "Marketing Assistant — 4GoodVibes Marketplace — Boston, MA",
+    "description": "Supported brand growth through research-driven campaigns and content creation strategies for a new e-commerce platform.",
+    "deliverables": [
+      {
+        "id": "4gv-gallery",
+        "title": "Marketing Materials",
+        "description": "Marketing and promotional content created for 4GoodVibes Marketplace.",
+        "media": [
+          {
+            "alt": "4GoodVibes envelope design",
+            "src": "assets/projects/4gv/Envelope (5.5 x 4.25 in).png",
+            "type": "image"
+          },
+          {
+            "alt": "4GoodVibes promotional design",
+            "src": "assets/projects/4gv/Untitled design.png",
+            "type": "image"
+          }
+        ]
+      }
+    ]
+  },
+  {
     "id": "exp-mainstreet",
     "logo": "logos/Main St.png?v=2",
     "role": "Main Street",
     "slug": "main-street",
-    "order": 2,
+    "order": 3,
     "title": "Main Street",
     "skills": [],
     "subtitle": "Hult Prize Pitch — Social Entrepreneurship Competition",

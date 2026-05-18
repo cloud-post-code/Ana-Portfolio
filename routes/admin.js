@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
+const { getProjectType, projectTypeLabel } = require('../lib/portfolio-helpers');
 const { getResumeTailorModelOptions, getResumeTailorDefaultSelection } = require('../lib/resume-tailor-models');
 const { getMaxResumePageLines, getMaxCoverLetterLines } = require('../lib/resume-line-budget');
 const { getProfileNotesCount } = require('../lib/resume-profile-notes');
@@ -11,7 +12,15 @@ router.get('/', async function (req, res, next) {
   try {
     const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => a.order - b.order);
     const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
-    res.render('admin/dashboard', { experiences, projects });
+    const clientProjects = projects.filter((p) => getProjectType(p) === 'client');
+    const personalProjects = projects.filter((p) => getProjectType(p) === 'personal');
+    res.render('admin/dashboard', {
+      experiences,
+      projects,
+      clientProjects,
+      personalProjects,
+      projectTypeLabel
+    });
   } catch (e) {
     next(e);
   }
@@ -87,7 +96,8 @@ router.get('/resume', async function (req, res, next) {
 });
 
 router.get('/projects/new', (req, res) => {
-  res.render('admin/entity-form', { item: null, isNew: true, entity: 'projects' });
+  const initialProjectType = req.query.type === 'personal' ? 'personal' : 'client';
+  res.render('admin/entity-form', { item: null, isNew: true, entity: 'projects', initialProjectType });
 });
 
 router.get('/projects/:id/edit', async function (req, res, next) {
