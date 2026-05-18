@@ -29,24 +29,15 @@
         </div>
       </div>
 
-      <div class="admin-dash__presentation-card admin__card admin-dash__hero-video-card">
+      <div class="admin-dash__presentation-card admin__card admin-dash__hero-video-link-card">
         <h4 class="admin-dash__presentation-title">Hero background video</h4>
         <p class="admin-dash__presentation-lead admin__text-muted">
-          Upload separate loops for desktop (browser) and mobile. MP4, WebM, or MOV · max 50 MB each. If only one is uploaded, it is used on all screen sizes.<% if (typeof databaseEnabled !== 'undefined' && databaseEnabled) { %> Videos are stored in PostgreSQL and persist across deploys.<% } %>
+          Upload separate desktop and mobile loops for the homepage hero. MP4, WebM, or MOV · max 50 MB each.
         </p>
-        <p class="admin__resume-actions" style="margin-bottom:1rem;">
+        <div class="admin__resume-actions">
+          <a href="/admin/hero-video" class="admin__btn admin__btn--primary">Manage hero videos</a>
           <a href="/" class="admin__btn admin__btn--outline" target="_blank" rel="noopener">Preview homepage</a>
-        </p>
-        <%- include('partials/hero-video-variant', {
-          variant: 'desktop',
-          label: 'Desktop (browser)',
-          meta: heroVideo && heroVideo.desktop ? heroVideo.desktop : {}
-        }) %>
-        <%- include('partials/hero-video-variant', {
-          variant: 'mobile',
-          label: 'Mobile',
-          meta: heroVideo && heroVideo.mobile ? heroVideo.mobile : {}
-        }) %>
+        </div>
       </div>
 
       <div class="admin-dash__presentation-card admin__card">

@@ -1,0 +1,38 @@
+<%- include('layout-top', { adminTitle: 'Hero video' }) %>
+
+<section class="admin__section">
+  <div class="admin__section-header">
+    <div>
+      <h2>Hero background video</h2>
+      <p class="admin__section-lead">
+        Upload separate loops for <strong>desktop (browser)</strong> and <strong>mobile</strong>.
+        MP4, WebM, or MOV · max 50 MB each. If only one is uploaded, it is used on all screen sizes.
+        <% if (typeof databaseEnabled !== 'undefined' && databaseEnabled) { %>
+        Videos are stored in PostgreSQL and persist across deploys.
+        <% } else { %>
+        Videos are saved under <code>uploads/</code> on the server.
+        <% } %>
+      </p>
+    </div>
+    <a href="/" class="admin__btn admin__btn--outline" target="_blank" rel="noopener">Preview homepage</a>
+  </div>
+
+  <div class="admin__card admin-dash__hero-video-card">
+    <%- include('partials/hero-video-variant', {
+      variant: 'desktop',
+      label: 'Desktop (browser)',
+      meta: heroVideo && heroVideo.desktop ? heroVideo.desktop : {}
+    }) %>
+    <%- include('partials/hero-video-variant', {
+      variant: 'mobile',
+      label: 'Mobile',
+      meta: heroVideo && heroVideo.mobile ? heroVideo.mobile : {}
+    }) %>
+  </div>
+
+  <p class="admin__text-muted" style="margin-top:1rem;font-size:0.88rem;">
+    <a href="/admin">&larr; Back to dashboard</a>
+  </p>
+</section>
+
+<%- include('layout-bottom') %>

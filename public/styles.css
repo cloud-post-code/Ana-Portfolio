@@ -1152,33 +1152,7 @@ body.portfolio-hero-marquee-focus #brands.section {
     font-size: clamp(3rem, 14vw, 6rem);
   }
 
-  /* Video hero: compact stacked layout — video + copy scale down together */
-  .hero--has-video {
-    min-height: 0;
-    height: auto;
-    padding: max(4.75rem, calc(3.75rem + env(safe-area-inset-top, 0px))) clamp(1rem, 4vw, 1.25rem)
-      clamp(2rem, 5vw, 2.5rem);
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: clamp(1rem, 3vw, 1.5rem);
-  }
-
-  .hero--has-video .hero__video-wrap {
-    position: relative;
-    inset: unset;
-    width: min(88vw, 360px);
-    max-width: 100%;
-    margin: 0 auto;
-    aspect-ratio: 4 / 5;
-    max-height: min(42svh, 320px);
-    border-radius: var(--radius-lg);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
-  }
-
-  .hero--has-video .hero__video {
-    border-radius: inherit;
-  }
-
+  /* Video hero: full-bleed background on mobile (same as desktop) */
   .hero--has-video .hero__content {
     padding: 0 clamp(0.25rem, 2vw, 0.5rem);
   }
@@ -1240,12 +1214,6 @@ body.portfolio-hero-marquee-focus #brands.section {
   .hero__actions {
     flex-direction: column;
     align-items: center;
-  }
-
-  .hero--has-video .hero__video-wrap {
-    width: min(92vw, 300px);
-    max-height: min(38svh, 260px);
-    aspect-ratio: 3 / 4;
   }
 
   .hero--has-video .hero__title {

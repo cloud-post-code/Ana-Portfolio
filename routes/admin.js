@@ -15,14 +15,12 @@ router.get('/', async function (req, res, next) {
     const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
     const clientProjects = projects.filter((p) => getProjectType(p) === 'client');
     const personalProjects = projects.filter((p) => getProjectType(p) === 'personal');
-    const heroVideo = await getHeroVideoMeta();
     res.render('admin/dashboard', {
       experiences,
       projects,
       clientProjects,
       personalProjects,
       projectTypeLabel,
-      heroVideo,
       databaseEnabled: cms.isDatabaseEnabled()
     });
   } catch (e) {
@@ -57,6 +55,19 @@ router.get('/resume/profile-notes', async function (req, res, next) {
       resumeTailorDefault,
       maxResumePageLines: getMaxResumePageLines(),
       maxCoverLetterLines: getMaxCoverLetterLines()
+    });
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/hero-video', async function (req, res, next) {
+  try {
+    const heroVideo = await getHeroVideoMeta();
+    res.render('admin/hero-video', {
+      adminTitle: 'Hero video',
+      heroVideo,
+      databaseEnabled: cms.isDatabaseEnabled()
     });
   } catch (e) {
     next(e);
