@@ -113,12 +113,16 @@ router.post('/upload/multiple', upload.array('files', 20), (req, res) => {
 });
 
 const {
-  HERO_VIDEO_KV,
   getHeroVideoMeta,
   guessVideoMime,
+  parseHeroVideoVariant,
+  normalizeHeroVideoKv,
   setHeroVideoBlob,
+  deleteHeroVideoBlob,
   removePreviousHeroVideo,
-  writeHeroVideoToDisk
+  writeHeroVideoToDisk,
+  getHeroVideoKvRaw,
+  saveHeroVideoKv
 } = require('../lib/hero-video');
 
 router.get('/hero-video', async function (req, res, next) {
@@ -134,17 +138,26 @@ router.post('/hero-video', uploadHeroVideo.single('video'), async function (req,
     if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: 'Upload an MP4, WebM, or MOV file (max 50 MB).' });
     }
-    const prev = await cms.getKv(HERO_VIDEO_KV);
+    const variant = parseHeroVideoVariant(req.body && req.body.variant);
+    if (!variant) {
+      return res.status(400).json({ error: 'variant must be desktop or mobile' });
+    }
+
+    const kv = normalizeHeroVideoKv(await getHeroVideoKvRaw());
+    const prev = kv[variant];
     await removePreviousHeroVideo(prev);
+    if (cms.isDatabaseEnabled()) {
+      await deleteHeroVideoBlob(variant);
+    }
 
     const ext = path.extname(req.file.originalname || '').toLowerCase();
     const mimeType = req.file.mimetype || guessVideoMime(ext);
-    const originalFilename = req.file.originalname || `hero${ext || '.mp4'}`;
+    const originalFilename = req.file.originalname || `hero-${variant}${ext || '.mp4'}`;
     const updatedAt = new Date().toISOString();
 
     let meta;
     if (cms.isDatabaseEnabled()) {
-      await setHeroVideoBlob(req.file.buffer, mimeType, originalFilename);
+      await setHeroVideoBlob(req.file.buffer, mimeType, originalFilename, variant);
       meta = {
         storage: 'database',
         path: null,
@@ -153,7 +166,7 @@ router.post('/hero-video', uploadHeroVideo.single('video'), async function (req,
         updatedAt
       };
     } else {
-      const rel = writeHeroVideoToDisk(req.file.buffer, originalFilename);
+      const rel = writeHeroVideoToDisk(req.file.buffer, originalFilename, variant);
       meta = {
         storage: 'disk',
         path: rel,
@@ -163,26 +176,35 @@ router.post('/hero-video', uploadHeroVideo.single('video'), async function (req,
       };
     }
 
-    await cms.setKv(HERO_VIDEO_KV, meta);
-    const out = await getHeroVideoMeta();
-    res.json(out);
+    kv[variant] = meta;
+    await saveHeroVideoKv(kv);
+    res.json(await getHeroVideoMeta());
   } catch (e) {
     next(e);
   }
 });
 
-router.delete('/hero-video', async function (req, res, next) {
+router.delete('/hero-video/:variant', async function (req, res, next) {
   try {
-    const prev = await cms.getKv(HERO_VIDEO_KV);
-    await removePreviousHeroVideo(prev);
-    await cms.setKv(HERO_VIDEO_KV, {
+    const variant = parseHeroVideoVariant(req.params.variant);
+    if (!variant) {
+      return res.status(400).json({ error: 'variant must be desktop or mobile' });
+    }
+
+    const kv = normalizeHeroVideoKv(await getHeroVideoKvRaw());
+    await removePreviousHeroVideo(kv[variant]);
+    if (cms.isDatabaseEnabled()) {
+      await deleteHeroVideoBlob(variant);
+    }
+    kv[variant] = {
       storage: null,
       path: null,
       mimeType: null,
       originalFilename: null,
       updatedAt: null
-    });
-    res.json({ success: true });
+    };
+    await saveHeroVideoKv(kv);
+    res.json({ success: true, ...(await getHeroVideoMeta()) });
   } catch (e) {
     next(e);
   }

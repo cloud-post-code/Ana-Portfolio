@@ -40,16 +40,6 @@
           </div>
         </header>
 
-        <% if (item.description) { %>
-        <section class="detail__lead-band reveal-blur" aria-label="Overview">
-          <div class="detail__lead-band-inner">
-            <div class="detail__lead-box">
-              <p class="detail__lead-text"><%= item.description %></p>
-            </div>
-          </div>
-        </section>
-        <% } %>
-
         <% (item.deliverables || []).forEach(function(del) { %>
         <section class="detail__deliverable reveal-blur" aria-labelledby="<%= del.id %>-heading">
           <div class="detail__deliverable-heading<%= del.description ? ' detail__deliverable-heading--has-about' : '' %>">

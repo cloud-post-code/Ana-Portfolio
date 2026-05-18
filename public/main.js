@@ -425,6 +425,8 @@
   }
 
   // ---- Detail page: collapsible "About The Project" panel ----
+  const ABOUT_PANEL_MS = 460;
+
   document.querySelectorAll('.detail__about-toggle').forEach((btn) => {
     btn.addEventListener('click', () => {
       const deliverable = btn.closest('.detail__deliverable');
@@ -434,9 +436,23 @@
       if (!layout || !panel || !aside) return;
 
       const open = !layout.classList.contains('detail__deliverable-layout--about-open');
-      layout.classList.toggle('detail__deliverable-layout--about-open', open);
+
+      if (open) {
+        aside.hidden = false;
+        aside.setAttribute('aria-hidden', 'false');
+        void layout.offsetWidth;
+        layout.classList.add('detail__deliverable-layout--about-open');
+      } else {
+        layout.classList.remove('detail__deliverable-layout--about-open');
+        aside.setAttribute('aria-hidden', 'true');
+        window.setTimeout(() => {
+          if (!layout.classList.contains('detail__deliverable-layout--about-open')) {
+            aside.hidden = true;
+          }
+        }, ABOUT_PANEL_MS);
+      }
+
       btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-      aside.hidden = !open;
 
       const icon = btn.querySelector('.detail__about-toggle-icon');
       if (icon) icon.textContent = open ? '\u00d7' : '+';

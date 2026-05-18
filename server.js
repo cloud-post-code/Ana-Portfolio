@@ -5,7 +5,7 @@ const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
 
 const cms = require('./lib/cms-store');
-const { getHeroVideoForServe } = require('./lib/hero-video');
+const { getHeroVideoForServe, parseHeroVideoVariant } = require('./lib/hero-video');
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
@@ -28,11 +28,10 @@ app.get('/resume.md', async function (req, res, next) {
   }
 });
 
-/** Hero background video from PostgreSQL when DATABASE_URL is set (survives Railway redeploys). */
-app.get('/hero-video/file', async function (req, res, next) {
+async function serveHeroVideoBlob(req, res, next, variant) {
   try {
     if (!cms.isDatabaseEnabled()) return next();
-    const blob = await getHeroVideoForServe();
+    const blob = await getHeroVideoForServe(variant);
     if (!blob || !blob.data || !blob.data.length) return next();
     res.set({
       'Content-Type': blob.mimeType || 'video/mp4',
@@ -44,6 +43,16 @@ app.get('/hero-video/file', async function (req, res, next) {
   } catch (e) {
     next(e);
   }
+}
+
+/** Hero background video from PostgreSQL when DATABASE_URL is set (survives Railway redeploys). */
+app.get('/hero-video/file', function (req, res, next) {
+  serveHeroVideoBlob(req, res, next, 'desktop');
+});
+app.get('/hero-video/file/:variant', function (req, res, next) {
+  const variant = parseHeroVideoVariant(req.params.variant);
+  if (!variant) return res.status(400).send('Invalid variant');
+  serveHeroVideoBlob(req, res, next, variant);
 });
 
 app.use(express.static(path.join(__dirname, 'public')));

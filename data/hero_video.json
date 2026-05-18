@@ -1,5 +1,16 @@
 {
-  "path": null,
-  "originalFilename": null,
-  "updatedAt": null
+  "desktop": {
+    "storage": null,
+    "path": null,
+    "mimeType": null,
+    "originalFilename": null,
+    "updatedAt": null
+  },
+  "mobile": {
+    "storage": null,
+    "path": null,
+    "mimeType": null,
+    "originalFilename": null,
+    "updatedAt": null
+  }
 }
