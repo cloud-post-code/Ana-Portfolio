@@ -6,10 +6,8 @@
       <span class="nav__toggle-box" aria-hidden="true"><span></span><span></span><span></span></span>
     </button>
     <ul class="nav__links" id="navLinks">
+      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '#hero' %>">Home</a></li>
       <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#about">About</a></li>
-      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#brands">Work Experiences</a></li>
-      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#client-projects">Client Projects</a></li>
-      <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#personal-projects">Personal Projects</a></li>
       <li><a href="<%= typeof isDetail !== 'undefined' && isDetail ? '/' : '' %>#contact" class="nav__cta">Hire me</a></li>
     </ul>
   </div>
