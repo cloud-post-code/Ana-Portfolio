@@ -669,11 +669,18 @@ a {
 }
 
 .brands__grid {
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 1.25rem;
   align-items: stretch;
+  width: 100%;
+}
+
+.brands__grid > .brand-tile {
+  flex: 0 1 260px;
+  width: 100%;
+  max-width: 340px;
 }
 
 .brand-tile {
@@ -1229,7 +1236,14 @@ body.portfolio-hero-marquee-focus #brands.section {
   }
 
   .brands__grid {
-    grid-template-columns: 1fr;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .brands__grid > .brand-tile {
+    flex: 1 1 100%;
+    max-width: 100%;
   }
 
   .hero__title {
