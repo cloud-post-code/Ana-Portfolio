@@ -804,7 +804,7 @@ a {
 }
 
 /* ============================================
-   Marquee (full-width strip under hero)
+   Marquee (skills strip in About section)
    ============================================ */
 
 .marquee-strip {
@@ -812,8 +812,11 @@ a {
   z-index: 2;
   width: 100%;
   overflow: hidden;
-  /* Sits flush under hero; subtle separation without layout shift */
   box-shadow: 0 6px 24px rgba(26, 26, 26, 0.06);
+}
+
+.about .marquee-strip {
+  margin-bottom: clamp(1.75rem, 4.5vw, 3.5rem);
 }
 
 .marquee {
@@ -879,7 +882,7 @@ body.portfolio-hero-marquee-focus #brands .brands__focus-main,
 body.portfolio-hero-marquee-focus #client-projects,
 body.portfolio-hero-marquee-focus #personal-projects,
 body.portfolio-hero-marquee-focus #projects,
-body.portfolio-hero-marquee-focus #about,
+body.portfolio-hero-marquee-focus #about .container,
 body.portfolio-hero-marquee-focus #contact,
 body.portfolio-hero-marquee-focus .footer {
   display: none !important;
@@ -887,11 +890,6 @@ body.portfolio-hero-marquee-focus .footer {
 
 body.portfolio-hero-marquee-focus #brands.section {
   padding: clamp(0.325rem, 1vw, 0.5rem) 0;
-}
-
-/* Tighter top padding on About when it follows the marquee */
-.marquee-strip + #about {
-  padding-top: clamp(1.75rem, 4.5vw, 3.5rem);
 }
 
 /* ============================================
