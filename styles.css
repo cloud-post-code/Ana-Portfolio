@@ -671,8 +671,8 @@ a {
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-accent);
-  margin-bottom: 0.094rem;
-  padding-bottom: 0.056rem;
+  margin-bottom: 0;
+  padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--color-accent);
   max-width: none;
 }
@@ -683,6 +683,8 @@ a {
   gap: clamp(0.35rem, 1.5vw, 0.75rem);
   align-items: stretch;
   width: 100%;
+  margin-top: 0.65rem;
+  margin-bottom: 0.65rem;
 }
 
 .brands__grid > .brand-tile {
@@ -785,23 +787,25 @@ a {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.035rem;
-  margin-top: 0.05rem;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
   flex-shrink: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 .brand-tile__tag {
   display: inline-block;
-  padding: 0.018rem 0.055rem;
-  font-size: 0.65rem;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.78rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   color: var(--color-accent);
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid currentColor;
-  border-radius: 999px;
-  line-height: 1.4;
+  border-radius: 0;
+  line-height: 1.35;
 }
 
 #brands .brand-tile:focus-visible,
