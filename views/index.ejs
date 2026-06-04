@@ -112,8 +112,13 @@
           <% } else { %>
           <div class="brands__grid">
             <% experiences.forEach(function(exp) { %>
-            <a href="/experience/<%= exp.slug %>" class="brand-tile">
-              <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo" />
+            <a href="/experience/<%= exp.slug %>" class="brand-tile<%= exp.logoHover ? ' brand-tile--has-hover' : '' %>">
+              <span class="brand-tile__logo-wrap">
+                <img src="/<%= exp.logo %>" alt="<%= exp.title %>" class="brand-tile__logo brand-tile__logo--default" />
+                <% if (exp.logoHover) { %>
+                <img src="/<%= exp.logoHover %>" alt="" aria-hidden="true" class="brand-tile__logo brand-tile__logo--hover" />
+                <% } %>
+              </span>
               <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
             </a>

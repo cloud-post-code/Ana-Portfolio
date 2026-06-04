@@ -163,6 +163,7 @@ function addMediaItem(grid, type, src, alt) {
 
   var html =
     '<div class="admin__media-item">' +
+      '<span class="admin__media-drag" title="Drag to reorder">&#9776;</span>' +
       '<div class="admin__media-preview">' + previewHTML + '</div>' +
       '<div class="admin__media-fields">' +
         '<select name="media_type">' +
@@ -177,6 +178,7 @@ function addMediaItem(grid, type, src, alt) {
     '</div>';
 
   grid.insertAdjacentHTML('beforeend', html);
+  initMediaDragAndDrop(grid);
 }
 
 /* ─── Add deliverable sub-group ──────────────────────────────────────── */
@@ -272,6 +274,7 @@ if (form) {
       dateRange: getValue('dateRange'),
       description: getValue('description'),
       logo: getValue('logo'),
+      logoHover: getValue('logoHover'),
       subtitle: getValue('subtitle'),
       hidden: getValue('hidden'),
       projectType: getValue('projectType') === 'personal' ? 'personal' : 'client',
@@ -344,6 +347,8 @@ function initDragAndDrop() {
 
   list.querySelectorAll('.admin__deliverable-drag').forEach(function (handle) {
     var item = handle.closest('.admin__deliverable');
+    if (item.dataset.dragInit === '1') return;
+    item.dataset.dragInit = '1';
 
     item.setAttribute('draggable', 'true');
 
@@ -377,6 +382,59 @@ function initDragAndDrop() {
         } else {
           parent.insertBefore(dragSrc, item);
         }
+      }
+    });
+  });
+
+  list.querySelectorAll('.admin__media-grid').forEach(function (grid) {
+    initMediaDragAndDrop(grid);
+  });
+}
+
+/* ─── Drag-and-drop for media items within a sub-group ───────────────── */
+function initMediaDragAndDrop(grid) {
+  if (!grid) return;
+  var dragSrc = null;
+
+  grid.querySelectorAll('.admin__media-item').forEach(function (item) {
+    if (item.dataset.dragInit === '1') return;
+    item.dataset.dragInit = '1';
+
+    item.setAttribute('draggable', 'true');
+
+    item.addEventListener('dragstart', function (e) {
+      // Don't start drag when interacting with inputs/buttons
+      var tag = (e.target.tagName || '').toLowerCase();
+      if (tag === 'input' || tag === 'select' || tag === 'textarea' || tag === 'button') {
+        e.preventDefault();
+        return;
+      }
+      dragSrc = item;
+      item.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+    });
+
+    item.addEventListener('dragend', function () {
+      item.classList.remove('dragging');
+      dragSrc = null;
+    });
+
+    item.addEventListener('dragover', function (e) {
+      if (!dragSrc || dragSrc.parentNode !== grid) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+
+    item.addEventListener('drop', function (e) {
+      if (!dragSrc || dragSrc === item || dragSrc.parentNode !== grid) return;
+      e.preventDefault();
+      var allItems = Array.from(grid.querySelectorAll('.admin__media-item'));
+      var fromIdx = allItems.indexOf(dragSrc);
+      var toIdx = allItems.indexOf(item);
+      if (fromIdx < toIdx) {
+        grid.insertBefore(dragSrc, item.nextSibling);
+      } else {
+        grid.insertBefore(dragSrc, item);
       }
     });
   });

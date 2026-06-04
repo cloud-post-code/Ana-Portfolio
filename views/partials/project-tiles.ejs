@@ -3,8 +3,13 @@
 <% } else { %>
 <div class="brands__grid">
   <% projects.forEach(function(proj) { %>
-  <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %>">
-    <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo" />
+  <a href="/project/<%= proj.slug %>" class="brand-tile<%= proj.tileClass ? ' ' + proj.tileClass : '' %><%= proj.logoHover ? ' brand-tile--has-hover' : '' %>">
+    <span class="brand-tile__logo-wrap">
+      <img src="/<%= proj.logo %>" alt="<%= proj.title %>" class="brand-tile__logo brand-tile__logo--default" />
+      <% if (proj.logoHover) { %>
+      <img src="/<%= proj.logoHover %>" alt="" aria-hidden="true" class="brand-tile__logo brand-tile__logo--hover" />
+      <% } %>
+    </span>
     <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
     <span class="brand-tile__cta">VIEW DETAILS</span>
   </a>

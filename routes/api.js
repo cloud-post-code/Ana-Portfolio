@@ -21,7 +21,7 @@ const upload = multer({
   storage,
   limits: { fileSize: 50 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
-    const allowed = /jpeg|jpg|png|gif|webp|mp4|webm|mov/;
+    const allowed = /jpeg|jpg|png|gif|webp|mp4|webm|mov|pdf/;
     const ext = allowed.test(path.extname(file.originalname).toLowerCase());
     const mime = allowed.test(file.mimetype.split('/')[1]);
     cb(null, ext || mime);
@@ -248,6 +248,7 @@ function crudRoutes(entityName, filename) {
         dateRange: req.body.dateRange || '',
         description: req.body.description || '',
         logo: req.body.logo || '',
+        logoHover: req.body.logoHover || '',
         skills: req.body.skills || [],
         subtitle: req.body.subtitle || '',
         hidden: req.body.hidden || false,

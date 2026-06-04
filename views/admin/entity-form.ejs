@@ -59,6 +59,18 @@ var adminTitle = isNew
       <% } %>
     </div>
 
+    <div class="admin__form-group admin__form-group--full">
+      <label>Hover logo (shown when hovering the tile)</label>
+      <div class="admin__file-input">
+        <input type="text" name="logoHover" value="<%= isNew ? '' : (item.logoHover || '') %>" placeholder="Path or upload (optional)" />
+        <input type="file" accept="image/*" onchange="uploadFile(this, 'logoHover')" />
+        <button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload</button>
+      </div>
+      <% if (!isNew && item.logoHover) { %>
+      <img src="/<%= item.logoHover %>" class="admin__preview-thumb" alt="Current hover logo" />
+      <% } %>
+    </div>
+
     <% if (entity === 'experiences') { %>
     <div class="admin__form-group admin__form-group--full">
       <label>Role / Job Title</label>
@@ -147,6 +159,7 @@ var adminTitle = isNew
             <div class="admin__media-grid">
               <% if (del.media) { del.media.forEach(function(m) { %>
               <div class="admin__media-item">
+                <span class="admin__media-drag" title="Drag to reorder">&#9776;</span>
                 <div class="admin__media-preview">
                   <% if (m.type === 'image') { %>
                   <img src="/<%= m.src %>" alt="<%= m.alt %>" />
