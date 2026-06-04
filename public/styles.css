@@ -670,7 +670,8 @@ a {
 
 .brands__grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  width: 100%;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 1.25rem;
   align-items: stretch;
 }
@@ -691,7 +692,7 @@ a {
   height: 100%;
 }
 
-/* 300×150px logo slot (150 tall × 300 wide); cover centers square marks, crops top/bottom */
+/* 300×150px logo slot; contain keeps the full mark inside the frame */
 .brand-tile__logo {
   display: block;
   flex: 0 0 auto;
@@ -702,8 +703,76 @@ a {
   border: none;
   border-radius: 0;
   background: transparent;
-  object-fit: cover;
+  object-fit: contain;
   object-position: center;
+}
+
+.brand-tile__logo-wrap {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 300px;
+  height: 150px;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.brand-tile__logo-wrap .brand-tile__logo {
+  width: 100%;
+  height: 100%;
+}
+
+.brand-tile__logo--hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 220ms ease;
+  pointer-events: none;
+}
+
+.brand-tile__logo--default {
+  opacity: 1;
+  transition: opacity 220ms ease;
+}
+
+.brand-tile--has-hover:hover .brand-tile__logo--default,
+.brand-tile--has-hover:focus-visible .brand-tile__logo--default {
+  opacity: 0;
+}
+
+.brand-tile--has-hover:hover .brand-tile__logo--hover,
+.brand-tile--has-hover:focus-visible .brand-tile__logo--hover {
+  opacity: 1;
+}
+
+/* Title + CTA appear on hover when a hover logo is configured */
+.brand-tile--has-hover .brand-tile__name,
+.brand-tile--has-hover .brand-tile__cta,
+.brand-tile--has-hover .brand-tile__tags {
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 220ms ease, max-height 220ms ease;
+}
+
+.brand-tile--has-hover:hover .brand-tile__name,
+.brand-tile--has-hover:hover .brand-tile__cta,
+.brand-tile--has-hover:hover .brand-tile__tags,
+.brand-tile--has-hover:focus-visible .brand-tile__name,
+.brand-tile--has-hover:focus-visible .brand-tile__cta,
+.brand-tile--has-hover:focus-visible .brand-tile__tags {
+  opacity: 1;
+  max-height: 8rem;
+  margin-top: 0;
+  pointer-events: auto;
+}
+
+.brand-tile--has-hover:hover .brand-tile__tags,
+.brand-tile--has-hover:focus-visible .brand-tile__tags {
+  margin-top: 0.5rem;
 }
 
 .brand-tile__name {
@@ -1074,12 +1143,6 @@ body.portfolio-hero-marquee-focus #brands.section {
     padding: clamp(1.5rem, 3.5vw, 2.5rem) 0;
   }
 }
-@media (max-width: 1024px) {
-  .brands__grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
 
   .section {
@@ -1166,8 +1229,6 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .brands__grid {
     grid-template-columns: 1fr;
-    max-width: 400px;
-    margin: 0 auto;
   }
 
   .hero__title {
@@ -1285,7 +1346,8 @@ body.portfolio-hero-marquee-focus #brands.section {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .brand-tile__logo--img.brand-tile__logo--wide {
@@ -1398,15 +1460,13 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .detail__deliverable-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: clamp(1.25rem, 3vw, 2.25rem);
   align-items: start;
 }
 
-/* Collapsible about panel: media resizes horizontally when About opens */
+/* Collapsible about panel: side-by-side only when About is open */
 .detail__deliverable-layout--has-about {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0fr);
-  column-gap: 0;
   row-gap: clamp(1.25rem, 3vw, 2.25rem);
   transition:
     grid-template-columns 0.45s cubic-bezier(0.4, 0, 0.2, 1),
@@ -1508,6 +1568,7 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .detail__deliverable-media {
   min-width: 0;
+  width: 100%;
 }
 
 .detail__deliverable-desc {
@@ -1520,6 +1581,7 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .detail__gallery {
   display: grid;
+  width: 100%;
   grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
   gap: 1rem;
 }
