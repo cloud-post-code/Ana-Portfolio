@@ -656,6 +656,15 @@ a {
   padding: clamp(0.1125rem, 0.25vw, 0.1875rem) 0;
 }
 
+#brands .brands__focus-main,
+#client-projects .brands__focus-main,
+#personal-projects .brands__focus-main,
+#projects .brands__focus-main {
+  max-width: min(1320px, 100%);
+  padding-left: clamp(0.35rem, 1.25vw, 0.65rem);
+  padding-right: clamp(0.35rem, 1.25vw, 0.65rem);
+}
+
 .brands__group-title {
   font-family: var(--font-title);
   font-size: clamp(1.125rem, 3vw, 1.8rem);
@@ -671,7 +680,7 @@ a {
 .brands__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.125rem;
+  gap: clamp(0.35rem, 1.5vw, 0.75rem);
   align-items: stretch;
   width: 100%;
 }
@@ -688,7 +697,7 @@ a {
   justify-content: flex-start;
   text-align: center;
   gap: 0.075rem;
-  padding: 0.05rem 0.025rem 0.1rem;
+  padding: 0;
   background: transparent;
   border: none;
   border-radius: 0;
@@ -697,15 +706,15 @@ a {
   height: 100%;
 }
 
-/* Logo slot; contain keeps the full mark inside the frame */
+/* Logo slot: square frame reduces side letterboxing; logos scale to full column width */
 .brand-tile__logo {
   display: block;
   flex: 0 0 auto;
   width: 100%;
   height: auto;
-  aspect-ratio: 11 / 6;
+  aspect-ratio: 1 / 1;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
   border: none;
   border-radius: 0;
   background: transparent;
@@ -719,9 +728,9 @@ a {
   flex: 0 0 auto;
   width: 100%;
   height: auto;
-  aspect-ratio: 11 / 6;
+  aspect-ratio: 1 / 1;
   max-width: 100%;
-  margin: 0 auto;
+  margin: 0;
   overflow: hidden;
 }
 
@@ -1223,9 +1232,9 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .brand-tile__logo,
   .brand-tile__logo-wrap {
-    width: min(100%, 400px);
+    width: 100%;
     height: auto;
-    aspect-ratio: 11 / 6;
+    aspect-ratio: 1 / 1;
   }
 
   .hero__title {
