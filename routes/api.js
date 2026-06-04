@@ -32,7 +32,9 @@ const upload = multer({
       /\.html?$/i.test(ext) ||
       mime === 'text/html' ||
       mime === 'application/xhtml+xml';
-    cb(null, okImage || okVideo || okPdf || okHtml);
+    const okAudio =
+      /\.(mp3|wav|ogg|m4a|aac|flac|webm)$/i.test(ext) || mime.startsWith('audio/');
+    cb(null, okImage || okVideo || okPdf || okHtml || okAudio);
   }
 });
 

@@ -111,6 +111,20 @@
                   </div>
                   <a class="detail__html__link" href="/<%= m.src %>" target="_blank" rel="noopener noreferrer">Open full page<%= m.alt ? (' — ' + m.alt) : '' %></a>
                 </div>
+                  <% } else if (m.type === 'audio' || m.type === 'audio-autoplay' || /\.(mp3|wav|ogg|m4a|aac|flac|webm)$/i.test(m.src || '')) { %>
+                <div class="detail__audio" data-state="paused"<%= m.type === 'audio-autoplay' ? ' data-autoplay="true"' : '' %>>
+                  <audio class="detail__audio__media" preload="metadata" aria-label="<%= m.alt || 'Audio clip' %>">
+                    <source src="<%= m.src %>" />
+                  </audio>
+                  <div class="detail__audio__bar" role="group" aria-label="<%= m.alt || 'Audio player' %>">
+                    <button type="button" class="detail__audio__play" aria-label="Play audio"></button>
+                    <input type="range" class="detail__audio__seek" min="0" max="100" value="0" step="0.1" aria-label="Seek" />
+                    <span class="detail__audio__time" aria-live="off">
+                      <span class="detail__audio__current">0:00</span><span class="detail__audio__sep" aria-hidden="true"> / </span><span class="detail__audio__duration">0:00</span>
+                    </span>
+                  </div>
+                  <% if (m.alt) { %><p class="detail__audio__label"><%= m.alt %></p><% } %>
+                </div>
                   <% } %>
                 <% }); %>
               </div>

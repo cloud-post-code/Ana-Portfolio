@@ -144,9 +144,23 @@ function isHtmlUploadFile(file) {
   );
 }
 
+function isAudioPath(pathStr) {
+  return /\.(mp3|wav|ogg|m4a|aac|flac|webm)$/i.test(pathStr || '');
+}
+
+function isAudioUploadFile(file) {
+  if (!file) return false;
+  var n = (file.name || '').toLowerCase();
+  return (
+    isAudioPath(n) ||
+    (file.type && String(file.type).toLowerCase().indexOf('audio/') === 0)
+  );
+}
+
 function mediaTypeFromUpload(pathStr, file) {
   if (isHtmlUploadFile(file) || isHtmlPath(pathStr)) return 'html';
   if (isPdfUploadFile(file) || isPdfPath(pathStr)) return 'pdf';
+  if (isAudioUploadFile(file) || isAudioPath(pathStr)) return 'audio';
   if (/\.(mp4|webm|mov)$/i.test(pathStr || '')) return 'video-hover';
   return 'image';
 }
@@ -188,15 +202,18 @@ function addMediaManual(btn) {
 function addMediaItem(grid, type, src, alt) {
   var isHtml = type === 'html';
   var isPdf = type === 'pdf';
-  var isVideo = type !== 'image' && !isPdf && !isHtml;
+  var isAudio = type === 'audio' || type === 'audio-autoplay';
+  var isVideo = type !== 'image' && !isPdf && !isHtml && !isAudio;
   var previewHTML = src
     ? (isHtml
       ? '<span class="admin__media-preview-html" title="HTML">HTML</span>'
       : isPdf
         ? '<span class="admin__media-preview-pdf" title="PDF">PDF</span>'
-        : isVideo
-          ? '<video src="/' + src + '" muted></video>'
-          : '<img src="/' + src + '" alt="" />')
+        : isAudio
+          ? '<span class="admin__media-preview-audio" title="Audio">AUDIO</span>'
+          : isVideo
+            ? '<video src="/' + src + '" muted></video>'
+            : '<img src="/' + src + '" alt="" />')
     : '';
 
   var html =
@@ -211,6 +228,8 @@ function addMediaItem(grid, type, src, alt) {
           '<option value="video-hover"' + (type === 'video-hover' ? ' selected' : '') + '>Video (hover play)</option>' +
           '<option value="video-still"' + (type === 'video-still' ? ' selected' : '') + '>Video (still frame)</option>' +
           '<option value="video-click"' + (type === 'video-click' ? ' selected' : '') + '>Video (click play/pause)</option>' +
+          '<option value="audio"' + (type === 'audio' ? ' selected' : '') + '>Audio — paused on open</option>' +
+          '<option value="audio-autoplay"' + (type === 'audio-autoplay' ? ' selected' : '') + '>Audio — play on open</option>' +
         '</select>' +
         '<input type="text" name="media_src" value="' + src + '" placeholder="File path" />' +
         '<input type="text" name="media_alt" value="' + alt + '" placeholder="Alt text" />' +
@@ -265,7 +284,7 @@ function addDeliverable() {
         '<div class="admin__section-header">' +
           '<h4>Media</h4>' +
           '<div>' +
-            '<input type="file" accept="image/*,video/*,application/pdf,.pdf,text/html,.html,.htm" multiple onchange="uploadMedia(this)" style="display:none" />' +
+            '<input type="file" accept="image/*,video/*,audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,application/pdf,.pdf,text/html,.html,.htm" multiple onchange="uploadMedia(this)" style="display:none" />' +
             '<button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload Files</button>' +
             '<button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="addMediaManual(this)">+ Add Manually</button>' +
           '</div>' +

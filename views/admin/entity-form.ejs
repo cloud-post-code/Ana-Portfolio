@@ -155,7 +155,7 @@ var adminTitle = isNew
             <div class="admin__section-header">
               <h4>Media</h4>
               <div>
-                <input type="file" accept="image/*,video/*,application/pdf,.pdf,text/html,.html,.htm" multiple onchange="uploadMedia(this)" style="display:none" />
+                <input type="file" accept="image/*,video/*,audio/*,.mp3,.wav,.ogg,.m4a,.aac,.flac,application/pdf,.pdf,text/html,.html,.htm" multiple onchange="uploadMedia(this)" style="display:none" />
                 <button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload Files</button>
                 <button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="addMediaManual(this)">+ Add Manually</button>
               </div>
@@ -169,6 +169,8 @@ var adminTitle = isNew
                   <span class="admin__media-preview-html" title="HTML">HTML</span>
                   <% } else if (m.type === 'pdf' || /\.pdf$/i.test(m.src || '')) { %>
                   <span class="admin__media-preview-pdf" title="PDF">PDF</span>
+                  <% } else if (m.type === 'audio' || m.type === 'audio-autoplay' || /\.(mp3|wav|ogg|m4a|aac|flac|webm)$/i.test(m.src || '')) { %>
+                  <span class="admin__media-preview-audio" title="Audio">AUDIO</span>
                   <% } else if (m.type === 'image') { %>
                   <img src="/<%= m.src %>" alt="<%= m.alt %>" />
                   <% } else { %>
@@ -183,6 +185,8 @@ var adminTitle = isNew
                     <option value="video-hover" <%= m.type === 'video-hover' ? 'selected' : '' %>>Video (hover play)</option>
                     <option value="video-still" <%= m.type === 'video-still' ? 'selected' : '' %>>Video (still frame)</option>
                     <option value="video-click" <%= m.type === 'video-click' ? 'selected' : '' %>>Video (click play/pause)</option>
+                    <option value="audio" <%= m.type === 'audio' ? 'selected' : '' %>>Audio — paused on open</option>
+                    <option value="audio-autoplay" <%= m.type === 'audio-autoplay' ? 'selected' : '' %>>Audio — play on open</option>
                   </select>
                   <input type="text" name="media_src" value="<%= m.src %>" placeholder="File path" />
                   <input type="text" name="media_alt" value="<%= m.alt %>" placeholder="Alt text" />

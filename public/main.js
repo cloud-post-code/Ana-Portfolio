@@ -339,6 +339,107 @@
     setState(false);
   });
 
+  // ---- Audio player bars (play/pause, seek, elapsed / total time) ----
+  function formatAudioTime(seconds) {
+    if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
+    const m = Math.floor(seconds / 60);
+    const s = Math.floor(seconds % 60);
+    return `${m}:${String(s).padStart(2, '0')}`;
+  }
+
+  document.querySelectorAll('.detail__audio').forEach((wrap) => {
+    const audio = wrap.querySelector('.detail__audio__media');
+    const btn = wrap.querySelector('.detail__audio__play');
+    const seek = wrap.querySelector('.detail__audio__seek');
+    const currentEl = wrap.querySelector('.detail__audio__current');
+    const durationEl = wrap.querySelector('.detail__audio__duration');
+    if (!audio) return;
+
+    let seeking = false;
+
+    const setState = (playing) => {
+      wrap.dataset.state = playing ? 'playing' : 'paused';
+      if (btn) btn.setAttribute('aria-label', playing ? 'Pause audio' : 'Play audio');
+    };
+
+    const updateDuration = () => {
+      if (durationEl) durationEl.textContent = formatAudioTime(audio.duration);
+    };
+
+    const updateProgress = () => {
+      if (seeking || !seek) return;
+      const pct = audio.duration ? (audio.currentTime / audio.duration) * 100 : 0;
+      seek.value = String(pct);
+      if (currentEl) currentEl.textContent = formatAudioTime(audio.currentTime);
+    };
+
+    const toggle = (e) => {
+      if (e) e.stopPropagation();
+      if (audio.paused) {
+        document.querySelectorAll('.detail__audio__media').forEach((other) => {
+          if (other !== audio && !other.paused) {
+            try {
+              other.pause();
+            } catch {
+              /* ignore */
+            }
+          }
+        });
+        audio.play().then(() => setState(true)).catch(() => {});
+      } else {
+        audio.pause();
+        setState(false);
+      }
+    };
+
+    if (btn) btn.addEventListener('click', toggle);
+
+    audio.addEventListener('loadedmetadata', () => {
+      updateDuration();
+      updateProgress();
+    });
+    audio.addEventListener('durationchange', updateDuration);
+    audio.addEventListener('timeupdate', updateProgress);
+    audio.addEventListener('play', () => setState(true));
+    audio.addEventListener('pause', () => setState(false));
+    audio.addEventListener('ended', () => {
+      setState(false);
+      if (seek) seek.value = '0';
+      if (currentEl) currentEl.textContent = formatAudioTime(0);
+    });
+
+    if (seek) {
+      seek.addEventListener('input', () => {
+        seeking = true;
+        const pct = Number(seek.value) / 100;
+        const t = audio.duration ? pct * audio.duration : 0;
+        if (currentEl) currentEl.textContent = formatAudioTime(t);
+      });
+      seek.addEventListener('change', () => {
+        const pct = Number(seek.value) / 100;
+        if (audio.duration) audio.currentTime = pct * audio.duration;
+        seeking = false;
+        updateProgress();
+      });
+    }
+
+    setState(false);
+    if (audio.readyState >= 1) updateDuration();
+
+    if (wrap.dataset.autoplay === 'true') {
+      const tryAutoplay = () => {
+        const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (reducedMotion) return;
+        audio.play().then(() => setState(true)).catch(() => {});
+      };
+      if (audio.readyState >= 1) {
+        tryAutoplay();
+      } else {
+        audio.addEventListener('loadedmetadata', tryAutoplay, { once: true });
+      }
+    }
+  });
+
   // ---- Detail page: fullscreen lightbox for gallery images & videos ----
   const detailMain = document.querySelector('main.detail');
   if (detailMain) {
