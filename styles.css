@@ -158,18 +158,18 @@ a {
    ============================================ */
 
 .nav {
-  --nav-bg-opacity: 0.78;
-  --nav-border-opacity: 0.55;
+  --nav-bg-opacity: 1;
+  --nav-border-opacity: 1;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
-  padding-top: max(0.65rem, env(safe-area-inset-top, 0px));
-  padding-bottom: max(0.35rem, env(safe-area-inset-bottom, 0px));
-  padding-left: max(clamp(1rem, 3vw, 2.5rem), env(safe-area-inset-left, 0px));
-  padding-right: max(clamp(1rem, 3vw, 2.5rem), env(safe-area-inset-right, 0px));
-  pointer-events: none;
+  padding: 0;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: #ffffff;
+  border-bottom: 1px solid var(--color-border);
+  box-shadow: 0 2px 12px rgba(26, 26, 26, 0.06);
 }
 
 .nav__inner {
@@ -181,17 +181,12 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem 1rem;
-  padding: 0.45rem clamp(1rem, 3vw, 2rem) 0.45rem clamp(0.75rem, 2.5vw, 1.5rem);
-  border-radius: 18px;
-  border: 1px solid rgba(210, 214, 222, var(--nav-border-opacity));
-  background: rgba(255, 255, 255, var(--nav-bg-opacity));
-  -webkit-backdrop-filter: blur(16px) saturate(1.12);
-  backdrop-filter: blur(16px) saturate(1.12);
-  box-shadow: 0 4px 24px rgba(26, 26, 26, 0.06);
-  transition:
-    background 0.15s linear,
-    border-color 0.15s linear,
-    box-shadow 0.45s var(--ease-out);
+  padding: 0.55rem clamp(1rem, 3vw, 2rem);
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  transition: box-shadow 0.3s var(--ease-out);
 }
 
 .nav--scrolled .nav__inner {
@@ -584,7 +579,7 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center top;
+  object-position: center center;
 }
 
 .about__accent-shape {
@@ -1599,7 +1594,8 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .detail__gallery img,
 .detail__gallery .detail__slide-still,
-.detail__gallery .detail__video-hover .detail__video-hover__media {
+.detail__gallery .detail__video-hover .detail__video-hover__media,
+.detail__gallery .detail__video-click .detail__video-click__media {
   width: 100%;
   height: auto;
   border-radius: var(--radius);
@@ -1608,6 +1604,61 @@ body.portfolio-hero-marquee-focus #brands.section {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   vertical-align: middle;
   display: block;
+}
+
+.detail__video-click {
+  position: relative;
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+  background: #0a0a0a;
+  overflow: hidden;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+}
+
+.detail__gallery .detail__video-click .detail__video-click__media {
+  border: none;
+  box-shadow: none;
+  object-fit: cover;
+}
+
+.detail__video-click__btn {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.9);
+  background: rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.2s ease, background 0.2s ease;
+  pointer-events: none;
+}
+
+.detail__video-click__btn::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  margin-left: 6px;
+  border-style: solid;
+  border-width: 14px 0 14px 22px;
+  border-color: transparent transparent transparent #fff;
+}
+
+.detail__video-click[data-state="playing"] .detail__video-click__btn {
+  opacity: 0;
+}
+
+.detail__video-click:hover .detail__video-click__btn,
+.detail__video-click:focus-within .detail__video-click__btn {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.6);
 }
 
 .detail__video-hover {

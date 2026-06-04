@@ -170,6 +170,7 @@ function addMediaItem(grid, type, src, alt) {
           '<option value="image"' + (type === 'image' ? ' selected' : '') + '>Image</option>' +
           '<option value="video-hover"' + (type === 'video-hover' ? ' selected' : '') + '>Video (hover play)</option>' +
           '<option value="video-still"' + (type === 'video-still' ? ' selected' : '') + '>Video (still frame)</option>' +
+          '<option value="video-click"' + (type === 'video-click' ? ' selected' : '') + '>Video (click play/pause)</option>' +
         '</select>' +
         '<input type="text" name="media_src" value="' + src + '" placeholder="File path" />' +
         '<input type="text" name="media_alt" value="' + alt + '" placeholder="Alt text" />' +

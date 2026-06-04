@@ -299,6 +299,34 @@
     wrap.setAttribute('tabindex', '0');
   });
 
+  // ---- Click-to-play/pause videos ----
+  document.querySelectorAll('.detail__video-click').forEach((wrap) => {
+    const video = wrap.querySelector('video');
+    const btn = wrap.querySelector('.detail__video-click__btn');
+    if (!video) return;
+
+    const setState = (playing) => {
+      wrap.dataset.state = playing ? 'playing' : 'paused';
+      if (btn) btn.setAttribute('aria-label', playing ? 'Pause video' : 'Play video');
+    };
+
+    const toggle = (e) => {
+      if (e) e.stopPropagation();
+      if (video.paused) {
+        video.play().then(() => setState(true)).catch(() => {});
+      } else {
+        video.pause();
+        setState(false);
+      }
+    };
+
+    wrap.addEventListener('click', toggle);
+    video.addEventListener('play', () => setState(true));
+    video.addEventListener('pause', () => setState(false));
+    video.addEventListener('ended', () => setState(false));
+    setState(false);
+  });
+
   // ---- Detail page: fullscreen lightbox for gallery images & videos ----
   const detailMain = document.querySelector('main.detail');
   if (detailMain) {

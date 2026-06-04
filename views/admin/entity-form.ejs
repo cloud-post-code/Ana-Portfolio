@@ -176,6 +176,7 @@ var adminTitle = isNew
                     <option value="image" <%= m.type === 'image' ? 'selected' : '' %>>Image</option>
                     <option value="video-hover" <%= m.type === 'video-hover' ? 'selected' : '' %>>Video (hover play)</option>
                     <option value="video-still" <%= m.type === 'video-still' ? 'selected' : '' %>>Video (still frame)</option>
+                    <option value="video-click" <%= m.type === 'video-click' ? 'selected' : '' %>>Video (click play/pause)</option>
                   </select>
                   <input type="text" name="media_src" value="<%= m.src %>" placeholder="File path" />
                   <input type="text" name="media_alt" value="<%= m.alt %>" placeholder="Alt text" />

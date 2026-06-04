@@ -84,6 +84,13 @@
                 <video class="detail__slide-still" muted playsinline preload="metadata" disablePictureInPicture aria-label="<%= m.alt %>">
                   <source src="<%= m.src %>" type="video/mp4" />
                 </video>
+                  <% } else if (m.type === 'video-click') { %>
+                <div class="detail__video-click" data-state="paused">
+                  <video class="detail__video-click__media" muted playsinline loop preload="metadata" aria-label="<%= m.alt %>">
+                    <source src="<%= m.src %>" type="video/mp4" />
+                  </video>
+                  <button type="button" class="detail__video-click__btn" aria-label="Play video"></button>
+                </div>
                   <% } %>
                 <% }); %>
               </div>
