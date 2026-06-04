@@ -81,6 +81,7 @@ const { markdownToDocxBuffer } = require('../lib/markdown-to-docx');
 async function loadData(filename) {
   if (filename === 'experiences.json') return cms.getPortfolio('experiences');
   if (filename === 'projects.json') return cms.getPortfolio('projects');
+  if (filename === 'pdfs.json') return cms.getPortfolio('pdfs');
   if (filename === 'resume.json') {
     const v = await cms.getKv('resume');
     const defaults = { path: null, originalFilename: null, updatedAt: null };
@@ -93,6 +94,7 @@ async function loadData(filename) {
 async function saveData(filename, data) {
   if (filename === 'experiences.json') return cms.savePortfolio('experiences', data);
   if (filename === 'projects.json') return cms.savePortfolio('projects', data);
+  if (filename === 'pdfs.json') return cms.savePortfolio('pdfs', data);
   if (filename === 'resume.json') return cms.setKv('resume', data);
   throw new Error('saveData: unknown file ' + filename);
 }
@@ -250,10 +252,13 @@ function crudRoutes(entityName, filename) {
         logo: req.body.logo || '',
         logoHover: req.body.logoHover || '',
         skills: req.body.skills || [],
+        tags: Array.isArray(req.body.tags) ? req.body.tags : [],
         subtitle: req.body.subtitle || '',
         hidden: req.body.hidden || false,
         projectType: req.body.projectType === 'personal' ? 'personal' : 'client',
         deliverables: req.body.deliverables || [],
+        cover: req.body.cover || '',
+        file: req.body.file || '',
         order: req.body.order != null ? req.body.order : data.length + 1
       };
 
@@ -367,6 +372,7 @@ function crudRoutes(entityName, filename) {
 
 crudRoutes('experiences', 'experiences.json');
 crudRoutes('projects', 'projects.json');
+crudRoutes('pdfs', 'pdfs.json');
 
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
 const RESUME_MD_FS = path.join(PUBLIC_DIR, 'resume.md');

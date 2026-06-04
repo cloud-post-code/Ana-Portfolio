@@ -12,6 +12,13 @@
     </span>
     <span class="brand-tile__name"><%= proj.title.toUpperCase() %></span>
     <span class="brand-tile__cta">VIEW DETAILS</span>
+    <% if (proj.tags && proj.tags.length) { %>
+    <span class="brand-tile__tags">
+      <% proj.tags.forEach(function(tag) { %>
+      <span class="brand-tile__tag"><%= tag %></span>
+      <% }); %>
+    </span>
+    <% } %>
   </a>
   <% }); %>
 </div>

@@ -280,6 +280,10 @@ if (form) {
       projectType: getValue('projectType') === 'personal' ? 'personal' : 'client',
       order: parseInt(getValue('order'), 10) || 1,
       skills: [],
+      tags: (getValue('tags') || '')
+        .split(',')
+        .map(function (t) { return t.trim(); })
+        .filter(function (t) { return t.length > 0; }),
       deliverables: collectDeliverables()
     };
 

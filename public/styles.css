@@ -729,6 +729,29 @@ a {
   color: var(--color-accent);
 }
 
+.brand-tile__tags {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  flex-shrink: 0;
+}
+
+.brand-tile__tag {
+  display: inline-block;
+  padding: 0.18rem 0.55rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  line-height: 1.4;
+}
+
 #brands .brand-tile:focus-visible,
 #client-projects .brand-tile:focus-visible,
 #personal-projects .brand-tile:focus-visible,
