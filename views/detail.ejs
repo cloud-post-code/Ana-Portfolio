@@ -71,6 +71,20 @@
                   </video>
                   <button type="button" class="detail__video-click__btn" aria-label="Play video"></button>
                 </div>
+                  <% } else if (m.type === 'pdf' || /\.pdf$/i.test(m.src || '')) { %>
+                <div class="detail__pdf">
+                  <div class="detail__pdf__frame">
+                    <iframe src="/<%= m.src %>" title="<%= m.alt || 'PDF document' %>" loading="lazy"></iframe>
+                  </div>
+                  <a class="detail__pdf__link" href="/<%= m.src %>" target="_blank" rel="noopener noreferrer">Open PDF<%= m.alt ? (' — ' + m.alt) : '' %></a>
+                </div>
+                  <% } else if (m.type === 'html' || /\.html?$/i.test(m.src || '')) { %>
+                <div class="detail__html">
+                  <div class="detail__html__frame">
+                    <iframe class="detail__html__iframe" src="/<%= m.src %>" title="<%= m.alt || 'HTML page' %>" loading="lazy"></iframe>
+                  </div>
+                  <a class="detail__html__link" href="/<%= m.src %>" target="_blank" rel="noopener noreferrer">Open full page<%= m.alt ? (' — ' + m.alt) : '' %></a>
+                </div>
                   <% } %>
                 <% }); %>
               </div>

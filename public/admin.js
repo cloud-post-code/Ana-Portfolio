@@ -120,6 +120,37 @@ function uploadFile(fileInput, fieldName) {
     .catch(function () { showToast('Upload failed', 'error'); });
 }
 
+function isPdfPath(pathStr) {
+  return /\.pdf$/i.test(pathStr || '');
+}
+
+function isPdfUploadFile(file) {
+  if (!file) return false;
+  var n = (file.name || '').toLowerCase();
+  return n.slice(-4) === '.pdf' || file.type === 'application/pdf';
+}
+
+function isHtmlPath(pathStr) {
+  return /\.html?$/i.test(pathStr || '');
+}
+
+function isHtmlUploadFile(file) {
+  if (!file) return false;
+  var n = (file.name || '').toLowerCase();
+  return (
+    /\.html?$/.test(n) ||
+    file.type === 'text/html' ||
+    file.type === 'application/xhtml+xml'
+  );
+}
+
+function mediaTypeFromUpload(pathStr, file) {
+  if (isHtmlUploadFile(file) || isHtmlPath(pathStr)) return 'html';
+  if (isPdfUploadFile(file) || isPdfPath(pathStr)) return 'pdf';
+  if (/\.(mp4|webm|mov)$/i.test(pathStr || '')) return 'video-hover';
+  return 'image';
+}
+
 /* ─── Upload media files into a deliverable ──────────────────────────── */
 function uploadMedia(fileInput) {
   var files = fileInput.files;
@@ -135,10 +166,11 @@ function uploadMedia(fileInput) {
   fetch('/api/upload/multiple', { method: 'POST', body: formData })
     .then(function (res) { return res.json(); })
     .then(function (results) {
-      results.forEach(function (r) {
-        var isVideo = /\.(mp4|webm|mov)$/i.test(r.filename);
-        var mediaType = isVideo ? 'video-hover' : 'image';
-        addMediaItem(mediaGrid, mediaType, r.path, r.filename);
+      results.forEach(function (r, i) {
+        var file = files[i];
+        var mediaType = mediaTypeFromUpload(r.path || r.filename, file);
+        var alt = file && file.name ? file.name.replace(/\.[^.]+$/, '') : '';
+        addMediaItem(mediaGrid, mediaType, r.path, alt);
       });
       showToast(results.length + ' file(s) uploaded', 'success');
     })
@@ -154,11 +186,17 @@ function addMediaManual(btn) {
 }
 
 function addMediaItem(grid, type, src, alt) {
-  var isVideo = type !== 'image';
+  var isHtml = type === 'html';
+  var isPdf = type === 'pdf';
+  var isVideo = type !== 'image' && !isPdf && !isHtml;
   var previewHTML = src
-    ? (isVideo
-      ? '<video src="/' + src + '" muted></video>'
-      : '<img src="/' + src + '" alt="" />')
+    ? (isHtml
+      ? '<span class="admin__media-preview-html" title="HTML">HTML</span>'
+      : isPdf
+        ? '<span class="admin__media-preview-pdf" title="PDF">PDF</span>'
+        : isVideo
+          ? '<video src="/' + src + '" muted></video>'
+          : '<img src="/' + src + '" alt="" />')
     : '';
 
   var html =
@@ -168,6 +206,8 @@ function addMediaItem(grid, type, src, alt) {
       '<div class="admin__media-fields">' +
         '<select name="media_type">' +
           '<option value="image"' + (type === 'image' ? ' selected' : '') + '>Image</option>' +
+          '<option value="html"' + (type === 'html' ? ' selected' : '') + '>HTML page</option>' +
+          '<option value="pdf"' + (type === 'pdf' ? ' selected' : '') + '>PDF</option>' +
           '<option value="video-hover"' + (type === 'video-hover' ? ' selected' : '') + '>Video (hover play)</option>' +
           '<option value="video-still"' + (type === 'video-still' ? ' selected' : '') + '>Video (still frame)</option>' +
           '<option value="video-click"' + (type === 'video-click' ? ' selected' : '') + '>Video (click play/pause)</option>' +
@@ -225,7 +265,7 @@ function addDeliverable() {
         '<div class="admin__section-header">' +
           '<h4>Media</h4>' +
           '<div>' +
-            '<input type="file" accept="image/*,video/*" multiple onchange="uploadMedia(this)" style="display:none" />' +
+            '<input type="file" accept="image/*,video/*,application/pdf,.pdf,text/html,.html,.htm" multiple onchange="uploadMedia(this)" style="display:none" />' +
             '<button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload Files</button>' +
             '<button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="addMediaManual(this)">+ Add Manually</button>' +
           '</div>' +

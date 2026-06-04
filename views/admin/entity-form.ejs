@@ -155,7 +155,7 @@ var adminTitle = isNew
             <div class="admin__section-header">
               <h4>Media</h4>
               <div>
-                <input type="file" accept="image/*,video/*" multiple onchange="uploadMedia(this)" style="display:none" />
+                <input type="file" accept="image/*,video/*,application/pdf,.pdf,text/html,.html,.htm" multiple onchange="uploadMedia(this)" style="display:none" />
                 <button type="button" class="admin__btn admin__btn--small" onclick="this.previousElementSibling.click()">Upload Files</button>
                 <button type="button" class="admin__btn admin__btn--small admin__btn--outline" onclick="addMediaManual(this)">+ Add Manually</button>
               </div>
@@ -165,7 +165,11 @@ var adminTitle = isNew
               <div class="admin__media-item">
                 <span class="admin__media-drag" title="Drag to reorder">&#9776;</span>
                 <div class="admin__media-preview">
-                  <% if (m.type === 'image') { %>
+                  <% if (m.type === 'html' || /\.html?$/i.test(m.src || '')) { %>
+                  <span class="admin__media-preview-html" title="HTML">HTML</span>
+                  <% } else if (m.type === 'pdf' || /\.pdf$/i.test(m.src || '')) { %>
+                  <span class="admin__media-preview-pdf" title="PDF">PDF</span>
+                  <% } else if (m.type === 'image') { %>
                   <img src="/<%= m.src %>" alt="<%= m.alt %>" />
                   <% } else { %>
                   <video src="/<%= m.src %>" muted></video>
@@ -174,6 +178,8 @@ var adminTitle = isNew
                 <div class="admin__media-fields">
                   <select name="media_type">
                     <option value="image" <%= m.type === 'image' ? 'selected' : '' %>>Image</option>
+                    <option value="html" <%= m.type === 'html' ? 'selected' : '' %>>HTML page</option>
+                    <option value="pdf" <%= m.type === 'pdf' ? 'selected' : '' %>>PDF</option>
                     <option value="video-hover" <%= m.type === 'video-hover' ? 'selected' : '' %>>Video (hover play)</option>
                     <option value="video-still" <%= m.type === 'video-still' ? 'selected' : '' %>>Video (still frame)</option>
                     <option value="video-click" <%= m.type === 'video-click' ? 'selected' : '' %>>Video (click play/pause)</option>

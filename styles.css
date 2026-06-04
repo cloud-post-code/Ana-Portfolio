@@ -678,9 +678,9 @@ a {
 }
 
 .brands__grid > .brand-tile {
-  flex: 0 1 260px;
+  flex: 0 1 360px;
   width: 100%;
-  max-width: 340px;
+  max-width: 480px;
 }
 
 .brand-tile {
@@ -690,7 +690,7 @@ a {
   justify-content: flex-start;
   text-align: center;
   gap: 0.75rem;
-  padding: 1.5rem 1rem;
+  padding: 1.75rem 1.35rem 1.5rem;
   background: #fff;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
@@ -699,12 +699,12 @@ a {
   height: 100%;
 }
 
-/* 300×150px logo slot; contain keeps the full mark inside the frame */
+/* Logo slot; contain keeps the full mark inside the frame */
 .brand-tile__logo {
   display: block;
   flex: 0 0 auto;
-  width: 300px;
-  height: 150px;
+  width: 380px;
+  height: 190px;
   max-width: 100%;
   margin: 0 auto;
   border: none;
@@ -718,8 +718,8 @@ a {
   position: relative;
   display: block;
   flex: 0 0 auto;
-  width: 300px;
-  height: 150px;
+  width: 380px;
+  height: 190px;
   max-width: 100%;
   margin: 0 auto;
   overflow: hidden;
@@ -753,9 +753,8 @@ a {
   opacity: 1;
 }
 
-/* Title + CTA appear on hover when a hover logo is configured */
+/* Title + tags appear on hover when a hover logo is configured; CTA stays visible */
 .brand-tile--has-hover .brand-tile__name,
-.brand-tile--has-hover .brand-tile__cta,
 .brand-tile--has-hover .brand-tile__tags {
   opacity: 0;
   max-height: 0;
@@ -766,10 +765,8 @@ a {
 }
 
 .brand-tile--has-hover:hover .brand-tile__name,
-.brand-tile--has-hover:hover .brand-tile__cta,
 .brand-tile--has-hover:hover .brand-tile__tags,
 .brand-tile--has-hover:focus-visible .brand-tile__name,
-.brand-tile--has-hover:focus-visible .brand-tile__cta,
 .brand-tile--has-hover:focus-visible .brand-tile__tags {
   opacity: 1;
   max-height: 8rem;
@@ -793,11 +790,12 @@ a {
 
 .brand-tile__cta {
   flex-shrink: 0;
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.12em;
   color: var(--color-accent);
+  margin-top: 0.15rem;
 }
 
 .brand-tile__tags {
@@ -1236,7 +1234,7 @@ body.portfolio-hero-marquee-focus #brands.section {
   }
 
   .brands__grid {
-    max-width: 400px;
+    max-width: 100%;
     margin-left: auto;
     margin-right: auto;
   }
@@ -1244,6 +1242,13 @@ body.portfolio-hero-marquee-focus #brands.section {
   .brands__grid > .brand-tile {
     flex: 1 1 100%;
     max-width: 100%;
+  }
+
+  .brand-tile__logo,
+  .brand-tile__logo-wrap {
+    width: min(100%, 340px);
+    height: auto;
+    aspect-ratio: 2 / 1;
   }
 
   .hero__title {
@@ -1637,6 +1642,85 @@ body.portfolio-hero-marquee-focus #brands.section {
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
   vertical-align: middle;
   display: block;
+}
+
+.detail__pdf {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.detail__pdf__frame {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  min-height: 220px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #f8f8f8;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.detail__pdf__frame iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.detail__pdf__link {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-accent, #c45c26);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.detail__pdf__link:hover {
+  text-decoration-thickness: 2px;
+}
+
+.detail__gallery .detail__html {
+  grid-column: 1 / -1;
+}
+
+.detail__html {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  width: 100%;
+}
+
+.detail__html__frame {
+  width: 100%;
+  min-height: min(72vh, 640px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.detail__html__iframe {
+  width: 100%;
+  height: 100%;
+  min-height: min(72vh, 640px);
+  border: 0;
+  display: block;
+}
+
+.detail__html__link {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--color-accent, #c45c26);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.detail__html__link:hover {
+  text-decoration-thickness: 2px;
 }
 
 .detail__video-click {
