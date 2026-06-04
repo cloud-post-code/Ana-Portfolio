@@ -198,8 +198,7 @@
   <section class="contact section" id="contact">
     <div class="container">
       <div class="contact__content">
-        <h2 class="section__title reveal-scale">Let's talk about<br />the <span class="highlight">role.</span></h2>
-        <p class="contact__desc reveal-blur">If you're hiring for marketing, brand, or creative strategy, I'm interested in full-time and internship opportunities. Use the buttons below to reach out—I reply quickly to serious hiring conversations.</p>
+        <%- include('partials/contact-copy') %>
         <div class="contact__links reveal-scale">
           <% if (typeof resumeFileExists !== 'undefined' && resumeFileExists && resume && resume.path) { %>
           <% var _rp = String(resume.path || '').toLowerCase(); %>
