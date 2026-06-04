@@ -678,9 +678,9 @@ a {
 }
 
 .brands__grid > .brand-tile {
-  flex: 0 1 360px;
+  flex: 0 1 400px;
   width: 100%;
-  max-width: 480px;
+  max-width: 560px;
 }
 
 .brand-tile {
@@ -690,10 +690,10 @@ a {
   justify-content: flex-start;
   text-align: center;
   gap: 0.75rem;
-  padding: 1.75rem 1.35rem 1.5rem;
-  background: #fff;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
+  padding: 0.5rem 0.25rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: 0;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
   height: 100%;
@@ -703,8 +703,8 @@ a {
 .brand-tile__logo {
   display: block;
   flex: 0 0 auto;
-  width: 380px;
-  height: 190px;
+  width: 440px;
+  height: 240px;
   max-width: 100%;
   margin: 0 auto;
   border: none;
@@ -718,8 +718,8 @@ a {
   position: relative;
   display: block;
   flex: 0 0 auto;
-  width: 380px;
-  height: 190px;
+  width: 440px;
+  height: 240px;
   max-width: 100%;
   margin: 0 auto;
   overflow: hidden;
@@ -751,32 +751,6 @@ a {
 .brand-tile--has-hover:hover .brand-tile__logo--hover,
 .brand-tile--has-hover:focus-visible .brand-tile__logo--hover {
   opacity: 1;
-}
-
-/* Title + tags appear on hover when a hover logo is configured; CTA stays visible */
-.brand-tile--has-hover .brand-tile__name,
-.brand-tile--has-hover .brand-tile__tags {
-  opacity: 0;
-  max-height: 0;
-  margin: 0;
-  overflow: hidden;
-  pointer-events: none;
-  transition: opacity 220ms ease, max-height 220ms ease;
-}
-
-.brand-tile--has-hover:hover .brand-tile__name,
-.brand-tile--has-hover:hover .brand-tile__tags,
-.brand-tile--has-hover:focus-visible .brand-tile__name,
-.brand-tile--has-hover:focus-visible .brand-tile__tags {
-  opacity: 1;
-  max-height: 8rem;
-  margin-top: 0;
-  pointer-events: auto;
-}
-
-.brand-tile--has-hover:hover .brand-tile__tags,
-.brand-tile--has-hover:focus-visible .brand-tile__tags {
-  margin-top: 0.5rem;
 }
 
 .brand-tile__name {
@@ -1246,9 +1220,9 @@ body.portfolio-hero-marquee-focus #brands.section {
 
   .brand-tile__logo,
   .brand-tile__logo-wrap {
-    width: min(100%, 340px);
+    width: min(100%, 400px);
     height: auto;
-    aspect-ratio: 2 / 1;
+    aspect-ratio: 11 / 6;
   }
 
   .hero__title {
@@ -1372,7 +1346,7 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .brand-tile__logo--img.brand-tile__logo--wide {
   width: 100%;
-  max-width: 220px;
+  max-width: 320px;
   aspect-ratio: 2.5 / 1;
 }
 
@@ -1644,29 +1618,90 @@ body.portfolio-hero-marquee-focus #brands.section {
   display: block;
 }
 
+.detail__gallery .detail__pdf {
+  grid-column: 1 / -1;
+  justify-self: center;
+  width: min(100%, 720px);
+  margin-inline: auto;
+}
+
 .detail__pdf {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  align-items: center;
+  gap: 0.65rem;
   min-width: 0;
 }
 
-.detail__pdf__frame {
+.detail__pdf__trigger {
+  display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
-  min-height: 220px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: zoom-in;
+  text-align: center;
+  font: inherit;
+  color: inherit;
+}
+
+.detail__pdf__trigger:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+
+.detail__pdf__preview {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 8.5 / 11;
+  max-height: min(78vh, 860px);
+  margin: 0 auto;
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
   overflow: hidden;
-  background: #f8f8f8;
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+  background: #fff;
+  box-shadow: 0 8px 36px rgba(0, 0, 0, 0.1);
 }
 
-.detail__pdf__frame iframe {
+.detail__pdf__canvas {
+  display: block;
   width: 100%;
   height: 100%;
-  border: 0;
-  display: block;
+}
+
+.detail__pdf__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.04);
+  transition: background 180ms ease;
+  pointer-events: none;
+}
+
+.detail__pdf__overlay-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-accent, #c45c26);
+}
+
+.detail__pdf__overlay-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-muted);
+}
+
+.detail__pdf__trigger:hover .detail__pdf__overlay,
+.detail__pdf__trigger:focus-visible .detail__pdf__overlay {
+  background: rgba(0, 0, 0, 0.06);
 }
 
 .detail__pdf__link {
@@ -1679,6 +1714,108 @@ body.portfolio-hero-marquee-focus #brands.section {
 
 .detail__pdf__link:hover {
   text-decoration-thickness: 2px;
+}
+
+/* Fullscreen PDF viewer modal */
+.detail-pdf-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10050;
+  display: flex;
+  flex-direction: column;
+  color: #fff;
+}
+
+.detail-pdf-modal[hidden] {
+  display: none !important;
+}
+
+.detail-pdf-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(8, 8, 10, 0.92);
+}
+
+.detail-pdf-modal__close {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  z-index: 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 1.75rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.detail-pdf-modal__close:hover,
+.detail-pdf-modal__close:focus-visible {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.detail-pdf-modal__toolbar {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 4rem 0.75rem 1.25rem;
+  font-size: 0.85rem;
+}
+
+.detail-pdf-modal__title {
+  font-weight: 600;
+  opacity: 0.92;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-pdf-modal__page {
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.detail-pdf-modal__scroll {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-snap-type: y mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.detail-pdf-modal__page-wrap {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  min-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 1rem 2rem;
+  box-sizing: border-box;
+}
+
+.detail-pdf-modal__page-wrap canvas {
+  display: block;
+  max-width: min(100%, 920px);
+  width: auto;
+  height: auto;
+  background: #fff;
+  box-shadow: 0 16px 56px rgba(0, 0, 0, 0.45);
+  border-radius: 2px;
+}
+
+body.detail-pdf-modal-open {
+  overflow: hidden;
 }
 
 .detail__gallery .detail__html {

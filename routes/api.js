@@ -225,6 +225,19 @@ router.delete('/hero-video/:variant', async function (req, res, next) {
   }
 });
 
+function normalizeTags(tags) {
+  if (Array.isArray(tags)) {
+    return tags.map((t) => String(t).trim()).filter(Boolean);
+  }
+  if (typeof tags === 'string') {
+    return tags
+      .split(',')
+      .map((t) => t.trim())
+      .filter(Boolean);
+  }
+  return [];
+}
+
 // ─── Generic CRUD factory ──────────────────────────────────────────────────
 function crudRoutes(entityName, filename) {
   router.get(`/${entityName}`, async function (req, res, next) {
@@ -260,7 +273,7 @@ function crudRoutes(entityName, filename) {
         logo: req.body.logo || '',
         logoHover: req.body.logoHover || '',
         skills: req.body.skills || [],
-        tags: Array.isArray(req.body.tags) ? req.body.tags : [],
+        tags: normalizeTags(req.body.tags),
         subtitle: req.body.subtitle || '',
         hidden: req.body.hidden || false,
         projectType: req.body.projectType === 'personal' ? 'personal' : 'client',
@@ -292,6 +305,9 @@ function crudRoutes(entityName, filename) {
       if (idx === -1) return res.status(404).json({ error: 'Not found' });
 
       const updated = { ...data[idx], ...req.body, id: data[idx].id };
+      if (req.body.tags !== undefined) {
+        updated.tags = normalizeTags(req.body.tags);
+      }
       if (req.body.title && req.body.title !== data[idx].title) {
         updated.slug = slugify(req.body.title);
         let slug = updated.slug;

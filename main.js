@@ -503,6 +503,157 @@
       if (!g) return;
       openDetailLightboxFromEventTarget(e.target);
     });
+
+    // ---- Detail page: PDF preview + fullscreen page viewer ----
+    const PDFJS_VERSION = '4.8.69';
+    const PDFJS_BASE = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@' + PDFJS_VERSION;
+    let pdfjsLibPromise = null;
+    let pdfModalScrollHandler = null;
+
+    function loadPdfJs() {
+      if (!pdfjsLibPromise) {
+        pdfjsLibPromise = import(PDFJS_BASE + '/build/pdf.min.mjs').then((lib) => {
+          lib.GlobalWorkerOptions.workerSrc = PDFJS_BASE + '/build/pdf.worker.min.mjs';
+          return lib;
+        });
+      }
+      return pdfjsLibPromise;
+    }
+
+    function renderPdfPageToCanvas(pdf, pageNumber, canvas, maxCssWidth) {
+      return pdf.getPage(pageNumber).then((page) => {
+        const baseViewport = page.getViewport({ scale: 1 });
+        const cssScale = maxCssWidth / baseViewport.width;
+        const dpr = window.devicePixelRatio || 1;
+        const viewport = page.getViewport({ scale: cssScale * dpr });
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        canvas.style.width = Math.floor(viewport.width / dpr) + 'px';
+        canvas.style.height = Math.floor(viewport.height / dpr) + 'px';
+        return page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+      });
+    }
+
+    function loadPdfDocument(src) {
+      return loadPdfJs().then((pdfjsLib) => pdfjsLib.getDocument(src).promise);
+    }
+
+    function ensurePdfModal() {
+      let root = document.getElementById('detailPdfModal');
+      if (root) return root;
+      root = document.createElement('div');
+      root.id = 'detailPdfModal';
+      root.className = 'detail-pdf-modal';
+      root.hidden = true;
+      root.setAttribute('role', 'dialog');
+      root.setAttribute('aria-modal', 'true');
+      root.innerHTML =
+        '<div class="detail-pdf-modal__backdrop" aria-hidden="true"></div>' +
+        '<button type="button" class="detail-pdf-modal__close" aria-label="Close PDF viewer">&times;</button>' +
+        '<div class="detail-pdf-modal__toolbar">' +
+          '<span class="detail-pdf-modal__title"></span>' +
+          '<span class="detail-pdf-modal__page"></span>' +
+        '</div>' +
+        '<div class="detail-pdf-modal__scroll"></div>';
+      document.body.appendChild(root);
+      root.querySelector('.detail-pdf-modal__backdrop').addEventListener('click', closePdfModal);
+      root.querySelector('.detail-pdf-modal__close').addEventListener('click', closePdfModal);
+      return root;
+    }
+
+    function closePdfModal() {
+      const root = document.getElementById('detailPdfModal');
+      if (!root || root.hidden) return;
+      root.hidden = true;
+      document.body.classList.remove('detail-pdf-modal-open');
+      const scroll = root.querySelector('.detail-pdf-modal__scroll');
+      if (scroll) {
+        scroll.innerHTML = '';
+        if (pdfModalScrollHandler) {
+          scroll.removeEventListener('scroll', pdfModalScrollHandler);
+          pdfModalScrollHandler = null;
+        }
+      }
+    }
+
+    function updatePdfModalPageIndicator(root, total) {
+      const scroll = root.querySelector('.detail-pdf-modal__scroll');
+      const label = root.querySelector('.detail-pdf-modal__page');
+      if (!scroll || !label || !total) return;
+      const wraps = scroll.querySelectorAll('.detail-pdf-modal__page-wrap');
+      let current = 1;
+      const mid = scroll.scrollTop + scroll.clientHeight * 0.35;
+      wraps.forEach((wrap, idx) => {
+        if (wrap.offsetTop <= mid) current = idx + 1;
+      });
+      label.textContent = 'Page ' + current + ' of ' + total;
+    }
+
+    function openPdfModal(src, title) {
+      const root = ensurePdfModal();
+      const scroll = root.querySelector('.detail-pdf-modal__scroll');
+      const titleEl = root.querySelector('.detail-pdf-modal__title');
+      if (!scroll || !titleEl) return;
+
+      titleEl.textContent = title || 'PDF document';
+      scroll.innerHTML = '<p style="padding:2rem;text-align:center;opacity:0.85">Loading PDF…</p>';
+      root.hidden = false;
+      document.body.classList.add('detail-pdf-modal-open');
+      root.querySelector('.detail-pdf-modal__close').focus();
+
+      loadPdfDocument(src).then((pdf) => {
+        scroll.innerHTML = '';
+        const total = pdf.numPages;
+        const maxWidth = Math.min(window.innerWidth - 32, 920);
+        const tasks = [];
+
+        for (let i = 1; i <= total; i += 1) {
+          const wrap = document.createElement('div');
+          wrap.className = 'detail-pdf-modal__page-wrap';
+          const canvas = document.createElement('canvas');
+          wrap.appendChild(canvas);
+          scroll.appendChild(wrap);
+          tasks.push(renderPdfPageToCanvas(pdf, i, canvas, maxWidth));
+        }
+
+        return Promise.all(tasks).then(() => {
+          updatePdfModalPageIndicator(root, total);
+          pdfModalScrollHandler = () => updatePdfModalPageIndicator(root, total);
+          scroll.addEventListener('scroll', pdfModalScrollHandler, { passive: true });
+        });
+      }).catch(() => {
+        scroll.innerHTML =
+          '<p style="padding:2rem;text-align:center">Could not load PDF. ' +
+          '<a href="' + src + '" target="_blank" rel="noopener noreferrer" style="color:#fff">Open in new tab</a></p>';
+      });
+    }
+
+    document.querySelectorAll('.detail__pdf').forEach((block) => {
+      const src = block.getAttribute('data-pdf-src');
+      const title = block.getAttribute('data-pdf-title') || 'PDF document';
+      const canvas = block.querySelector('.detail__pdf__canvas');
+      const trigger = block.querySelector('.detail__pdf__trigger');
+      const preview = block.querySelector('.detail__pdf__preview');
+      if (!src || !canvas || !trigger) return;
+
+      loadPdfDocument(src).then((pdf) => {
+        const maxPreviewWidth = preview ? preview.clientWidth || 640 : 640;
+        return renderPdfPageToCanvas(pdf, 1, canvas, maxPreviewWidth);
+      }).catch(() => {
+        trigger.disabled = true;
+        trigger.style.cursor = 'not-allowed';
+      });
+
+      trigger.addEventListener('click', () => {
+        openPdfModal(src, title);
+      });
+    });
+
+    document.addEventListener('keydown', (ev) => {
+      const pdfRoot = document.getElementById('detailPdfModal');
+      if (!pdfRoot || pdfRoot.hidden) return;
+      if (ev.key === 'Escape') closePdfModal();
+    });
   }
 
   // ---- Detail page: collapsible "About The Project" panel ----

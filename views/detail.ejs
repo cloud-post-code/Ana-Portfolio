@@ -72,10 +72,16 @@
                   <button type="button" class="detail__video-click__btn" aria-label="Play video"></button>
                 </div>
                   <% } else if (m.type === 'pdf' || /\.pdf$/i.test(m.src || '')) { %>
-                <div class="detail__pdf">
-                  <div class="detail__pdf__frame">
-                    <iframe src="/<%= m.src %>" title="<%= m.alt || 'PDF document' %>" loading="lazy"></iframe>
-                  </div>
+                <div class="detail__pdf" data-pdf-src="/<%= m.src %>" data-pdf-title="<%= m.alt || 'PDF document' %>">
+                  <button type="button" class="detail__pdf__trigger" aria-label="Open <%= m.alt || 'PDF document' %> fullscreen">
+                    <span class="detail__pdf__preview">
+                      <canvas class="detail__pdf__canvas" aria-hidden="true"></canvas>
+                      <span class="detail__pdf__overlay">
+                        <span class="detail__pdf__overlay-icon" aria-hidden="true">⤢</span>
+                        <span class="detail__pdf__overlay-text">Click to view — scroll page by page</span>
+                      </span>
+                    </span>
+                  </button>
                   <a class="detail__pdf__link" href="/<%= m.src %>" target="_blank" rel="noopener noreferrer">Open PDF<%= m.alt ? (' — ' + m.alt) : '' %></a>
                 </div>
                   <% } else if (m.type === 'html' || /\.html?$/i.test(m.src || '')) { %>

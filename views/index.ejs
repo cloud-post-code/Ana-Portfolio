@@ -89,6 +89,13 @@
               </span>
               <span class="brand-tile__name"><%= exp.title.toUpperCase() %></span>
               <span class="brand-tile__cta">VIEW DETAILS</span>
+              <% if (exp.tags && exp.tags.length) { %>
+              <span class="brand-tile__tags">
+                <% exp.tags.forEach(function(tag) { %>
+                <span class="brand-tile__tag"><%= tag %></span>
+                <% }); %>
+              </span>
+              <% } %>
             </a>
             <% }); %>
           </div>

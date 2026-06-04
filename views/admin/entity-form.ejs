@@ -32,11 +32,11 @@ var adminTitle = isNew
       <textarea name="description" rows="3"><%= isNew ? '' : item.description %></textarea>
     </div>
 
-    <% if (entity === 'projects') { %>
     <div class="admin__form-group admin__form-group--full">
       <label>Tags (comma-separated, shown below "View Details" on the tile)</label>
       <input type="text" name="tags" value="<%= isNew ? '' : ((item.tags || []).join(', ')) %>" placeholder="e.g. Branding, Web Design, Print" />
     </div>
+    <% if (entity === 'projects') { %>
     <%
       var defaultProjectType = 'client';
       if (isNew && typeof initialProjectType !== 'undefined' && initialProjectType === 'personal') defaultProjectType = 'personal';
