@@ -9,6 +9,13 @@ const { getHeroVideoForServe, parseHeroVideoVariant } = require('./lib/hero-vide
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('trust proxy', true);
+
+app.use(function (req, res, next) {
+  res.locals.siteOrigin = req.protocol + '://' + req.get('host');
+  res.locals.pageUrl = res.locals.siteOrigin + req.originalUrl.split('?')[0];
+  next();
+});
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
