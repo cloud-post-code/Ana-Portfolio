@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://ana-portfolio-production.up.railway.app/styles.css" />
+  <style>
+    /* Force animation end-states for the static capture */
+    .hero__title-inner, .reveal-blur, .reveal-scale {
+      opacity: 1 !important;
+      transform: none !important;
+      filter: none !important;
+      transition: none !important;
+      animation: none !important;
+    }
+    html, body { overflow: hidden; }
+  </style>
+</head>
+<body>
+  <section class="hero hero--has-video" id="hero">
+    <div class="hero__video-wrap" aria-hidden="true">
+      <video class="hero__video hero__video--desktop" src="https://ana-portfolio-production.up.railway.app/hero-video/file" autoplay muted loop playsinline></video>
+    </div>
+    <div class="hero__content">
+      <h1 class="hero__title">
+        <span class="hero__title-line"><span class="hero__title-inner is-visible">Ana</span></span>
+        <span class="hero__title-line hero__title-line--accent"><span class="hero__title-inner is-visible">Machuca</span></span>
+      </h1>
+      <p class="hero__tagline reveal-blur is-visible">Take a look around my marketing playground</p>
+    </div>
+  </section>
+</body>
+</html>
