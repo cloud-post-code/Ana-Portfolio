@@ -35,10 +35,10 @@
     /* ── Grid ── */
     .oh-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      grid-template-columns: repeat(3, 1fr);
       gap: 36px 28px;
       width: 100%;
-      max-width: 860px;
+      max-width: 620px;
     }
 
     /* ── Envelope wrapper ── */
@@ -248,7 +248,7 @@
     .oh-modal__body::-webkit-scrollbar-thumb { background: rgba(139,26,74,.25); border-radius: 4px; }
 
     /* ── Responsive ── */
-    @media (max-width: 520px) {
+    @media (max-width: 480px) {
       .oh-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 24px 16px;
