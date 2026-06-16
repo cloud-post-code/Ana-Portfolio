@@ -36,9 +36,9 @@
     .oh-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 36px 28px;
+      gap: 48px 32px;
       width: 100%;
-      max-width: 620px;
+      max-width: 820px;
     }
 
     /* ── Envelope wrapper ── */
@@ -54,8 +54,8 @@
     /* ── Envelope — perspective wrapper ── */
     .oh-envelope {
       position: relative;
-      width: 160px;
-      height: 110px;
+      width: 220px;
+      height: 155px;
       perspective: 600px;
       transition: transform 0.18s ease;
     }
@@ -79,8 +79,8 @@
       position: absolute;
       bottom: 0; left: 0;
       width: 0; height: 0;
-      border-bottom: 55px solid #f0a8c0;
-      border-right: 80px solid transparent;
+      border-bottom: 78px solid #f0a8c0;
+      border-right: 110px solid transparent;
     }
 
     /* Right side flap */
@@ -88,8 +88,8 @@
       position: absolute;
       bottom: 0; right: 0;
       width: 0; height: 0;
-      border-bottom: 55px solid #f0a8c0;
-      border-left: 80px solid transparent;
+      border-bottom: 78px solid #f0a8c0;
+      border-left: 110px solid transparent;
     }
 
     /* Bottom flap */
@@ -97,15 +97,15 @@
       position: absolute;
       bottom: 0; left: 0;
       width: 0; height: 0;
-      border-left: 80px solid transparent;
-      border-right: 80px solid transparent;
-      border-bottom: 60px solid #e896b8;
+      border-left: 110px solid transparent;
+      border-right: 110px solid transparent;
+      border-bottom: 84px solid #e896b8;
     }
 
     /* "Open when" label above each envelope */
     .oh-env__label {
       display: block;
-      width: 160px;
+      width: 220px;
       text-align: center;
       font-size: 0.68rem;
       font-family: 'DM Sans', sans-serif;
@@ -121,9 +121,9 @@
       position: absolute;
       top: 0; left: 0;
       width: 0; height: 0;
-      border-left: 80px solid transparent;
-      border-right: 80px solid transparent;
-      border-top: 62px solid #f4b6cc;
+      border-left: 110px solid transparent;
+      border-right: 110px solid transparent;
+      border-top: 86px solid #f4b6cc;
       transform-origin: top center;
       transform-style: preserve-3d;
       transition: transform 0.55s cubic-bezier(.4,0,.2,1);
@@ -138,16 +138,14 @@
     /* ── Card — hidden inside envelope, slides up on open ── */
     .oh-card {
       position: absolute;
-      left: 10px;
-      right: 10px;
-      /* sits fully inside — bottom of card flush with envelope bottom */
-      bottom: 6px;
-      height: 90px;
+      left: 12px;
+      right: 12px;
+      bottom: 8px;
+      height: 124px;
       background: linear-gradient(135deg, #ff8fb1 0%, #ffb3cb 60%, #ffd6e4 100%);
       border-radius: 6px;
       z-index: 2;
       box-shadow: 0 2px 10px rgba(214,48,119,.2);
-      /* start clipped inside envelope — overflow:hidden on .oh-env__back handles this */
       transform: translateY(0px);
       opacity: 0;
       transition:
@@ -156,7 +154,7 @@
     }
 
     .oh-item.is-opening .oh-card {
-      transform: translateY(-105px);
+      transform: translateY(-145px);
       opacity: 1;
     }
 
@@ -262,18 +260,19 @@
     .oh-modal__body::-webkit-scrollbar-thumb { background: rgba(139,26,74,.25); border-radius: 4px; }
 
     /* ── Responsive ── */
-    @media (max-width: 480px) {
+    @media (max-width: 600px) {
       .oh-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 24px 16px;
+        gap: 32px 16px;
       }
-      .oh-envelope { width: 140px; height: 96px; }
-      .oh-env__side-left  { border-bottom-width: 48px; border-right-width: 70px; }
-      .oh-env__side-right { border-bottom-width: 48px; border-left-width: 70px; }
-      .oh-env__bottom { border-left-width: 70px; border-right-width: 70px; border-bottom-width: 52px; }
-      .oh-env__top    { border-left-width: 70px; border-right-width: 70px; border-top-width: 54px; }
-      .oh-card { left: 8px; right: 8px; height: 78px; }
-      .oh-item.is-opening .oh-card { transform: translateY(-92px); }
+      .oh-envelope { width: 160px; height: 110px; }
+      .oh-env__side-left  { border-bottom-width: 55px; border-right-width: 80px; }
+      .oh-env__side-right { border-bottom-width: 55px; border-left-width: 80px; }
+      .oh-env__bottom { border-left-width: 80px; border-right-width: 80px; border-bottom-width: 60px; }
+      .oh-env__top    { border-left-width: 80px; border-right-width: 80px; border-top-width: 62px; }
+      .oh-card { left: 8px; right: 8px; height: 90px; }
+      .oh-item.is-opening .oh-card { transform: translateY(-105px); }
+      .oh-env__label { width: 160px; }
     }
   </style>
 </head>
