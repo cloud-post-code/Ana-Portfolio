@@ -171,13 +171,15 @@
     .oh-modal {
       background: linear-gradient(145deg, #ff8fb1 0%, #ffb3cb 50%, #ffd6e4 100%);
       border-radius: 20px;
-      width: min(420px, 88vw);
-      padding: 48px 40px 40px;
+      width: min(480px, 92vw);
+      max-height: 88vh;
+      display: flex;
+      flex-direction: column;
       box-shadow: 0 28px 70px rgba(214,48,119,.38);
       transform: scale(0.82) translateY(32px);
       transition: transform 0.42s cubic-bezier(.34,1.56,.64,1);
       position: relative;
-      text-align: center;
+      overflow: hidden;
     }
 
     .oh-modal-overlay.is-visible .oh-modal {
@@ -186,7 +188,7 @@
 
     .oh-modal__close {
       position: absolute;
-      top: 16px; right: 18px;
+      top: 14px; right: 16px;
       background: none;
       border: none;
       font-size: 1.2rem;
@@ -196,38 +198,54 @@
       padding: 6px;
       opacity: 0.7;
       transition: opacity 0.15s;
+      z-index: 2;
     }
     .oh-modal__close:hover { opacity: 1; }
 
-    .oh-modal__reason {
-      font-family: 'Anton', sans-serif;
-      font-size: 1.15rem;
-      color: #8b1a4a;
-      letter-spacing: 0.02em;
-      margin-bottom: 20px;
-      line-height: 1.3;
+    /* Reason — sticky header at top of card */
+    .oh-modal__header {
+      padding: 32px 40px 20px;
+      text-align: center;
+      border-bottom: 1px solid rgba(139,26,74,.15);
+      flex-shrink: 0;
     }
 
-    .oh-modal__divider {
-      width: 40px;
-      height: 2px;
-      background: rgba(139,26,74,.25);
-      margin: 0 auto 20px;
-      border-radius: 2px;
+    .oh-modal__reason {
+      font-family: 'Anton', sans-serif;
+      font-size: 1.2rem;
+      color: #8b1a4a;
+      letter-spacing: 0.02em;
+      line-height: 1.3;
+      margin: 0;
+    }
+
+    /* Scrollable letter body */
+    .oh-modal__body {
+      padding: 24px 40px 32px;
+      overflow-y: auto;
+      flex: 1;
+      text-align: left;
     }
 
     .oh-modal__message {
-      font-size: 1rem;
+      font-size: 0.97rem;
       color: #5a0a2a;
-      line-height: 1.7;
-      font-weight: 500;
+      line-height: 1.75;
+      font-weight: 400;
+      white-space: pre-line;
     }
 
     .oh-modal__heart {
-      font-size: 1.8rem;
+      font-size: 1.4rem;
       display: block;
-      margin-top: 24px;
+      text-align: center;
+      margin-top: 20px;
     }
+
+    /* Scrollbar styling */
+    .oh-modal__body::-webkit-scrollbar { width: 4px; }
+    .oh-modal__body::-webkit-scrollbar-track { background: transparent; }
+    .oh-modal__body::-webkit-scrollbar-thumb { background: rgba(139,26,74,.25); border-radius: 4px; }
 
     /* ── Responsive ── */
     @media (max-width: 520px) {
@@ -372,10 +390,13 @@
 <div class="oh-modal-overlay" id="ohModal" role="dialog" aria-modal="true" aria-labelledby="ohModalReason">
   <div class="oh-modal">
     <button class="oh-modal__close" id="ohModalClose" aria-label="Close">✕</button>
-    <p class="oh-modal__reason" id="ohModalReason"></p>
-    <div class="oh-modal__divider"></div>
-    <p class="oh-modal__message" id="ohModalMessage"></p>
-    <span class="oh-modal__heart">♡</span>
+    <div class="oh-modal__header">
+      <p class="oh-modal__reason" id="ohModalReason"></p>
+    </div>
+    <div class="oh-modal__body">
+      <p class="oh-modal__message" id="ohModalMessage"></p>
+      <span class="oh-modal__heart">♡</span>
+    </div>
   </div>
 </div>
 
@@ -386,40 +407,40 @@
 (function () {
   const cards = [
     {
-      reason: 'Because you show up every day',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You\'re Thinking About Your Career',
+      message: 'My love,\n\nI hope you know how much I believe in you. I know you are going to get exactly where you want to go in your career. I am not worried about you, not even a little, because I know who you are.\n\nYou are smart, determined, capable, and so much stronger than you give yourself credit for. Whatever path you choose, I know you will find your way through it and become everything you are meant to be.\n\nI believe in you completely. Always.\n\nLove,\nYour biggest fan',
     },
     {
-      reason: 'Because your laugh lights up the room',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You\'re Having a Hard Day at Your First Job',
+      message: 'My sweet girl,\n\nI know today might feel heavy, but I also know something very important: you are my lion.\n\nYou are brave. You are strong. You are fierce, even when you do not feel like it. A hard day does not mean you are failing. It just means you are learning, growing, and becoming even more powerful.\n\nSo take a breath, lift your little lion head, and remember who you are.\n\nNow rawrrr.\nNo, seriously. Rawrrr.\n\nI love you so much.',
     },
     {
-      reason: 'Because you never stop growing',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You Forget How Strong You Are',
+      message: 'My tough little one,\n\nYou are so much stronger than you know.\n\nI know this because I have seen you be brave. And bravery does not mean you are never scared. Bravery is being scared and still finding a way through it. Bravery is shaking a little, crying a little, doubting yourself a little, and then still taking the next step.\n\nYou have done hard things before. You have overcome moments that felt impossible. And because you have done it before, I know you can do it again.\n\nYou are my tough little one, and I am so proud of you.',
     },
     {
-      reason: 'Because the world is better with you in it',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You Need to Breathe',
+      message: 'My love,\n\nCome here for a second.\n\nBreathe with me.\n\nIn.\nOut.\n\nIn.\nOut.\n\nIn.\nOut.\n\nThere you go.\n\nEven if I am not physically there, I am with you in this little note. Imagine me holding you, breathing with you, reminding you that you are safe and loved.\n\nOne more time.\n\nIn.\nOut.\n\nI love you. You\'re okay.',
     },
     {
-      reason: 'Because your kindness is a superpower',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You Miss Me',
+      message: 'My baby,\n\nI love you so much and I miss you more than words can explain.\n\nSometimes missing you feels like I want you closer than close. Like I want you wrapped around me, tucked into my heart, living under my skin so I never have to feel far from you.\n\nI wish I could hold you right now. I wish I could kiss your face and squeeze you and remind you in person how loved you are.\n\nBut until I can, open this and remember: I am yours. I love you. I miss you. And I cannot wait to be close to you again.',
     },
     {
-      reason: 'Because you make hard things look beautiful',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You Need to Remember You\'re the One',
+      message: 'My love,\n\nYou are the only girl I love.\n\nI love you more than I have ever loved anyone. More than any other girl, more than I ever thought I could love someone. You are the one for me.\n\nYou are my favorite person, my safest place, my sweetest love, and the one I choose again and again.\n\nI love you a-more.\n\nAlways yours.',
     },
     {
-      reason: 'Because you choose love even when it\'s hard',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You\'re Doubting Your Beauty',
+      message: 'My beautiful girl,\n\nI know sometimes you do not see yourself the way I see you. I know your mind can be mean to you and make you question things that I have never questioned for even one second.\n\nBut I need you to know this: you are so, so beautiful.\n\nNot just in the obvious way, even though yes, you are gorgeous. Your face, your smile, your eyes, your body, all of you. But also the way you exist. The way you laugh. The way you care. The way you look at me. The way you make everything feel warmer just by being there.\n\nI wish I could let you borrow my eyes for one minute so you could finally understand what I see.\n\nYou are beautiful when you are dressed up. You are beautiful when you are tired. You are beautiful when you are being silly. You are beautiful when you do not feel beautiful at all.\n\nYou are my pretty girl, my sweet girl, my only girl.\n\nAnd I promise, there is nothing about you I would change.',
     },
     {
-      reason: 'Because your dreams deserve to come true',
-      message: 'Message coming soon ♡',
+      reason: 'Open When You Need to Remember You Changed Everything',
+      message: 'My Colombian mamacita,\n\nI need you to understand something very serious.\n\nBefore you, I was not an ass guy. Everyone knows this. My friends literally used to make fun of me because I would say dumb things like, "I don\'t really like ass, only nicely shaped tits."\n\nAnd then you happened.\n\nSpecifically, you in those PJs on the 8th floor that day.\n\nI saw you and something in my brain changed forever. Your ass genuinely rewired me. I understood something I had never understood before. It was like my whole life before that moment was missing important information.\n\nYou changed everything.\n\nSo yes, you are my Colombian mamacita. Yes, you are insanely beautiful. Yes, I am obsessed with you. And yes, your ass deserves historical recognition for what it did to me that day.\n\nI love every part of you, but I had to give special credit where special credit is due.\n\nForever converted,\nYour man',
     },
     {
-      reason: 'Because you inspire everyone around you',
-      message: 'Message coming soon ♡',
+      reason: 'Open When It Is Dark and Scary',
+      message: 'My love,\n\nI know the dark can feel scary sometimes. It can make everything feel bigger, quieter, and more alone than it really is.\n\nBut I need you to remember something: you are the light.\n\nYou have no idea how many times you have guided me through darkness without even realizing it. Your love, your heart, your smile, your voice, and the way you care have lit up places in me that I thought would stay dark forever.\n\nYour light is so bright. It reaches people. It reaches me. It makes everything feel softer, warmer, and safer.\n\nSo if you are scared right now, I want you to remember that the same light you have given me is still inside you. You are not alone. You are not helpless. You are my light, and you always will be.\n\nAlso, if it is actually dark and you are actually scared, turn on your flashlight, baby. Clearly you have your phone if you are reading this.\n\nI love you.',
     },
     {
       reason: 'Because simply being you is more than enough',
