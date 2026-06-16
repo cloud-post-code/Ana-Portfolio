@@ -48,6 +48,10 @@ router.get('/experience/:slug', async function (req, res, next) {
   }
 });
 
+router.get('/one-heart', function (req, res) {
+  res.render('one-heart');
+});
+
 router.get('/project/:slug', async function (req, res, next) {
   try {
     const projects = await cms.getPortfolio('projects');
