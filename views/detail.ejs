@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <%- include('partials/head', { pageTitle: item.title + ' — ' + (itemType === 'experience' ? 'Work Experience' : 'Project') + ' — Ana Machuca', pageDesc: item.description }) %>
+  <%- include('partials/jsonld') %>
 </head>
 <body class="page-detail">
   <%- include('partials/nav', { isDetail: true }) %>

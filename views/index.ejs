@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <%- include('partials/head') %>
+  <%- include('partials/jsonld') %>
 </head>
 <body>
   <% var visibleProjects = projects.filter(function (p) { return !p.hidden; }); %>

@@ -1,0 +1,3 @@
+<% if (typeof jsonld !== 'undefined' && Array.isArray(jsonld) && jsonld.length) { %>
+<script type="application/ld+json"><%- JSON.stringify(jsonld.length === 1 ? jsonld[0] : jsonld) %></script>
+<% } %>

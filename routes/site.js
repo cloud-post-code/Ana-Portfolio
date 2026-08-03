@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const cms = require('../lib/cms-store');
 const { getHeroVideoMeta } = require('../lib/hero-video');
+const schemaOrg = require('../lib/schema-org');
 
 router.get('/', async function (req, res, next) {
   try {
@@ -31,7 +32,8 @@ router.get('/', async function (req, res, next) {
       else resume.path = hasPdf ? '/resume.pdf' : '/resume.docx';
     }
     const heroVideo = await getHeroVideoMeta();
-    res.render('index', { experiences, projects, resume, resumeFileExists, heroVideo });
+    const jsonld = schemaOrg.homeSchemas(res.locals.siteOrigin, experiences, projects);
+    res.render('index', { experiences, projects, resume, resumeFileExists, heroVideo, jsonld });
   } catch (e) {
     next(e);
   }
@@ -42,7 +44,8 @@ router.get('/experience/:slug', async function (req, res, next) {
     const experiences = await cms.getPortfolio('experiences');
     const item = experiences.find(e => e.slug === req.params.slug);
     if (!item) return res.status(404).send('Experience not found');
-    res.render('detail', { item, itemType: 'experience' });
+    const jsonld = [schemaOrg.creativeWorkSchema(res.locals.siteOrigin, item, 'experience')];
+    res.render('detail', { item, itemType: 'experience', jsonld });
   } catch (e) {
     next(e);
   }
@@ -52,12 +55,24 @@ router.get('/one-heart', function (req, res) {
   res.render('one-heart');
 });
 
+/** Schema.org catalog of all content — ingestion feed for NLWeb and AI agents. */
+router.get('/schema.json', async function (req, res, next) {
+  try {
+    const experiences = (await cms.getPortfolio('experiences')).sort((a, b) => a.order - b.order);
+    const projects = (await cms.getPortfolio('projects')).sort((a, b) => a.order - b.order);
+    res.json(schemaOrg.catalogSchemas(res.locals.siteOrigin, experiences, projects));
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get('/project/:slug', async function (req, res, next) {
   try {
     const projects = await cms.getPortfolio('projects');
     const item = projects.find(p => p.slug === req.params.slug);
     if (!item) return res.status(404).send('Project not found');
-    res.render('detail', { item, itemType: 'project' });
+    const jsonld = [schemaOrg.creativeWorkSchema(res.locals.siteOrigin, item, 'project')];
+    res.render('detail', { item, itemType: 'project', jsonld });
   } catch (e) {
     next(e);
   }
