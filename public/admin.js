@@ -162,6 +162,9 @@ function normalizeEmbedSrc(value) {
   var v = String(value || '').trim();
   var m = v.match(/<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
   if (m) v = m[1];
+  /* A double-paste produces the URL twice back-to-back; keep the first copy. */
+  var dup = v.match(/^(https?:\/\/.+?)https?:\/\//i);
+  if (dup) v = dup[1];
   var yt = v.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/)|youtu\.be\/)([\w-]{6,})/i);
   if (yt) v = 'https://www.youtube.com/embed/' + yt[1];
   if (/^\/\//.test(v)) v = 'https:' + v;
