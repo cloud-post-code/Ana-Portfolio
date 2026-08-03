@@ -84,6 +84,13 @@
                   </button>
                   <a class="detail__pdf__link" href="/<%= m.src %>" target="_blank" rel="noopener noreferrer">Open PDF<%= m.alt ? (' — ' + m.alt) : '' %></a>
                 </div>
+                  <% } else if (m.type === 'embed') { %>
+                <div class="detail__html detail__embed">
+                  <div class="detail__html__frame">
+                    <iframe class="detail__html__iframe" src="<%= m.src %>" title="<%= m.alt || 'Embedded content' %>" loading="lazy" allow="autoplay; fullscreen; picture-in-picture; encrypted-media; clipboard-write" allowfullscreen referrerpolicy="strict-origin-when-cross-origin"></iframe>
+                  </div>
+                  <a class="detail__html__link" href="<%= m.src %>" target="_blank" rel="noopener noreferrer">Open in new tab<%= m.alt ? (' — ' + m.alt) : '' %></a>
+                </div>
                   <% } else if (m.type === 'html' || /\.html?$/i.test(m.src || '')) { %>
                 <div class="detail__html">
                   <div class="detail__html__frame">

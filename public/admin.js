@@ -157,6 +157,18 @@ function isAudioUploadFile(file) {
   );
 }
 
+/* Accepts a bare URL or a full pasted <iframe ...> embed snippet; returns the URL. */
+function normalizeEmbedSrc(value) {
+  var v = String(value || '').trim();
+  var m = v.match(/<iframe[^>]*\ssrc\s*=\s*["']([^"']+)["']/i);
+  if (m) v = m[1];
+  var yt = v.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/)|youtu\.be\/)([\w-]{6,})/i);
+  if (yt) v = 'https://www.youtube.com/embed/' + yt[1];
+  if (/^\/\//.test(v)) v = 'https:' + v;
+  if (v && !/^https?:\/\//i.test(v) && /^[\w-]+(\.[\w-]+)+/.test(v)) v = 'https://' + v;
+  return v;
+}
+
 function mediaTypeFromUpload(pathStr, file) {
   if (isHtmlUploadFile(file) || isHtmlPath(pathStr)) return 'html';
   if (isPdfUploadFile(file) || isPdfPath(pathStr)) return 'pdf';
@@ -201,11 +213,14 @@ function addMediaManual(btn) {
 
 function addMediaItem(grid, type, src, alt) {
   var isHtml = type === 'html';
+  var isEmbed = type === 'embed';
   var isPdf = type === 'pdf';
   var isAudio = type === 'audio' || type === 'audio-autoplay';
-  var isVideo = type !== 'image' && !isPdf && !isHtml && !isAudio;
+  var isVideo = type !== 'image' && !isPdf && !isHtml && !isEmbed && !isAudio;
   var previewHTML = src
-    ? (isHtml
+    ? (isEmbed
+      ? '<span class="admin__media-preview-html" title="Embed">EMBED</span>'
+      : isHtml
       ? '<span class="admin__media-preview-html" title="HTML">HTML</span>'
       : isPdf
         ? '<span class="admin__media-preview-pdf" title="PDF">PDF</span>'
@@ -224,6 +239,7 @@ function addMediaItem(grid, type, src, alt) {
         '<select name="media_type">' +
           '<option value="image"' + (type === 'image' ? ' selected' : '') + '>Image</option>' +
           '<option value="html"' + (type === 'html' ? ' selected' : '') + '>HTML page</option>' +
+          '<option value="embed"' + (type === 'embed' ? ' selected' : '') + '>Embed (iframe link)</option>' +
           '<option value="pdf"' + (type === 'pdf' ? ' selected' : '') + '>PDF</option>' +
           '<option value="video-hover"' + (type === 'video-hover' ? ' selected' : '') + '>Video (hover play)</option>' +
           '<option value="video-still"' + (type === 'video-still' ? ' selected' : '') + '>Video (still frame)</option>' +
@@ -231,7 +247,7 @@ function addMediaItem(grid, type, src, alt) {
           '<option value="audio"' + (type === 'audio' ? ' selected' : '') + '>Audio — paused on open</option>' +
           '<option value="audio-autoplay"' + (type === 'audio-autoplay' ? ' selected' : '') + '>Audio — play on open</option>' +
         '</select>' +
-        '<input type="text" name="media_src" value="' + src + '" placeholder="File path" />' +
+        '<input type="text" name="media_src" value="' + src + '" placeholder="File path or embed URL" />' +
         '<input type="text" name="media_alt" value="' + alt + '" placeholder="Alt text" />' +
       '</div>' +
       '<button type="button" class="admin__media-remove" onclick="this.closest(\'.admin__media-item\').remove()" title="Remove">&times;</button>' +
@@ -389,9 +405,12 @@ function collectDeliverables() {
 
     var mediaItems = block.querySelectorAll('.admin__media-item');
     mediaItems.forEach(function (mi) {
+      var mType = mi.querySelector('[name="media_type"]').value;
+      var mSrc = mi.querySelector('[name="media_src"]').value;
+      if (mType === 'embed') mSrc = normalizeEmbedSrc(mSrc);
       del.media.push({
-        type: mi.querySelector('[name="media_type"]').value,
-        src: mi.querySelector('[name="media_src"]').value,
+        type: mType,
+        src: mSrc,
         alt: mi.querySelector('[name="media_alt"]').value
       });
     });
@@ -675,6 +694,19 @@ function initAdminPortfolioFocusToggle() {
     }
   });
 }
+
+/* Pasting a full <iframe> snippet (or a YouTube link) into a src field
+   extracts the URL and flips the media type to "embed" automatically. */
+document.addEventListener('paste', function (e) {
+  var input = e.target;
+  if (!input || input.name !== 'media_src') return;
+  var text = (e.clipboardData || window.clipboardData).getData('text') || '';
+  if (!/<iframe/i.test(text) && !/youtube\.com|youtu\.be/i.test(text)) return;
+  e.preventDefault();
+  input.value = normalizeEmbedSrc(text);
+  var typeSelect = input.closest('.admin__media-fields').querySelector('[name="media_type"]');
+  if (typeSelect) typeSelect.value = 'embed';
+});
 
 document.addEventListener('DOMContentLoaded', function () {
   initDragAndDrop();

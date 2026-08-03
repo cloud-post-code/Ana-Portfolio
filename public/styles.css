@@ -1955,6 +1955,17 @@ body.detail-pdf-modal-open {
   display: block;
 }
 
+.detail__embed .detail__html__frame {
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+  background: #0a0a0a;
+}
+
+.detail__embed .detail__html__iframe {
+  min-height: 0;
+  height: 100%;
+}
+
 .detail__html__link {
   font-size: 0.88rem;
   font-weight: 500;

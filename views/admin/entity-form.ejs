@@ -165,7 +165,9 @@ var adminTitle = isNew
               <div class="admin__media-item">
                 <span class="admin__media-drag" title="Drag to reorder">&#9776;</span>
                 <div class="admin__media-preview">
-                  <% if (m.type === 'html' || /\.html?$/i.test(m.src || '')) { %>
+                  <% if (m.type === 'embed') { %>
+                  <span class="admin__media-preview-html" title="Embed">EMBED</span>
+                  <% } else if (m.type === 'html' || /\.html?$/i.test(m.src || '')) { %>
                   <span class="admin__media-preview-html" title="HTML">HTML</span>
                   <% } else if (m.type === 'pdf' || /\.pdf$/i.test(m.src || '')) { %>
                   <span class="admin__media-preview-pdf" title="PDF">PDF</span>
@@ -181,6 +183,7 @@ var adminTitle = isNew
                   <select name="media_type">
                     <option value="image" <%= m.type === 'image' ? 'selected' : '' %>>Image</option>
                     <option value="html" <%= m.type === 'html' ? 'selected' : '' %>>HTML page</option>
+                    <option value="embed" <%= m.type === 'embed' ? 'selected' : '' %>>Embed (iframe link)</option>
                     <option value="pdf" <%= m.type === 'pdf' ? 'selected' : '' %>>PDF</option>
                     <option value="video-hover" <%= m.type === 'video-hover' ? 'selected' : '' %>>Video (hover play)</option>
                     <option value="video-still" <%= m.type === 'video-still' ? 'selected' : '' %>>Video (still frame)</option>
@@ -188,7 +191,7 @@ var adminTitle = isNew
                     <option value="audio" <%= m.type === 'audio' ? 'selected' : '' %>>Audio — paused on open</option>
                     <option value="audio-autoplay" <%= m.type === 'audio-autoplay' ? 'selected' : '' %>>Audio — play on open</option>
                   </select>
-                  <input type="text" name="media_src" value="<%= m.src %>" placeholder="File path" />
+                  <input type="text" name="media_src" value="<%= m.src %>" placeholder="File path or embed URL" />
                   <input type="text" name="media_alt" value="<%= m.alt %>" placeholder="Alt text" />
                 </div>
                 <button type="button" class="admin__media-remove" onclick="this.closest('.admin__media-item').remove()" title="Remove">&times;</button>
