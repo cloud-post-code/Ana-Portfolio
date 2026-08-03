@@ -1,0 +1,126 @@
+<div class="ask-search" id="askSearch" hidden>
+  <div class="ask-search__backdrop" data-ask-close></div>
+  <div class="ask-search__panel" role="dialog" aria-modal="true" aria-label="Ask AI about Ana's work">
+    <form class="ask-search__form" id="askSearchForm">
+      <svg class="ask-search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg>
+      <input id="askSearchInput" type="text" placeholder="Ask anything about Ana's work…" autocomplete="off" spellcheck="false" />
+      <button type="submit" class="ask-search__submit">Ask</button>
+      <button type="button" class="ask-search__close" aria-label="Close search" data-ask-close>&times;</button>
+    </form>
+    <p class="ask-search__status" id="askSearchStatus" hidden></p>
+    <div class="ask-search__results" id="askSearchResults"></div>
+  </div>
+</div>
+<script>
+(function () {
+  var NLWEB_BASE = 'https://nlweb-production-52c7.up.railway.app';
+  var overlay = document.getElementById('askSearch');
+  var toggle = document.getElementById('askSearchToggle');
+  var form = document.getElementById('askSearchForm');
+  var input = document.getElementById('askSearchInput');
+  var status = document.getElementById('askSearchStatus');
+  var results = document.getElementById('askSearchResults');
+  if (!overlay || !toggle) return;
+
+  var source = null;
+  var received = 0;
+
+  function open() {
+    overlay.hidden = false;
+    document.body.classList.add('ask-search-open');
+    requestAnimationFrame(function () { overlay.classList.add('ask-search--visible'); input.focus(); });
+  }
+
+  function close() {
+    stopStream();
+    overlay.classList.remove('ask-search--visible');
+    document.body.classList.remove('ask-search-open');
+    setTimeout(function () { overlay.hidden = true; }, 200);
+  }
+
+  function stopStream() {
+    if (source) { source.close(); source = null; }
+  }
+
+  function setStatus(text) {
+    status.hidden = !text;
+    status.textContent = text || '';
+  }
+
+  function addItems(items) {
+    items.forEach(function (item) {
+      if (!item || !item.url || !item.name) return;
+      if (results.querySelector('[data-url="' + CSS.escape(item.url) + '"]')) return;
+      var card = document.createElement('a');
+      card.className = 'ask-search__item';
+      card.href = item.url;
+      card.setAttribute('data-url', item.url);
+      card.setAttribute('data-score', item.score || 0);
+      var title = document.createElement('strong');
+      title.textContent = item.name;
+      card.appendChild(title);
+      if (item.description) {
+        var p = document.createElement('p');
+        p.textContent = item.description;
+        card.appendChild(p);
+      }
+      var placed = false;
+      var existing = results.children;
+      for (var i = 0; i < existing.length; i++) {
+        if ((Number(existing[i].getAttribute('data-score')) || 0) < (item.score || 0)) {
+          results.insertBefore(card, existing[i]);
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) results.appendChild(card);
+      received++;
+    });
+  }
+
+  function ask(query) {
+    stopStream();
+    results.innerHTML = '';
+    received = 0;
+    setStatus('Asking…');
+    var url = NLWEB_BASE + '/ask?query=' + encodeURIComponent(query) + '&site=ana-portfolio';
+    source = new EventSource(url);
+    var timer = setTimeout(function () { finish(); }, 60000);
+
+    function finish() {
+      clearTimeout(timer);
+      stopStream();
+      setStatus(received ? '' : "No matches found — try asking about Ana's projects, experience, or skills.");
+    }
+
+    source.onmessage = function (ev) {
+      var msg;
+      try { msg = JSON.parse(ev.data); } catch (e) { return; }
+      if (msg.message_type === 'result' && Array.isArray(msg.content)) {
+        addItems(msg.content);
+        if (received) setStatus('');
+      } else if (msg.message_type === 'end-nlweb-response' || msg.message_type === 'complete') {
+        finish();
+      }
+    };
+    source.onerror = function () {
+      // Stream closed by server (normal end) or network failure
+      if (source && source.readyState === EventSource.CLOSED) finish();
+      else if (!received) { finish(); setStatus('Something went wrong — please try again.'); }
+    };
+  }
+
+  toggle.addEventListener('click', open);
+  overlay.addEventListener('click', function (ev) {
+    if (ev.target.hasAttribute('data-ask-close')) close();
+  });
+  document.addEventListener('keydown', function (ev) {
+    if (ev.key === 'Escape' && !overlay.hidden) close();
+  });
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var q = input.value.trim();
+    if (q) ask(q);
+  });
+})();
+</script>
